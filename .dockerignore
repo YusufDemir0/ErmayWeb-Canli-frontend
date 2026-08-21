@@ -1,0 +1,24 @@
+# Dependencies & Build artifacts
+node_modules
+.next
+out
+build
+dist
+
+# Environment variables
+.env*.local
+.env.production
+.env
+
+# Git & IDE files
+.git
+.gitignore
+.vscode
+.idea
+*.log
+
+# Docker & OS files
+Dockerfile*
+docker-compose*.yml
+.DS_Store
+Thumbs.db

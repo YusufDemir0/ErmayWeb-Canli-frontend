@@ -1,0 +1,134 @@
+'use client';
+
+import React, { useState } from 'react';
+import Hero from '../components/Hero';
+import BrandStrip from '../components/BrandStrip';
+import CategoryList from '../components/CategoryList';
+import CuratedSets from '../components/CuratedSets';
+import PromoBannerGrid from '../components/PromoBannerGrid';
+import ProductCard from '../components/ProductCard';
+import { useCMSStore } from '../stores/useCMSStore';
+import { Sparkles, Package, Flame, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+
+export default function HomePage() {
+  const products = useCMSStore((state) => state.products);
+  const homeConfig = useCMSStore((state) => state.homeConfig);
+
+  const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'new'>('featured');
+
+  const featuredProducts = products.filter((p) => p.badge?.includes('Öne Çıkan') || p.rating >= 4.8);
+  const newArrivals = products.slice(0, 8);
+
+  const displayedProducts = activeTab === 'all' 
+    ? products.slice(0, 8) 
+    : activeTab === 'featured' 
+      ? (featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : products.slice(0, 8))
+      : newArrivals;
+
+  return (
+    <div className="w-full bg-[#FCFAF6] text-neutral-800">
+      
+      {/* 1. HERO SLIDER BANNER */}
+      <Hero />
+
+      {/* 2. MINIMALIST LUXURY TRUST STRIP */}
+      <BrandStrip />
+
+      {/* 3. COLLECTION CATEGORIES QUICK SELECTOR */}
+      <CategoryList />
+
+      {/* 4. CURATED FACTORY SETS (Fabrikadan Takım Kombinasyonları) */}
+      <CuratedSets />
+
+      {/* 5. PROMO EDITORIAL BANNERS */}
+      <PromoBannerGrid />
+
+      {/* 6. TABBED COLLECTION SHOWCASE */}
+      <section className="py-14 md:py-20 bg-white border-b border-[#EAE3D2]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          
+          {/* Header with Category Tabs */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#EAE3D2] pb-6">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A880] block">
+                Zanaat & Tasarım
+              </span>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">
+                {homeConfig.featuredTitle || 'Seçkin Mobilya Koleksiyonu'}
+              </h2>
+            </div>
+
+            {/* Showcase Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+              {[
+                { id: 'featured', label: 'Öne Çıkanlar', icon: Flame },
+                { id: 'new', label: 'Yeni Tasarımlar', icon: Sparkles },
+                { id: 'all', label: 'Tüm Koleksiyon', icon: Package },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as 'all' | 'featured' | 'new')}
+                    className={`px-4 py-2 rounded-xs text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer flex-shrink-0 ${
+                      isActive
+                        ? 'bg-[#C5A880] text-white shadow-xs'
+                        : 'bg-[#FAF8F5] text-neutral-700 hover:bg-[#F4EFE6] border border-[#EAE3D2]'
+                    }`}
+                  >
+                    <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-[#C5A880]'}`} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {displayedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {/* View Catalog Button */}
+          <div className="text-center pt-4">
+            <Link
+              href="/katalog"
+              className="inline-flex items-center gap-2.5 border border-[#C5A880] text-[#B4966E] hover:bg-[#C5A880] hover:text-white text-xs font-bold tracking-widest uppercase py-3.5 px-8 transition-all rounded-xs shadow-xs"
+            >
+              <span>2026 Kataloğunu İnceleyin</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. DIRECT FACTORY MANUFACTURING & SALES BANNER */}
+      <section className="relative py-16 md:py-20 bg-[#F7F4EE] border-b border-[#EAE3D2] overflow-hidden text-neutral-800">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5">
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A880] block">
+            Kendi İmalatımız & Fabrikadan Satış
+          </span>
+          <h2 className="font-serif text-2xl md:text-4xl font-bold tracking-tight max-w-3xl mx-auto text-neutral-900 leading-tight">
+            Aracısız, Birinci Sınıf Malzeme ve Usta İmalatı
+          </h2>
+          <p className="text-neutral-600 font-light text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
+            Ermay Mobilya kendi üretim tesislerinde imal ettiği kaliteli ev ve ofis mobilyalarını doğrudan tüketiciyle ve bayileriyle buluşturur.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/iletisim"
+              className="inline-block bg-neutral-900 hover:bg-[#C5A880] text-white font-bold text-xs tracking-widest uppercase py-3.5 px-8 rounded-xs shadow-xs transition-all"
+            >
+              Fabrikadan Satış & İletişim
+            </Link>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+}
