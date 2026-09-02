@@ -164,6 +164,8 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
     const customizedProduct = {
       ...product,
       selectedColor: selectedSwatch.name,
+      selectedVariant: selectedSwatch.id || selectedSwatch.name,
+      variantId: selectedSwatch.id || undefined,
     };
     addToCart(customizedProduct, quantity);
     setAddedToCartSuccess(true);
@@ -174,6 +176,8 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
     const customizedProduct = {
       ...product,
       selectedColor: selectedSwatch.name,
+      selectedVariant: selectedSwatch.id || selectedSwatch.name,
+      variantId: selectedSwatch.id || undefined,
     };
     addToCart(customizedProduct, quantity);
     router.push('/odeme');

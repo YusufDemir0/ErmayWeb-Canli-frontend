@@ -35,7 +35,7 @@ export const ReceiptUploadModal: React.FC<ReceiptUploadModalProps> = ({
       setErrorMessage('');
 
       try {
-        const url = await uploadProductImage(file);
+        const url = await uploadProductImage(file, true);
         setFileUrl(url);
       } catch (err) {
         setErrorMessage('Dekont dosyası yüklenemedi. Lütfen tekrar deneyiniz.');

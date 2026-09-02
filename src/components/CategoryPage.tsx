@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { 
   SlidersHorizontal, Star, ShoppingBag, Eye, Heart, 
   ChevronRight, X, Check, Filter, RotateCcw 
@@ -21,11 +22,15 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   categorySlug,
   initialProducts = [],
 }) => {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams ? searchParams.get('search') : null;
+
   const firebaseProducts = useCMSStore((state) => state.products);
   const firebaseCategories = useCMSStore((state) => state.categories);
   const allProducts = firebaseProducts.length > 0 ? firebaseProducts : initialProducts;
   
-  const searchQuery = useUIStore((state) => state.searchQuery);
+  const uiSearchQuery = useUIStore((state) => state.searchQuery);
+  const effectiveSearch = (urlSearch !== null && urlSearch !== undefined ? urlSearch : uiSearchQuery).trim().toLowerCase();
   const isFavorite = useFavoritesStore((state) => state.isFavorite);
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
   const addToCart = useCartStore((state) => state.addToCart);
@@ -84,9 +89,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
 
     // 2. Matches search query
     const matchesSearch =
-      !searchQuery ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      !effectiveSearch ||
+      p.name.toLowerCase().includes(effectiveSearch) ||
+      (p.description && p.description.toLowerCase().includes(effectiveSearch)) ||
+      (p.material && p.material.toLowerCase().includes(effectiveSearch));
 
     // 3. Price inputs
     const matchesMin = appliedMinPrice === '' || p.price >= appliedMinPrice;

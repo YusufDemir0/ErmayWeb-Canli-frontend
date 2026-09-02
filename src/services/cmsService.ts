@@ -108,4 +108,29 @@ export const cmsService = {
       return null;
     }
   },
+
+  async getCorporateConfig(): Promise<any> {
+    try {
+      const response = await apiClient.get('/cms');
+      if (response.data?.success && response.data.cms?.corporate_config) {
+        return response.data.cms.corporate_config;
+      }
+    } catch {
+      // Fallback to default
+    }
+    return null;
+  },
+
+  async getStores(): Promise<any[]> {
+    try {
+      const response = await apiClient.get('/stores');
+      if (response.data?.success && Array.isArray(response.data.stores) && response.data.stores.length > 0) {
+        return response.data.stores;
+      }
+    } catch {
+      // Fallback
+    }
+    return [];
+  },
 };
+

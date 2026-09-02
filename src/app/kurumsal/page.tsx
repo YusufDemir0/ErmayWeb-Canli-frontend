@@ -1,22 +1,65 @@
-'use client';
-
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Award, ShieldCheck, Building2, CheckCircle, Hammer, Truck } from 'lucide-react';
-import { useCMSStore } from '../../stores/useCMSStore';
 
-export default function KurumsalPage() {
-  const corporateConfig = useCMSStore((state) => state.corporateConfig);
+import { cmsService } from '../../services/cmsService';
 
-  // Extract paragraphs from unified storyContent or fallback to legacy paragraphs
-  const paragraphs = corporateConfig.storyContent
-    ? corporateConfig.storyContent.split('\n').map((p) => p.trim()).filter(Boolean)
-    : [corporateConfig.storyParagraph1, corporateConfig.storyParagraph2].filter(Boolean) as string[];
+export const revalidate = 60; // ISR
+
+export const metadata: Metadata = {
+  title: 'Hakkımızda & İmalat Gücümüz | Ermay Mobilya Modoko',
+  description: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen %100 masif fırınlanmış gürgen iskeletli lüks ev ve ofis mobilyaları. İmalat felsefemiz ve üretim standartlarımız.',
+  keywords: 'ermay mobilya hakkında, modoko mobilya üreticisi, masif mobilya atölyesi, kaliteli ofis mobilyası imalatı',
+  openGraph: {
+    title: 'Hakkımızda & İmalat Gücümüz | Ermay Mobilya',
+    description: '40 yıllık ahşap ustalığı ve modern İtalyan çizgisiyle doğrudan fabrikadan satış güvencesi.',
+    url: 'https://ermaymobilya.com/kurumsal',
+    siteName: 'Ermay Mobilya',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+        width: 1200,
+        height: 800,
+        alt: 'Ermay Mobilya Atölyesi',
+      },
+    ],
+    locale: 'tr_TR',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://ermaymobilya.com/kurumsal',
+  },
+};
+
+const DEFAULT_CORP_DATA = {
+  heroBadge: '40 YILLIK TECRÜBE',
+  heroTitle: 'Geleneksel Ahşap Ustalığı,',
+  heroHighlight: 'Modern İtalyan Çizgisi.',
+  heroSubtitle: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen lüks ev ve ofis mobilyaları.',
+  experienceYears: '40+ Yıl',
+  experienceSubtitle: 'Kesintisiz İmalat Güvencesi',
+  storyImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+  storyTitle: 'İmalat Felsefemiz ve Zanaat Geleneğimiz',
+  storyContent: `Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün modern üretim tesisleri ve geniş satış ağı ile sürdürmektedir.\n\nHer bir parçada kullanılan %100 fırınlanmış gürgen ağacı, birinci sınıf çelik konstrüksiyon ve hakiki döşemelik kumaşlar, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.`,
+  visionTitle: 'İmalat Vizyonumuz',
+  visionText: 'Estetik ve ergonomiyi en yüksek malzeme kalitesiyle buluşturarak uzun ömürlü ve zamansız mobilyalar üretmek.',
+  missionTitle: 'Üretim Standartlarımız',
+  missionText: 'Her parçada fırınlanmış gürgen iskelet, leke tutmaz birinci sınıf kumaş ve yüksek dansiteli sünger kullanımı.',
+};
+
+export default async function KurumsalPage() {
+  const remoteConfig = await cmsService.getCorporateConfig();
+  const corporateConfig = remoteConfig ? { ...DEFAULT_CORP_DATA, ...remoteConfig } : DEFAULT_CORP_DATA;
+
+  const paragraphs = (corporateConfig.storyContent || DEFAULT_CORP_DATA.storyContent)
+    .split('\n')
+    .map((p: string) => p.trim())
+    .filter(Boolean);
 
   return (
     <div className="w-full bg-[#FAF8F5] min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Breadcrumb Navigation */}
         <nav className="text-xs text-neutral-400 font-light flex items-center gap-2 mb-8">
           <Link href="/" className="hover:text-[#C5A880] transition-colors">Ana Sayfa</Link>
@@ -30,7 +73,7 @@ export default function KurumsalPage() {
         <div className="relative bg-white text-neutral-900 rounded-sm overflow-hidden p-8 md:p-14 mb-12 border border-[#EAE3D2] shadow-2xs">
           <div className="max-w-3xl">
             <span className="inline-block bg-[#FAF8F5] text-[#8A4B20] font-bold text-[10px] uppercase tracking-[0.3em] px-3 py-1 rounded-xs mb-4 border border-[#EAE3D2]">
-              {corporateConfig.heroBadge || 'ERMAY MOBİLYA • İMALAT VE SATIŞ'}
+              {corporateConfig.heroBadge}
             </span>
             <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight uppercase leading-tight mb-6 text-neutral-900">
               {corporateConfig.heroTitle} <span className="text-[#C5A880]">{corporateConfig.heroHighlight}</span>
@@ -47,15 +90,15 @@ export default function KurumsalPage() {
           <div className="lg:col-span-5 relative">
             <div className="aspect-[4/3] rounded-xs overflow-hidden shadow-md border border-[#EAE3D2]">
               <img
-                src={corporateConfig.storyImage || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'}
+                src={corporateConfig.storyImage}
                 alt="Ermay Mobilya Atölyesi"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col bg-[#C5A880] text-white p-6 rounded-xs shadow-xl font-bold max-w-xs">
-              <span className="text-3xl font-extrabold">{corporateConfig.experienceYears || '30+ Yıl'}</span>
+              <span className="text-3xl font-extrabold">{corporateConfig.experienceYears}</span>
               <span className="text-xs uppercase tracking-wider font-semibold mt-1">
-                {corporateConfig.experienceSubtitle || 'Kesintisiz İmalat Güvencesi'}
+                {corporateConfig.experienceSubtitle}
               </span>
             </div>
           </div>
@@ -63,7 +106,7 @@ export default function KurumsalPage() {
           {/* Story Text Content */}
           <div className="lg:col-span-7 space-y-5 text-neutral-700 font-light leading-relaxed text-xs md:text-sm">
             <h2 className="text-xl md:text-2xl font-serif font-bold tracking-wide text-neutral-900 uppercase border-l-4 border-[#C5A880] pl-4">
-              {corporateConfig.storyTitle || 'İmalat Felsefemiz ve Zanaat Geleneğimiz'}
+              {corporateConfig.storyTitle}
             </h2>
 
             {paragraphs.map((para, pIdx) => (
@@ -99,20 +142,20 @@ export default function KurumsalPage() {
           <div className="bg-white p-8 rounded-sm border border-[#EAE3D2] shadow-2xs text-center">
             <Building2 className="h-10 w-10 text-[#C5A880] mx-auto mb-4 stroke-[1.5]" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-2">
-              {corporateConfig.visionTitle || 'İmalat Vizyonumuz'}
+              {corporateConfig.visionTitle}
             </h3>
             <p className="text-xs text-neutral-500 font-light leading-relaxed">
-              {corporateConfig.visionText || 'Estetik ve ergonomiyi en yüksek malzeme kalitesiyle buluşturarak uzun ömürlü mobilyalar üretmek.'}
+              {corporateConfig.visionText}
             </p>
           </div>
 
           <div className="bg-white p-8 rounded-sm border border-[#EAE3D2] shadow-2xs text-center">
             <Award className="h-10 w-10 text-[#C5A880] mx-auto mb-4 stroke-[1.5]" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-2">
-              {corporateConfig.missionTitle || 'Üretim Standartlarımız'}
+              {corporateConfig.missionTitle}
             </h3>
             <p className="text-xs text-neutral-500 font-light leading-relaxed">
-              {corporateConfig.missionText || 'Her parçada fırınlanmış gürgen iskelet, leke tutmaz birinci sınıf kumaş ve yüksek dansiteli sünger kullanımı.'}
+              {corporateConfig.missionText}
             </p>
           </div>
 
@@ -126,7 +169,6 @@ export default function KurumsalPage() {
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );

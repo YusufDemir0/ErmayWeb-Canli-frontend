@@ -2,14 +2,18 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ermayweb_jwt_secret_key_2026';
-const secretKey = new TextEncoder().encode(JWT_SECRET);
+const rawJwtSecret = process.env.JWT_SECRET;
+if (!rawJwtSecret && process.env.NODE_ENV === 'production') {
+  console.error('[SECURITY FATAL] JWT_SECRET is missing from environment variables!');
+}
+
+const secretKey = rawJwtSecret ? new TextEncoder().encode(rawJwtSecret) : null;
 
 /**
  * Edge-compatible Cryptographic JWT Verification using 'jose'
  */
 async function verifyAdminJwt(token?: string): Promise<{ valid: boolean; role?: string }> {
-  if (!token || typeof token !== 'string') return { valid: false };
+  if (!token || typeof token !== 'string' || !secretKey) return { valid: false };
 
   try {
     const { payload } = await jwtVerify(token, secretKey);

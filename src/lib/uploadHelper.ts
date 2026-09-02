@@ -6,13 +6,16 @@ const SERVER_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 /**
  * Enterprise Secure File Upload (Magic bytes & Binary Image validation)
  */
-export async function uploadProductImage(file: File): Promise<string> {
+export async function uploadProductImage(file: File, isPrivate: boolean = false): Promise<string> {
   // 1. Send multipart payload to Backend REST API /api/v1/upload
   try {
     const formData = new FormData();
     formData.append('file', file);
+    if (isPrivate) {
+      formData.append('isPrivate', 'true');
+    }
 
-    const res = await apiClient.post('/upload', formData, {
+    const res = await apiClient.post(`/upload${isPrivate ? '?isPrivate=1' : ''}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

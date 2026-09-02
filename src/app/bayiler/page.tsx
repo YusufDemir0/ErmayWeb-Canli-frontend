@@ -1,18 +1,45 @@
-'use client';
-
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Store, ExternalLink } from 'lucide-react';
-import { useCMSStore } from '../../stores/useCMSStore';
+import { DEFAULT_STORES } from '../../stores/useCMSStore';
+import { cmsService } from '../../services/cmsService';
 
-export default function BayilerPage() {
-  const stores = useCMSStore((state) => state.stores) || [];
-  const activeStores = stores.filter((s) => s.isActive !== false);
+export const revalidate = 60; // ISR
+
+export const metadata: Metadata = {
+  title: 'Satış Noktaları & Mağazalarımız | Ermay Mobilya Modoko',
+  description: 'Ermay Mobilya Modoko merkez showroom, Kocaeli fabrika satış mağazası ve Sakarya mağazalarımızın adres, telefon ve çalışma saatleri. Doğrudan üreticiden satış.',
+  keywords: 'ermay mobilya mağazaları, modoko mobilya mağazası, kocaeli mobilya, sakarya mobilya, mobilya fabrikadan satış noktaları',
+  openGraph: {
+    title: 'Satış Noktaları & Mağazalarımız | Ermay Mobilya',
+    description: 'Ermay Mobilya mağazalarını ziyaret edin, mobilya ve malzeme kalitesini yakından deneyimleyin.',
+    url: 'https://ermaymobilya.com/bayiler',
+    siteName: 'Ermay Mobilya',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+        width: 1200,
+        height: 800,
+        alt: 'Ermay Mobilya Modoko Mağazası',
+      },
+    ],
+    locale: 'tr_TR',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://ermaymobilya.com/bayiler',
+  },
+};
+
+export default async function BayilerPage() {
+  const remoteStores = await cmsService.getStores();
+  const allStores = remoteStores && remoteStores.length > 0 ? remoteStores : DEFAULT_STORES;
+  const activeStores = allStores.filter((s: any) => s.isActive !== false);
 
   return (
     <div className="w-full bg-[#FAF8F5] min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Breadcrumbs */}
         <nav className="text-xs text-neutral-400 font-light flex items-center gap-2 mb-8">
           <Link href="/" className="hover:text-[#C5A880] transition-colors">Ana Sayfa</Link>
@@ -134,7 +161,6 @@ export default function BayilerPage() {
             Bayilik & İletişim Talebi
           </Link>
         </div>
-
       </div>
     </div>
   );

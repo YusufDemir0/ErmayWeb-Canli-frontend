@@ -287,17 +287,19 @@ export default function CheckoutPage() {
       try {
         const cleanNum = (cardNumber || '').replace(/\s+/g, '');
         const [expMonth, expYear] = (cardExpiry || '12/28').split('/');
+        const selectedCard = userSavedCards.find((c) => c.id === selectedSavedCardId);
 
         const paymentPayload = {
           orderId: createdOrderId,
           conversationId: `CONV-${createdOrderId}`,
           totalAmount: finalAmount,
           installment: Number(selectedInstallment || 1),
-          cardHolderName: (cardHolder || user.name).trim(),
-          cardNumber: cleanNum,
-          expireMonth: expMonth || '12',
-          expireYear: expYear ? `20${expYear.slice(-2)}` : '2028',
-          cvv: (cardCvv || '000').trim(),
+          savedCardId: useSavedCard ? selectedSavedCardId : undefined,
+          cardHolderName: (useSavedCard ? (selectedCard?.cardHolder || user.name) : (cardHolder || user.name)).trim(),
+          cardNumber: useSavedCard ? undefined : cleanNum,
+          expireMonth: useSavedCard ? undefined : (expMonth || '12'),
+          expireYear: useSavedCard ? undefined : (expYear ? `20${expYear.slice(-2)}` : '2028'),
+          cvv: useSavedCard ? undefined : (cardCvv || '000').trim(),
           basketItems: cart.map((item) => ({
             id: item.product.id,
             name: item.product.name,

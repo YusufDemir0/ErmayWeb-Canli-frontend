@@ -111,7 +111,12 @@ export const useOrderStore = create<OrderState>()(
       createOrderAsync: async (orderData) => {
         try {
           const response = await apiClient.post('/orders', {
-            items: orderData.items.map((i) => ({ productId: i.product.id, quantity: i.quantity, price: i.price })),
+            items: orderData.items.map((i) => ({
+              productId: i.product.id,
+              variantId: i.product.variantId || undefined,
+              quantity: i.quantity,
+              price: i.price,
+            })),
             shippingAddress: orderData.shippingAddress,
             invoiceType: orderData.invoiceDetails?.invoiceType || 'INDIVIDUAL',
             tcKn: orderData.invoiceDetails?.tcKn,

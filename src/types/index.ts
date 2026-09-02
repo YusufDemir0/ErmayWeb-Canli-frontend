@@ -55,6 +55,8 @@ export interface Product {
   setPieces?: ProductSetPiece[]; // Yapılandırılmış Takım Parçaları
   colors?: ProductColorVariant[]; // Renk Seçenekleri & Görselleri
   selectedColor?: string; // Cart selection
+  selectedVariant?: string; // Cart variant selection
+  variantId?: string; // Cart variant ID
   inStock?: boolean;
   salesCount?: number;
   vatRate?: number;

@@ -142,8 +142,8 @@ function AccountPageContent() {
     }
 
     const nationalDigits = profilePhone.replace(/^\+\d+\s*/, '').replace(/\D/g, '');
-    if (nationalDigits.length !== 10) {
-      setProfileErrorMsg('Telefon numarası alan kodu hariç tam 10 haneli olmalıdır. (Örn: 5321234567)');
+    if (nationalDigits.length < 8 || nationalDigits.length > 15) {
+      setProfileErrorMsg('Lütfen geçerli bir telefon numarası giriniz (8-15 hane arası).');
       return;
     }
 

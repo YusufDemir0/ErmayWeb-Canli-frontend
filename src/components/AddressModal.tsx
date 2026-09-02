@@ -58,8 +58,8 @@ export const AddressModal: React.FC<AddressModalProps> = ({
       return;
     }
 
-    if (phoneDigits.length !== 10) {
-      setErrorMsg('Telefon numarası alan kodu hariç 10 haneli olmalıdır. (Örn: 5321234567)');
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      setErrorMsg('Lütfen geçerli bir telefon numarası giriniz (8-15 hane arası).');
       return;
     }
 
