@@ -256,9 +256,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   },
 ];
 
-export const useCMSStore = create<CMSState>()(
-  persist(
-    (set, get) => ({
+export const useCMSStore = create<CMSState>()((set, get) => ({
       tickerItems: DEFAULT_TICKER,
       campaignPopup: DEFAULT_POPUP,
       contactInfo: DEFAULT_CONTACT,
@@ -486,9 +484,5 @@ export const useCMSStore = create<CMSState>()(
         set({ corporateConfig: updated });
         apiClient.put('/cms/corporate_config', { content: updated }).catch((e) => console.warn(e));
       }
-    }),
-    {
-      name: 'ermay_cms_store',
-    }
-  )
+    })
 );

@@ -61,9 +61,7 @@ const DEFAULT_COUPONS: DiscountCoupon[] = [
   },
 ];
 
-export const useDiscountStore = create<DiscountState>()(
-  persist(
-    (set, get) => ({
+export const useDiscountStore = create<DiscountState>()((set, get) => ({
       coupons: DEFAULT_COUPONS,
       isLoading: false,
 
@@ -239,9 +237,5 @@ export const useDiscountStore = create<DiscountState>()(
         );
         set({ coupons: updated });
       },
-    }),
-    {
-      name: 'ermay_discount_coupons_store',
-    }
-  )
+    })
 );

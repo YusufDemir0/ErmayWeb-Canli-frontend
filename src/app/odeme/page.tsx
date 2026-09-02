@@ -292,20 +292,12 @@ export default function CheckoutPage() {
         const paymentPayload = {
           orderId: createdOrderId,
           conversationId: `CONV-${createdOrderId}`,
-          totalAmount: finalAmount,
           installment: Number(selectedInstallment || 1),
-          savedCardId: useSavedCard ? selectedSavedCardId : undefined,
-          cardHolderName: (useSavedCard ? (selectedCard?.cardHolder || user.name) : (cardHolder || user.name)).trim(),
-          cardNumber: useSavedCard ? undefined : cleanNum,
-          expireMonth: useSavedCard ? undefined : (expMonth || '12'),
-          expireYear: useSavedCard ? undefined : (expYear ? `20${expYear.slice(-2)}` : '2028'),
-          cvv: useSavedCard ? undefined : (cardCvv || '000').trim(),
-          basketItems: cart.map((item) => ({
-            id: item.product.id,
-            name: item.product.name,
-            category1: typeof item.product.category === 'object' ? (item.product.category as { name?: string }).name || 'Mobilya' : String(item.product.category || 'Mobilya'),
-            price: Number(item.product.price) * item.quantity,
-          })),
+          cardHolderName: (cardHolder || user.name).trim(),
+          cardNumber: cleanNum,
+          expireMonth: expMonth || '12',
+          expireYear: expYear ? `20${expYear.slice(-2)}` : '2028',
+          cvv: (cardCvv || '').trim(),
         };
 
         const paymentRes = await apiClient.post('/payments/process', paymentPayload);

@@ -88,9 +88,7 @@ interface OrderState {
   getUserOrders: (userId: string) => Order[];
 }
 
-export const useOrderStore = create<OrderState>()(
-  persist(
-    (set, get) => ({
+export const useOrderStore = create<OrderState>()((set, get) => ({
       orders: [],
       isLoading: false,
 
@@ -166,9 +164,5 @@ export const useOrderStore = create<OrderState>()(
       getUserOrders: (userId) => {
         return get().orders.filter((o) => o.userId === userId);
       }
-    }),
-    {
-      name: 'ermay_orders_store',
-    }
-  )
+    })
 );

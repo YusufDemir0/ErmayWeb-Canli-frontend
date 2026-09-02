@@ -175,7 +175,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
                 onChange={(e) =>
                   setLocalCorpConfig({ ...localCorpConfig, storyContent: e.target.value })
                 }
-                placeholder="1995 yılından bu yana kendi üretim tesislerimizde fırınlanmış gürgen ağacını, yüksek dansiteli süngeri ve birinci sınıf döşemeleri harmanlayarak..."
+                placeholder="1986 yılından bu yana kendi üretim tesislerimizde fırınlanmış gürgen ağacını, yüksek dansiteli süngeri ve birinci sınıf döşemeleri harmanlayarak..."
                 className="w-full text-xs border border-neutral-300 p-3 rounded-xs bg-white leading-relaxed focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
               />
             </div>

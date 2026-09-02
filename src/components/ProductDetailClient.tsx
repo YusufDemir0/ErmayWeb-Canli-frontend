@@ -13,6 +13,7 @@ import { useCMSStore } from '../stores/useCMSStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { productService } from '../services/productService';
+import apiClient from '../services/api';
 import { getProductImages } from '../lib/productImages';
 import type { Product, ProductColorVariant, ProductSetPiece } from '../types';
 import ProductCard from './ProductCard';
@@ -51,7 +52,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'reviews' | 'payment' | 'delivery'>('desc');
 
   // Customer Reviews State
-  const [reviews, setReviews] = useState([
+  const [reviews, setReviews] = useState<Array<{ id: string; name: string; rating: number; date: string; comment: string }>>([
     { id: 'rev-1', name: 'Murat K.', rating: 5, date: '12 Şubat 2026', comment: 'İmalat kalitesi ve malzeme işçiliği kusursuz. Doğrudan fabrikadan gelmesi ve montaj ekibinin titizliği çok memnun etti.' },
     { id: 'rev-2', name: 'Selin A.', rating: 5, date: '28 Ocak 2026', comment: 'Döşeme kumaşı ve iskelet dayanımı fotoğraflardan çok daha kaliteli duruyor. Tam istediğimiz ölçülerde teslim edildi.' },
   ]);
@@ -59,6 +60,25 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Fetch real reviews from Backend REST API
+  useEffect(() => {
+    if (!product?.id) return;
+    apiClient.get(`/reviews/product/${product.id}`)
+      .then((res) => {
+        if (res.data?.success && Array.isArray(res.data.reviews) && res.data.reviews.length > 0) {
+          const mapped = res.data.reviews.map((r: any) => ({
+            id: r.id,
+            name: r.userName || 'Müşteri',
+            rating: r.rating || 5,
+            date: new Date(r.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
+            comment: r.comment,
+          }));
+          setReviews(mapped);
+        }
+      })
+      .catch(() => {});
+  }, [product?.id]);
 
   // Hover Lens Zoom States
   const [isZoomed, setIsZoomed] = useState(false);
@@ -183,9 +203,10 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
     router.push('/odeme');
   };
 
-  const handleAddReview = (e: React.FormEvent) => {
+  const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReviewName.trim() || !newReviewComment.trim()) return;
+
     const rev = {
       id: `rev-${Date.now()}`,
       name: newReviewName.trim(),
@@ -193,11 +214,28 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
       date: 'Bugün',
       comment: newReviewComment.trim(),
     };
+
+    // Optimistic UI update
     setReviews([rev, ...reviews]);
+    const submittedName = newReviewName.trim();
+    const submittedComment = newReviewComment.trim();
+    const submittedRating = newReviewRating;
+
     setNewReviewName('');
     setNewReviewComment('');
     setReviewSubmitted(true);
     setTimeout(() => setReviewSubmitted(false), 4000);
+
+    try {
+      await apiClient.post('/reviews', {
+        productId: product.id,
+        userName: submittedName,
+        rating: submittedRating,
+        comment: submittedComment,
+      });
+    } catch (err) {
+      console.warn('Yorum sunucuya iletilemedi:', err);
+    }
   };
 
   const productCatSlug = typeof product.category === 'object' && product.category !== null 

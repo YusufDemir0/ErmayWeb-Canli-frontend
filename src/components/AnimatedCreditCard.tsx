@@ -141,8 +141,8 @@ export const AnimatedCreditCard: React.FC<AnimatedCreditCardProps> = ({
           </div>
 
           {/* Fine Print / Contact Notice */}
-          <div className="text-[8px] text-neutral-500 leading-relaxed font-light">
-            Bu kart Ermay Mobilya Sanayi tarafından düzenlenmiş sahte bir ödeme simülasyonudur. Müşteri hizmetleri: 0532 419 41 51 • www.ermaymobilya.com
+          <div className="text-[8px] text-neutral-400 leading-relaxed font-light">
+            Ermay Mobilya Güvenli Ödeme Altyapısı • 256-Bit SSL ve 3D Secure Güvencesiyle Korunmaktadır. Müşteri Destek: 0532 419 41 51 • www.ermaymobilya.com
           </div>
         </div>
       </div>
