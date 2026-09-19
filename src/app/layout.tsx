@@ -7,6 +7,7 @@ import { Footer } from '../components/Footer';
 import CartDrawer from '../components/CartDrawer';
 import FavoritesDrawer from '../components/FavoritesDrawer';
 import ProductQuickView from '../components/ProductQuickView';
+import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import '../index.css';
 
 // Optimize Inter (Modern Sans for UI & body)
@@ -25,9 +26,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'ERMAY Ofis & Ev Mobilyaları | Lüks Tasarım, Atölye Üretimi & Zanaat',
-  description: 'Ermay Mobilya - Kendi üretim tesislerimizde imal edilen lüks makam takımları, yemek odaları, oturma grupları ve takım kombinasyonları.',
-  keywords: 'ermay mobilya, ofis mobilyası, makam takımı, sekreter takımı, kanepe takımı, ofis koltuğu, lüks mobilya, istanbul mobilya, modoko mobilya',
+  title: 'ERMAY Mobilya | Modoko Masif Ahşap & Atölye İmalatı',
+  description: 'Ermay Mobilya - Modoko atölyelerimizde 40 yıllık ustalıkla imal edilen masif ahşap koltuk takımları, yemek odaları, makam takımları ve TV üniteleri. Kendi aracımızla adrese teslim ve montaj.',
+  keywords: 'ermay mobilya, masif ahşap, modoko mobilya, koltuk takımı, yemek odası, makam takımı, ahşap atölyesi, istanbul mobilya teslimat',
 };
 
 export default function RootLayout({
@@ -45,6 +46,7 @@ export default function RootLayout({
           <CartDrawer />
           <FavoritesDrawer />
           <ProductQuickView />
+          <FloatingWhatsApp />
         </AppInitializer>
       </body>
     </html>

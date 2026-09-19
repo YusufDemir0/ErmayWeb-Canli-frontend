@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Product, Category, StoreItem } from '../types';
+import type { Product, Category, StoreItem, SocialLinksConfig } from '../types';
 import { PRODUCTS } from '../data/mockData';
 import apiClient from '../services/api';
 
@@ -106,7 +106,20 @@ interface CMSState {
   // Home & Corporate CMS Actions
   updateHomeConfig: (config: Partial<HomeConfig>) => void;
   updateCorporateConfig: (config: Partial<CorporateConfig>) => void;
+
+  // Social Links
+  socialLinks: SocialLinksConfig;
+  updateSocialLinks: (config: Partial<SocialLinksConfig>) => void;
 }
+
+export const DEFAULT_SOCIAL_LINKS: SocialLinksConfig = {
+  instagram: 'https://instagram.com/ermaymobilya',
+  youtube: 'https://youtube.com/@ermaymobilya',
+  telegram: 'https://t.me/ErmayMobilya',
+  whatsapp: '905324194151',
+  facebook: 'https://facebook.com/ermaymobilya',
+  tiktok: 'https://tiktok.com/@ermaymobilya',
+};
 
 const DEFAULT_TICKER = [
   '• ÜCRETSİZ KARGO & MONTAJ',
@@ -265,6 +278,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
       stores: DEFAULT_STORES,
       homeConfig: DEFAULT_HOME_CONFIG,
       corporateConfig: DEFAULT_CORPORATE_CONFIG,
+      socialLinks: DEFAULT_SOCIAL_LINKS,
       isLoading: false,
 
       fetchCmsBlocks: async () => {
@@ -277,6 +291,9 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
               tickerItems: cms.ticker_items || get().tickerItems,
               campaignPopup: cms.campaign_popup || get().campaignPopup,
               contactInfo: cms.contact_info || get().contactInfo,
+              socialLinks: cms.social_links
+                ? { ...DEFAULT_SOCIAL_LINKS, ...(cms.social_links as SocialLinksConfig) }
+                : get().socialLinks,
               homeConfig: cms.home_config
                 ? { ...get().homeConfig, ...cms.home_config }
                 : cms.home_hero
@@ -295,6 +312,14 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         } finally {
           set({ isLoading: false });
         }
+      },
+
+      updateSocialLinks: (config) => {
+        set((state) => {
+          const updated = { ...state.socialLinks, ...config };
+          apiClient.put('/cms/social_links', { content: updated }).catch((e) => console.warn('Social links save error:', e));
+          return { socialLinks: updated };
+        });
       },
 
       fetchProductsAndCategories: async () => {

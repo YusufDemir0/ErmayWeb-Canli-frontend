@@ -3,103 +3,180 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CreditCard, Shield, Truck, RefreshCw, Send } from 'lucide-react';
+import { CreditCard, Shield, Truck, RefreshCw, Send, MessageSquare } from 'lucide-react';
+import { useCMSStore } from '../stores/useCMSStore';
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const YoutubeIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+    <polygon points="10 15 15 12 10 9 10 15" fill="currentColor"/>
+  </svg>
+);
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const contactInfo = useCMSStore((state) => state.contactInfo);
+  const socialLinks = useCMSStore((state) => state.socialLinks);
 
   return (
-    <footer id="main-footer" className="bg-brand-dark text-neutral-400 text-sm font-light mt-auto print:hidden">
+    <footer id="main-footer" className="bg-[#1C1815] text-neutral-400 text-sm font-light mt-auto print:hidden">
       {/* Upper Trust Section */}
-      <div className="border-b border-neutral-800 bg-neutral-950/40">
+      <div className="border-b border-neutral-800/80 bg-neutral-950/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-brand-camel flex-shrink-0">
+            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-amber-500 flex-shrink-0">
               <Truck className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-white text-xs font-semibold uppercase tracking-wider">Ücretsiz Teslimat & Kurulum</h4>
-              <p className="text-neutral-500 text-xs mt-1">10.000 TL üzeri tüm siparişlerde uzman ekibimiz tarafından montaj dahil ücretsiz gönderim.</p>
+              <h4 className="text-white text-xs font-bold uppercase tracking-wider">Kendi Aracımızla Teslimat</h4>
+              <p className="text-neutral-400 text-xs mt-1">Marmara bölgesi başta olmak üzere tüm siparişlerde montaj dahil kendi ekibimizle adrese teslim.</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-brand-camel flex-shrink-0">
+            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-amber-500 flex-shrink-0">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-white text-xs font-semibold uppercase tracking-wider">2 Yıl Garanti Garantisi</h4>
-              <p className="text-neutral-500 text-xs mt-1">Tüm koleksiyonlarımız üretime, mekanizmaya ve iskelet yapısına karşı 2 yıl Ermay garantisindedir.</p>
+              <h4 className="text-white text-xs font-bold uppercase tracking-wider">2 Yıl Fabrika Garantisi</h4>
+              <p className="text-neutral-400 text-xs mt-1">Fırınlanmış masif iskelet, teleskopik frenli ray ve mekanizmalar 2 yıl atölye güvencemizdedir.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-brand-camel flex-shrink-0">
+            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-amber-500 flex-shrink-0">
               <RefreshCw className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-white text-xs font-semibold uppercase tracking-wider">Kolay & Esnek İade</h4>
-              <p className="text-neutral-500 text-xs mt-1">Ürününüzü teslim aldıktan sonraki 14 gün içerisinde koşulsuz şartsız iade talebi oluşturabilirsiniz.</p>
+              <h4 className="text-white text-xs font-bold uppercase tracking-wider">Esnaf Sözü & Değişim</h4>
+              <p className="text-neutral-400 text-xs mt-1">Ürününüzü teslim aldığınızda kontrol edin; beğenmediğiniz veya hasarlı parçayı koşulsuz değiştiriyoruz.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-brand-camel flex-shrink-0">
+            <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-sm text-amber-500 flex-shrink-0">
               <CreditCard className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-white text-xs font-semibold uppercase tracking-wider">Güvenli Virtual POS Altyapısı</h4>
-              <p className="text-neutral-500 text-xs mt-1">128-bit SSL şifreleme ve 3D Secure güvencesiyle tüm kredi kartlarına vade farksız taksit.</p>
+              <h4 className="text-white text-xs font-bold uppercase tracking-wider">Güvenli Ödeme & Taksit</h4>
+              <p className="text-neutral-400 text-xs mt-1">128-bit SSL ve BDDK uyumlu mobilya taksit imkanı veya kapıda nakit/POS ile güvenli ödeme.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Middle Links and Newsletter Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
         {/* Brand details */}
-        <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-white text-lg font-bold tracking-[0.25em] uppercase">
-            Ermay <span className="font-light text-brand-camel">Mobilya</span>
-          </h3>
-          <p className="text-neutral-500 text-xs md:text-sm leading-relaxed max-w-sm">
-            Ermay Mobilya, modern ve lüks yaşam alanları için özenle tasarlanmış, doğal ahşap ve el işçiliğini ön planda tutan zamansız tasarımlar üretir.
+        <div className="lg:col-span-2 space-y-5">
+          <div>
+            <h3 className="text-white text-xl font-serif font-black tracking-wider uppercase">
+              ERMAY <span className="font-light text-amber-500 text-base">MOBİLYA</span>
+            </h3>
+            <p className="text-amber-500/90 text-[11px] font-semibold tracking-widest uppercase mt-0.5">
+              Modoko 40 Yıllık Ahşap İmalatçısı
+            </p>
+          </div>
+          <p className="text-neutral-400 text-xs leading-relaxed max-w-sm font-normal">
+            Aracı, komisyoncu veya gereksiz masraf olmadan; kendi atölyemizde ürettiğimiz masif ahşap ve modern mobilyaları doğrudan evinize ulaştırıyoruz.
           </p>
-          <div className="space-y-2 text-xs md:text-sm">
-            <p><strong>Merkez Mağaza:</strong> Modoko Mobilyacılar Sitesi, No: 42, Ümraniye / İstanbul</p>
-            <p><strong>Telefon:</strong> +90 (216) 555 42 42</p>
-            <p><strong>E-posta:</strong> info@ermaymobilya.com</p>
+          <div className="space-y-1.5 text-xs text-neutral-300">
+            <p><strong>Merkez Showroom:</strong> {contactInfo?.address || 'Modoko Mobilyacılar Sitesi, No: 42, Ümraniye / İstanbul'}</p>
+            <p><strong>Telefon / WhatsApp:</strong> {socialLinks?.whatsapp || contactInfo?.phone || '0532 000 00 00'}</p>
+            <p><strong>E-Posta:</strong> {contactInfo?.email || 'info@ermaymobilya.com'}</p>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="pt-2">
+            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-2">Bizi Takip Edin & Sipariş Verin:</span>
+            <div className="flex items-center gap-2">
+              {socialLinks?.instagram && (
+                <a
+                  href={socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-neutral-900 hover:bg-pink-600 text-neutral-300 hover:text-white rounded transition-colors"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon className="h-4 w-4" />
+                </a>
+              )}
+              {socialLinks?.youtube && (
+                <a
+                  href={socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-neutral-900 hover:bg-red-600 text-neutral-300 hover:text-white rounded transition-colors"
+                  aria-label="YouTube"
+                >
+                  <YoutubeIcon className="h-4 w-4" />
+                </a>
+              )}
+              {socialLinks?.telegram && (
+                <a
+                  href={socialLinks.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-neutral-900 hover:bg-sky-600 text-neutral-300 hover:text-white rounded transition-colors"
+                  aria-label="Telegram"
+                >
+                  <Send className="h-4 w-4" />
+                </a>
+              )}
+              {socialLinks?.whatsapp && (
+                <a
+                  href={`https://wa.me/${socialLinks.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobilyalarınız ve atölye üretiminiz hakkında bilgi almak istiyorum.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-emerald-700/80 hover:bg-emerald-600 text-white rounded transition-colors flex items-center gap-1.5 px-3 text-xs font-bold"
+                  aria-label="WhatsApp"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>WhatsApp Sipariş</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Categories column */}
         <div>
-          <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-6">Koleksiyonlar</h4>
-          <ul className="space-y-3.5 text-xs md:text-sm">
-            <li><Link href="/kategori/oturma-odasi" className="hover:text-brand-camel transition-colors">Oturma Odası</Link></li>
-            <li><Link href="/kategori/yemek-odasi" className="hover:text-brand-camel transition-colors">Yemek Odası</Link></li>
-            <li><Link href="/kategori/yatak-odasi" className="hover:text-brand-camel transition-colors">Yatak Odası</Link></li>
-            <li><Link href="/kategori/aksesuar" className="hover:text-brand-camel transition-colors">Aksesuar & Aydınlatma</Link></li>
-            <li><Link href="/indirimler" className="hover:text-brand-camel transition-colors">İndirimli Ürünler</Link></li>
+          <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Katalog</h4>
+          <ul className="space-y-2.5 text-xs text-neutral-300">
+            <li><Link href="/kategori/koltuk-takimlari" className="hover:text-amber-400 transition-colors">Koltuk Takımları</Link></li>
+            <li><Link href="/kategori/yemek-odalari" className="hover:text-amber-400 transition-colors">Yemek Odası</Link></li>
+            <li><Link href="/kategori/yatak-odalari" className="hover:text-amber-400 transition-colors">Yatak Odası</Link></li>
+            <li><Link href="/kategori/makam-takimlari" className="hover:text-amber-400 transition-colors">Makam Takımları</Link></li>
+            <li><Link href="/kategori/tv-uniteleri" className="hover:text-amber-400 transition-colors">TV Üniteleri</Link></li>
+            <li><Link href="/kategori/hepsi" className="hover:text-amber-400 transition-colors font-semibold text-amber-500">Tüm Ürünler →</Link></li>
           </ul>
         </div>
 
         {/* Corporate column */}
         <div>
-          <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-6">Kurumsal</h4>
-          <ul className="space-y-3.5 text-xs md:text-sm">
-            <li><Link href="/kurumsal" className="hover:text-brand-camel transition-colors">Hakkımızda</Link></li>
-            <li><Link href="/bayiler" className="hover:text-brand-camel transition-colors">Mağazalar & Bayiler</Link></li>
-            <li><Link href="/katalog" className="hover:text-brand-camel transition-colors">2026 Koleksiyon Kataloğu</Link></li>
-            <li><Link href="/iletisim" className="hover:text-brand-camel transition-colors">İletişim & Sipariş</Link></li>
+          <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Kurumsal & Yasal</h4>
+          <ul className="space-y-2.5 text-xs text-neutral-300">
+            <li><Link href="/kurumsal" className="hover:text-amber-400 transition-colors">Hakkımızda & İmalat</Link></li>
+            <li><Link href="/bayiler" className="hover:text-amber-400 transition-colors">Mağazalarımız</Link></li>
+            <li><Link href="/katalog" className="hover:text-amber-400 transition-colors">2026 Koleksiyon Kataloğu</Link></li>
+            <li><Link href="/iletisim" className="hover:text-amber-400 transition-colors">İletişim & Ulaşım</Link></li>
+            <li><Link href="/kurumsal" className="hover:text-amber-400 transition-colors text-amber-500/90 font-medium">KVKK Aydınlatma Metni</Link></li>
           </ul>
         </div>
 
         {/* Newsletter subscription */}
-        <div className="space-y-6">
-          <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-2">E-Bülten Üyeliği</h4>
-          <p className="text-neutral-500 text-xs leading-relaxed">
-            Yeni çıkan koleksiyonlar, özel indirimler ve tasarım önerilerinden ilk siz haberdar olun.
+        <div className="space-y-4">
+          <h4 className="text-white text-xs font-bold uppercase tracking-widest">Esnaf İndirimleri</h4>
+          <p className="text-neutral-400 text-xs leading-relaxed">
+            Atölyeden yeni çıkan modeller ve dönemsel fabrika indirimlerinden haberdar olun.
           </p>
           <form 
             onSubmit={(e) => {
@@ -113,11 +190,11 @@ export const Footer: React.FC = () => {
               type="email"
               required
               placeholder="E-posta adresiniz"
-              className="bg-transparent border-none text-xs text-white placeholder-neutral-600 focus:outline-none w-full pr-2"
+              className="bg-transparent border-none text-xs text-white placeholder-neutral-500 focus:outline-none w-full pr-2"
             />
             <button 
               type="submit" 
-              className="text-neutral-500 hover:text-brand-camel transition-colors p-1 cursor-pointer"
+              className="text-amber-500 hover:text-amber-400 transition-colors p-1 cursor-pointer"
               aria-label="Kaydol"
             >
               <Send className="h-4 w-4" />

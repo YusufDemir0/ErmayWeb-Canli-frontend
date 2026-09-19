@@ -42,6 +42,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   const [appliedMinPrice, setAppliedMinPrice] = useState<number | ''>('');
   const [appliedMaxPrice, setAppliedMaxPrice] = useState<number | ''>('');
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedWidthRange, setSelectedWidthRange] = useState<string>('all'); // all, compact (<150), medium (150-210), large (>210)
+  const [selectedDrawerFilter, setSelectedDrawerFilter] = useState<string>('all'); // all, 0, 1-2, 3-4, 5plus
+  const [selectedUnitFilter, setSelectedUnitFilter] = useState<string>('all'); // all, 1, 2-3, 4plus
   const [minRating, setMinRating] = useState<number | null>(null);
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('default');
@@ -55,6 +59,18 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     'Mermer & Pirinç',
     'Ergonomik Kumaş',
     'Ahşap',
+  ];
+
+  // Available Colors
+  const COLORS_LIST = [
+    'Ceviz',
+    'Antrasit',
+    'Siyah',
+    'Beyaz',
+    'Krem / Bej',
+    'Meşe',
+    'Gri',
+    'Haki Yeşil',
   ];
 
   // Resolve Category Name & Category List
@@ -101,13 +117,72 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     // 4. Material filter
     const matchesMaterial = selectedMaterials.length === 0 || selectedMaterials.some(m => p.material?.toLowerCase().includes(m.toLowerCase()));
 
-    // 5. Rating filter
+    // 5. Color filter
+    const pColors: string[] = [
+      ...(p.colors || []),
+      ...(p.colorOptions || []),
+      ...((p as any).color ? [(p as any).color] : [])
+    ].map(c => c.toLowerCase());
+
+    const matchesColor = selectedColors.length === 0 || selectedColors.some(sc => {
+      const scLower = sc.toLowerCase();
+      return pColors.some(pc => pc.includes(scLower) || scLower.includes(pc));
+    });
+
+    // 6. Width (Boyut X cm) filter
+    const width = p.widthCm || 0;
+    let matchesWidth = true;
+    if (selectedWidthRange === 'compact') {
+      matchesWidth = width > 0 && width < 150;
+    } else if (selectedWidthRange === 'medium') {
+      matchesWidth = width >= 150 && width <= 210;
+    } else if (selectedWidthRange === 'large') {
+      matchesWidth = width > 210;
+    }
+
+    // 7. Drawer count filter
+    const drawers = p.drawerCount || 0;
+    let matchesDrawers = true;
+    if (selectedDrawerFilter === 'none') {
+      matchesDrawers = drawers === 0;
+    } else if (selectedDrawerFilter === '1-2') {
+      matchesDrawers = drawers >= 1 && drawers <= 2;
+    } else if (selectedDrawerFilter === '3-4') {
+      matchesDrawers = drawers >= 3 && drawers <= 4;
+    } else if (selectedDrawerFilter === '5plus') {
+      matchesDrawers = drawers >= 5;
+    }
+
+    // 8. Unit count filter
+    const units = p.unitCount || 1;
+    let matchesUnits = true;
+    if (selectedUnitFilter === '1') {
+      matchesUnits = units === 1;
+    } else if (selectedUnitFilter === '2-3') {
+      matchesUnits = units >= 2 && units <= 3;
+    } else if (selectedUnitFilter === '4plus') {
+      matchesUnits = units >= 4;
+    }
+
+    // 9. Rating filter
     const matchesRating = minRating === null || p.rating >= minRating;
 
-    // 6. Stock filter
+    // 10. Stock filter
     const matchesStock = !inStockOnly || p.inStock;
 
-    return matchesCategory && matchesSearch && matchesMin && matchesMax && matchesMaterial && matchesRating && matchesStock;
+    return (
+      matchesCategory &&
+      matchesSearch &&
+      matchesMin &&
+      matchesMax &&
+      matchesMaterial &&
+      matchesColor &&
+      matchesWidth &&
+      matchesDrawers &&
+      matchesUnits &&
+      matchesRating &&
+      matchesStock
+    );
   });
 
   // Sort products
@@ -148,6 +223,13 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     setCurrentPage(1);
   };
 
+  const toggleColor = (color: string) => {
+    setSelectedColors(prev =>
+      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
+    );
+    setCurrentPage(1);
+  };
+
   const handleResetFilters = () => {
     setSelectedCatSlug('hepsi');
     setMinPrice('');
@@ -155,6 +237,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     setAppliedMinPrice('');
     setAppliedMaxPrice('');
     setSelectedMaterials([]);
+    setSelectedColors([]);
+    setSelectedWidthRange('all');
+    setSelectedDrawerFilter('all');
+    setSelectedUnitFilter('all');
     setMinRating(null);
     setInStockOnly(false);
     setSortBy('default');
@@ -179,7 +265,17 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     return product.image || '';
   };
 
-  const hasActiveFilters = selectedCatSlug !== 'hepsi' || appliedMinPrice !== '' || appliedMaxPrice !== '' || selectedMaterials.length > 0 || minRating !== null || inStockOnly;
+  const hasActiveFilters = 
+    selectedCatSlug !== 'hepsi' || 
+    appliedMinPrice !== '' || 
+    appliedMaxPrice !== '' || 
+    selectedMaterials.length > 0 || 
+    selectedColors.length > 0 ||
+    selectedWidthRange !== 'all' ||
+    selectedDrawerFilter !== 'all' ||
+    selectedUnitFilter !== 'all' ||
+    minRating !== null || 
+    inStockOnly;
 
   return (
     <div className="w-full bg-[#FBF9F5] min-h-screen text-neutral-800">
@@ -192,13 +288,22 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             <span>/</span>
             <span className="text-neutral-800 font-semibold">{categoryName}</span>
           </nav>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-neutral-900 uppercase">
-            {categoryName}
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-neutral-900 uppercase">
+                {categoryName}
+              </h1>
+              <p className="text-xs text-neutral-500 mt-0.5">Modoko İmalatçısı Güvencesiyle Fabrikadan Doğrudan Satış</p>
+            </div>
+            <div className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1.5 rounded-sm inline-flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>İstanbul & Kocaeli İçi Ücretsiz Kendi Aracımızla Teslimat & Montaj</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Main Grid: Left Filters + Right Products (Ref Hepsiburada style) */}
+      {/* Main Grid: Left Filters + Right Products */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* ---------------------------------------------------- */}
@@ -209,7 +314,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
           <div className="flex items-center justify-between border-b border-[#E5DEC9] pb-4">
             <span className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
               <Filter className="h-4 w-4 text-[#C5A880]" />
-              Filtreler
+              Atölye Filtreleri
             </span>
             {hasActiveFilters && (
               <button 
@@ -255,7 +360,116 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             </div>
           </div>
 
-          {/* 2. Price Range Filter */}
+          {/* 2. Color Filter */}
+          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+                Renk Seçenekleri
+              </h3>
+              {selectedColors.length > 0 && (
+                <button onClick={() => setSelectedColors([])} className="text-[10px] text-amber-700 hover:underline">Temizle</button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              {COLORS_LIST.map((col) => {
+                const isChecked = selectedColors.includes(col);
+                return (
+                  <label key={col} className={`flex items-center gap-2 p-1.5 rounded border cursor-pointer transition-all ${
+                    isChecked ? 'border-amber-700 bg-amber-50/50 font-bold text-neutral-900' : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => toggleColor(col)}
+                      className="h-3.5 w-3.5 accent-[#C5A880] rounded-xs cursor-pointer"
+                    />
+                    <span className="text-[11px] truncate">{col}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Dimension (Width / X cm) Filter */}
+          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              Genişlik (X cm) Ölçüsü
+            </h3>
+            <div className="space-y-1.5 text-xs">
+              {[
+                { id: 'all', label: 'Tüm Ölçüler' },
+                { id: 'compact', label: 'Kompakt (< 150 cm)' },
+                { id: 'medium', label: 'Standart (150 - 210 cm)' },
+                { id: 'large', label: 'Geniş / Büyük (> 210 cm)' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => { setSelectedWidthRange(opt.id); setCurrentPage(1); }}
+                  className={`w-full text-left py-1.5 px-2 rounded-xs flex items-center justify-between transition-colors ${
+                    selectedWidthRange === opt.id ? 'bg-[#FBF9F5] border border-[#C5A880] font-bold text-[#C5A880]' : 'hover:bg-[#FBF9F5] text-neutral-700'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {selectedWidthRange === opt.id && <Check className="h-3.5 w-3.5 text-[#C5A880]" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Drawer Count Filter */}
+          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              Çekmece Sayısı
+            </h3>
+            <div className="space-y-1.5 text-xs">
+              {[
+                { id: 'all', label: 'Tümü' },
+                { id: 'none', label: 'Çekmecesiz (0)' },
+                { id: '1-2', label: '1 - 2 Çekmeceli' },
+                { id: '3-4', label: '3 - 4 Çekmeceli' },
+                { id: '5plus', label: '5 ve Üzeri Çekmece' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => { setSelectedDrawerFilter(opt.id); setCurrentPage(1); }}
+                  className={`w-full text-left py-1.5 px-2 rounded-xs flex items-center justify-between transition-colors ${
+                    selectedDrawerFilter === opt.id ? 'bg-[#FBF9F5] border border-[#C5A880] font-bold text-[#C5A880]' : 'hover:bg-[#FBF9F5] text-neutral-700'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {selectedDrawerFilter === opt.id && <Check className="h-3.5 w-3.5 text-[#C5A880]" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 5. Unit / Module Count Filter */}
+          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              Ünite / Modül Sayısı
+            </h3>
+            <div className="space-y-1.5 text-xs">
+              {[
+                { id: 'all', label: 'Tüm Modüller' },
+                { id: '1', label: 'Tek Parça Ünite' },
+                { id: '2-3', label: '2 - 3 Parça Modüler' },
+                { id: '4plus', label: '4+ Parça Komple Takım' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => { setSelectedUnitFilter(opt.id); setCurrentPage(1); }}
+                  className={`w-full text-left py-1.5 px-2 rounded-xs flex items-center justify-between transition-colors ${
+                    selectedUnitFilter === opt.id ? 'bg-[#FBF9F5] border border-[#C5A880] font-bold text-[#C5A880]' : 'hover:bg-[#FBF9F5] text-neutral-700'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {selectedUnitFilter === opt.id && <Check className="h-3.5 w-3.5 text-[#C5A880]" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Price Range Filter */}
           <div className="border-b border-[#E5DEC9] pb-5 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Fiyat Aralığı (TL)
@@ -310,7 +524,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             </form>
           </div>
 
-          {/* 3. Material & Collection Checkboxes */}
+          {/* 7. Material & Collection Checkboxes */}
           <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Malzeme / İmalat
@@ -333,7 +547,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             </div>
           </div>
 
-          {/* 4. Rating Filter */}
+          {/* 8. Rating Filter */}
           <div className="border-b border-[#E5DEC9] pb-5 space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Müşteri Puanı
@@ -356,7 +570,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             </div>
           </div>
 
-          {/* 5. Stock Toggle */}
+          {/* 9. Stock Toggle */}
           <div>
             <label className="flex items-center justify-between cursor-pointer">
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-800">Sadece Stoktakiler</span>
@@ -421,6 +635,34 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-[#C5A880] text-[#B4966E] px-2.5 py-1 rounded-xs shadow-xs">
                   {appliedMinPrice || 0} TL - {appliedMaxPrice || '∞'} TL
                   <X className="h-3 w-3 cursor-pointer hover:text-rose-500" onClick={() => { setAppliedMinPrice(''); setAppliedMaxPrice(''); setMinPrice(''); setMaxPrice(''); }} />
+                </span>
+              )}
+
+              {selectedColors.map(col => (
+                <span key={col} className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                  Renk: {col}
+                  <X className="h-3 w-3 cursor-pointer hover:text-rose-500" onClick={() => toggleColor(col)} />
+                </span>
+              ))}
+
+              {selectedWidthRange !== 'all' && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                  Genişlik: {selectedWidthRange === 'compact' ? '< 150 cm' : selectedWidthRange === 'medium' ? '150-210 cm' : '> 210 cm'}
+                  <X className="h-3 w-3 cursor-pointer hover:text-rose-500" onClick={() => setSelectedWidthRange('all')} />
+                </span>
+              )}
+
+              {selectedDrawerFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                  Çekmece: {selectedDrawerFilter}
+                  <X className="h-3 w-3 cursor-pointer hover:text-rose-500" onClick={() => setSelectedDrawerFilter('all')} />
+                </span>
+              )}
+
+              {selectedUnitFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                  Ünite: {selectedUnitFilter}
+                  <X className="h-3 w-3 cursor-pointer hover:text-rose-500" onClick={() => setSelectedUnitFilter('all')} />
                 </span>
               )}
 
@@ -500,36 +742,77 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                     {/* Details */}
                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                       <div>
-                        <span className="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest block mb-1">
-                          {product.material || 'Ermay Özel Tasarım'}
-                        </span>
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest truncate">
+                            {product.material || 'Modoko Masif Ahşap'}
+                          </span>
+                          {product.widthCm && (
+                            <span className="text-[10px] bg-neutral-100 text-neutral-700 font-semibold px-1.5 py-0.5 rounded">
+                              {product.widthCm} cm
+                            </span>
+                          )}
+                        </div>
                         <Link 
                           href={`/urun/${product.id}`}
                           className="font-bold text-sm text-neutral-900 hover:text-[#C5A880] transition-colors line-clamp-1 block"
                         >
                           {product.name}
                         </Link>
-                      </div>
 
-                      <div className="flex items-end justify-between pt-2 border-t border-[#F4EFE6]">
-                        <div>
-                          {isDiscounted && (
-                            <span className="text-xs text-neutral-400 line-through block">
-                              {formatPrice(origPrice)}
+                        {/* Woodcraft specs mini tags */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {product.drawerCount !== undefined && product.drawerCount > 0 && (
+                            <span className="text-[10px] bg-amber-50 text-amber-800 font-medium px-1.5 py-0.5 rounded border border-amber-200/50">
+                              {product.drawerCount} Çekmeceli
                             </span>
                           )}
-                          <span className="text-base font-extrabold text-[#C87A53]">
-                            {formatPrice(product.price)}
-                          </span>
+                          {product.unitCount !== undefined && product.unitCount > 1 && (
+                            <span className="text-[10px] bg-neutral-50 text-neutral-600 font-medium px-1.5 py-0.5 rounded border border-neutral-200">
+                              {product.unitCount} Parça Modül
+                            </span>
+                          )}
+                          {((product.colorOptions && product.colorOptions.length > 0) || (product.colors && product.colors.length > 0)) && (
+                            <span className="text-[10px] text-neutral-500 font-normal">
+                              {((product.colorOptions || product.colors) || []).slice(0, 2).join(', ')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-[#F4EFE6] space-y-2">
+                        <div className="flex items-end justify-between">
+                          <div>
+                            {isDiscounted && (
+                              <span className="text-xs text-neutral-400 line-through block">
+                                {formatPrice(origPrice)}
+                              </span>
+                            )}
+                            <span className="text-base font-extrabold text-[#C87A53]">
+                              {formatPrice(product.price)}
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => addToCart(product, 1)}
+                            className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-2 px-3 rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          >
+                            <ShoppingBag className="h-3.5 w-3.5" />
+                            <span>Sepete Ekle</span>
+                          </button>
                         </div>
 
-                        <button
-                          onClick={() => addToCart(product, 1)}
-                          className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-2 px-3 rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        {/* WhatsApp quick contact */}
+                        <a
+                          href={`https://wa.me/905320000000?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında fiyat ve teslimat bilgisi almak istiyorum.`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full text-center py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded flex items-center justify-center gap-1.5 transition-colors"
                         >
-                          <ShoppingBag className="h-3.5 w-3.5" />
-                          <span>Ekle</span>
-                        </button>
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
+                          </svg>
+                          <span>WhatsApp ile Pazarlık / Bilgi Al</span>
+                        </a>
                       </div>
                     </div>
                   </div>

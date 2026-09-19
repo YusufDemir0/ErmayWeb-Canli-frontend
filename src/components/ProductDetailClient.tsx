@@ -514,52 +514,68 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
 
             {/* Quantity Selector & Action Buttons */}
             <div className="space-y-3 pt-1">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center border border-[#EAE3D2] rounded-xs bg-[#FAF8F5]">
+              {/* Action Buttons Row */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center border border-[#EAE3D2] rounded-xs bg-[#FAF8F5]">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-2.5 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                    >
+                      -
+                    </button>
+                    <span className="px-3 py-2.5 text-xs font-bold text-neutral-900">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-2.5 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Add to Cart Button */}
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                    onClick={handleAddToCartClick}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest bg-neutral-900 hover:bg-[#C5A880] text-white transition-colors cursor-pointer shadow-xs"
                   >
-                    -
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>Sepete Ekle</span>
                   </button>
-                  <span className="px-4 py-2 text-xs font-bold text-neutral-900">{quantity}</span>
+
+                  {/* Buy Now Button */}
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                    onClick={handleBuyNowClick}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest bg-[#C5A880] hover:bg-[#B4966E] text-white transition-colors cursor-pointer shadow-xs"
                   >
-                    +
+                    <span>Hemen Al</span>
+                  </button>
+
+                  {/* Toggle Favorite Button */}
+                  <button
+                    onClick={() => toggleFavorite(product)}
+                    className={`p-3 rounded-xs border transition-all cursor-pointer ${
+                      isFavorite 
+                        ? 'bg-rose-50 border-rose-300 text-rose-600' 
+                        : 'bg-white border-[#EAE3D2] text-neutral-600 hover:text-[#C5A880]'
+                    }`}
+                    aria-label="Favorilere Ekle"
+                  >
+                    <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
                 </div>
 
-                {/* Add to Cart Button */}
-                <button
-                  onClick={handleAddToCartClick}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest bg-neutral-900 hover:bg-[#C5A880] text-white transition-colors cursor-pointer shadow-xs"
+                {/* PROMINENT WHATSAPP ORDER LINE - ESNAF DÖNÜŞÜM BUTONU */}
+                <a
+                  href={`https://wa.me/${contactInfo.whatsapp || '905324194151'}?text=${encodeURIComponent(
+                    `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}\n• Ölçüler: ${product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : 'Standart')}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-sm hover:shadow-md active:scale-[0.99]"
                 >
-                  <ShoppingBag className="h-4 w-4" />
-                  <span>Sepete Ekle</span>
-                </button>
-
-                {/* Buy Now Button */}
-                <button
-                  onClick={handleBuyNowClick}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest bg-[#C5A880] hover:bg-[#B4966E] text-white transition-colors cursor-pointer shadow-xs"
-                >
-                  <span>Hemen Al</span>
-                </button>
-
-                {/* Toggle Favorite Button */}
-                <button
-                  onClick={() => toggleFavorite(product)}
-                  className={`p-3 rounded-xs border transition-all cursor-pointer ${
-                    isFavorite 
-                      ? 'bg-rose-50 border-rose-300 text-rose-600' 
-                      : 'bg-white border-[#EAE3D2] text-neutral-600 hover:text-[#C5A880]'
-                  }`}
-                  aria-label="Favorilere Ekle"
-                >
-                  <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                </button>
+                  <MessageSquare className="h-4 w-4 fill-white text-white" />
+                  <span>WhatsApp ile Sipariş Ver & Danış (Hızlı Yanıt)</span>
+                </a>
               </div>
 
               {addedToCartSuccess && (
@@ -569,16 +585,60 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                 </div>
               )}
 
-              {/* Direct WhatsApp Order Button */}
-              <a
-                href={`https://wa.me/${contactInfo.whatsapp}?text=Merhaba,%20${encodeURIComponent(product.name)}%20modeli%20hakkında%20bilgi%20ve%20sipariş%20vermek%20istiyorum.`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full bg-[#FAF8F5] hover:bg-[#F4EFE6] border border-[#EAE3D2] text-neutral-800 text-xs font-semibold py-2.5 px-4 rounded-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <MessageSquare className="h-4 w-4 text-emerald-600" />
-                <span>Bu Model İçin İmalat & WhatsApp Sipariş Hattı</span>
-              </a>
+              {/* CRAFTSMAN / ESNAF TRUST BADGES */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-200/80 text-[11px] text-neutral-700">
+                <div className="bg-[#FAF8F5] p-2 rounded-xs border border-[#EAE3D2] flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
+                  <div>
+                    <strong className="block text-neutral-900 font-bold">Kendi Aracımızla Teslimat</strong>
+                    <span className="text-[10px] text-neutral-500">Marmara bölgesi ücretsiz montaj</span>
+                  </div>
+                </div>
+                <div className="bg-[#FAF8F5] p-2 rounded-xs border border-[#EAE3D2] flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
+                  <div>
+                    <strong className="block text-neutral-900 font-bold">40 Yıllık Atölye Güvencesi</strong>
+                    <span className="text-[10px] text-neutral-500">5 yıl gövde & iskelet garantisi</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* DETAILED TECHNICAL SPECIFICATIONS TABLE (XYZ ÖLÇÜLER, ÇEKMECE & ÜNİTE) */}
+              <div className="bg-white border border-[#EAE3D2] rounded-xs p-3.5 space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+                    <Ruler className="h-3.5 w-3.5 text-[#C5A880]" />
+                    <span>Mobilya Teknik Özellikleri:</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-2xs">
+                    Atölyede Özel Ölçü Yapılır
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-[11px]">
+                  <div className="bg-[#FAF8F5] p-2 rounded-2xs border border-neutral-200 text-center">
+                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Genişlik (X)</span>
+                    <strong className="text-neutral-900">{product.widthCm ? `${product.widthCm} cm` : 'Standart'}</strong>
+                  </div>
+                  <div className="bg-[#FAF8F5] p-2 rounded-2xs border border-neutral-200 text-center">
+                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Derinlik (Y)</span>
+                    <strong className="text-neutral-900">{product.depthCm ? `${product.depthCm} cm` : 'Standart'}</strong>
+                  </div>
+                  <div className="bg-[#FAF8F5] p-2 rounded-2xs border border-neutral-200 text-center">
+                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Yükseklik (Z)</span>
+                    <strong className="text-neutral-900">{product.heightCm ? `${product.heightCm} cm` : 'Standart'}</strong>
+                  </div>
+                  <div className="bg-[#FAF8F5] p-2 rounded-2xs border border-neutral-200 text-center">
+                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Çekmece Adedi</span>
+                    <strong className="text-neutral-900">{product.drawerCount !== undefined ? `${product.drawerCount} Adet` : 'Yok'}</strong>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10.5px] text-neutral-600 pt-1 font-sans">
+                  <span>Ünite / Takım Parça Sayısı: <strong>{product.unitCount || 1} Parça</strong></span>
+                  <span>İmalat Malzemesi: <strong>{product.material || 'Masif Gürgen & MDF'}</strong></span>
+                </div>
+              </div>
             </div>
 
             {/* Set Pieces Breakdown with links to separately sold pieces */}

@@ -50,6 +50,12 @@ export interface Product {
   features?: string[];
   dimensions: string; // Ölçüler (Örn: G: 240cm | D: 95cm | Y: 75cm)
   dimensionSpec?: ProductDimensionSpec;
+  widthCm?: number;  // Genişlik (X) cm
+  depthCm?: number;  // Derinlik (Y) cm
+  heightCm?: number; // Yükseklik (Z) cm
+  drawerCount?: number; // Çekmece sayısı (örn: 2, 3, 4, 6)
+  unitCount?: number;   // Takım/ünite parça sayısı (örn: 1, 2, 3, 4)
+  colorOptions?: string[]; // Çoklu renk isimleri (örn: ['Siyah', 'Antrasit', 'Ceviz', 'Gri'])
   material: string; // Malzeme & Kumaş
   setContents?: string[] | string; // Takım İçeriği
   setPieces?: ProductSetPiece[]; // Yapılandırılmış Takım Parçaları
@@ -60,6 +66,15 @@ export interface Product {
   inStock?: boolean;
   salesCount?: number;
   vatRate?: number;
+}
+
+export interface SocialLinksConfig {
+  instagram?: string;
+  youtube?: string;
+  telegram?: string;
+  whatsapp?: string;
+  facebook?: string;
+  tiktok?: string;
 }
 
 export interface Category {

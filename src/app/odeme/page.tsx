@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { 
   CreditCard, ShieldCheck, MapPin, CheckCircle2, Lock, 
   Truck, ArrowLeft, Plus, AlertCircle, ShoppingBag, Loader2, BookmarkPlus,
-  FileText, Building2, KeyRound
+  FileText, Building2, KeyRound, Printer, Share2, Copy, Check
 } from 'lucide-react';
 import { useCartStore } from '../../stores/useCartStore';
 import { useAuthStore, type UserAddress, type SavedCard } from '../../stores/useAuthStore';
@@ -15,6 +15,9 @@ import { useDiscountStore } from '../../stores/useDiscountStore';
 import AddressModal from '../../components/AddressModal';
 import AnimatedCreditCard from '../../components/AnimatedCreditCard';
 import { InstallmentMatrix } from '../../components/InstallmentMatrix';
+import KvkkModal from '../../components/KvkkModal';
+import { detectClientDevice } from '../../lib/deviceDetector';
+import { getRegionalLogistics } from '../../lib/regionalCodes';
 import { 
   addressSchema, 
   creditCardSchema, 
@@ -101,8 +104,14 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState('');
 
+  // KVKK Acceptance & Modal State
+  const [kvkkAccepted, setKvkkAccepted] = useState<boolean>(false);
+  const [showKvkkModal, setShowKvkkModal] = useState<boolean>(false);
+
   // Order Placement Success State
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<any | null>(null);
+  const [isCopiedShareLink, setIsCopiedShareLink] = useState<boolean>(false);
 
   const userSavedCards = user?.savedCards || [];
 
@@ -194,6 +203,12 @@ export default function CheckoutPage() {
       }
     }
 
+    // KVKK Onay Kontrolü
+    if (!kvkkAccepted) {
+      setFormErrorMsg('Lütfen siparişi tamamlamak için 6698 sayılı KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      return;
+    }
+
     // 2. Kredi Kartı Bilgileri Doğrulaması (Yeni kart kullanılıyorsa)
     if (paymentMethod === 'credit_card' && !useSavedCard) {
       const cardVal = creditCardSchema.safeParse({
@@ -247,6 +262,10 @@ export default function CheckoutPage() {
 
     const finalAmount = Math.max(0, totalCartAmount - discountAmount);
 
+    // Cihaz ve Bölge Tespiti
+    const clientDevice = detectClientDevice();
+    const logistics = getRegionalLogistics(selectedAddr.city);
+
     // 1. First create the order in PENDING_PAYMENT state
     const res = await useOrderStore.getState().createOrderAsync({
       userId: user.uid,
@@ -272,6 +291,9 @@ export default function CheckoutPage() {
       paymentMethod,
       paymentStatus: 'PENDING',
       orderStatus: 'PENDING_PAYMENT',
+      deviceInfo: clientDevice,
+      regionCode: logistics.regionCode,
+      kvkkAccepted: true,
     });
 
     if (!res.success || !res.order) {
@@ -281,6 +303,7 @@ export default function CheckoutPage() {
     }
 
     const createdOrderId = res.order.id;
+    const orderNo = res.order.orderNumber || createdOrderId;
 
     // 2. If Credit Card: Execute authentic 3D Secure / Iyzico payment
     if (paymentMethod === 'credit_card') {
@@ -332,7 +355,8 @@ export default function CheckoutPage() {
       recordCouponUsage(couponCode);
     }
     clearCart();
-    setPlacedOrderId(createdOrderId);
+    setPlacedOrderId(orderNo);
+    setPlacedOrder(res.order);
   };
 
   const formatPrice = (price: number) => {
@@ -345,40 +369,116 @@ export default function CheckoutPage() {
 
   // ORDER SUCCESS SCREEN
   if (placedOrderId) {
+    const displayOrderNo = placedOrder?.orderNumber || placedOrderId;
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/hesabim?siparis=${displayOrderNo}` : `https://ermaymobilya.com/hesabim?siparis=${displayOrderNo}`;
+    const shareText = `Ermay Mobilya'dan siparişim onaylandı! Takip Kodu: ${displayOrderNo}`;
+
     return (
-      <div className="w-full bg-neutral-50 min-h-screen py-16 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-neutral-200 p-8 rounded-sm shadow-lg text-center space-y-6 animate-fade-in">
-          <div className="inline-flex p-4 bg-emerald-100 text-emerald-700 rounded-full">
-            <CheckCircle2 className="h-10 w-10" />
+      <div className="w-full bg-[#FBF9F5] min-h-screen py-12 flex items-center justify-center p-4">
+        <div className="max-w-xl w-full bg-white border border-neutral-300 p-8 rounded-lg shadow-xl text-center space-y-6 animate-fade-in print:p-0 print:border-none print:shadow-none">
+          
+          <div className="inline-flex p-4 bg-emerald-100 text-emerald-800 rounded-full">
+            <CheckCircle2 className="h-12 w-12" />
           </div>
+
           <div className="space-y-2">
-            <h1 className="text-xl font-bold uppercase tracking-wider text-neutral-900">
+            <span className="text-xs font-bold text-amber-700 uppercase tracking-widest block">
+              Modoko Atölye Teyidi Alındı
+            </span>
+            <h1 className="text-2xl font-black text-neutral-900">
               Siparişiniz Başarıyla Alındı!
             </h1>
-            <p className="text-xs text-neutral-500 font-light">
-              Siparişiniz atölyemizde hazırlanmaya başlandı.
+            <p className="text-xs text-neutral-600 max-w-md mx-auto">
+              Sipariş detaylarınız ve mesafeli satış sözleşmeniz <strong>{user.email}</strong> adresinize e-posta ile iletilmiştir.
             </p>
           </div>
 
-          <div className="bg-neutral-50 p-4 rounded-xs border border-neutral-200 text-xs space-y-1">
-            <span className="text-neutral-400 block uppercase font-bold text-[10px]">Sipariş Takip Kodu</span>
-            <span className="text-base font-mono font-extrabold text-brand-dark">{placedOrderId}</span>
+          {/* Order Details Badge Card */}
+          <div className="bg-amber-50/60 p-5 rounded-lg border border-amber-200 text-left space-y-3">
+            <div className="flex justify-between items-center pb-2 border-b border-amber-200/60">
+              <span className="text-xs font-semibold text-neutral-600">Sipariş Numarası:</span>
+              <span className="text-base font-mono font-black text-amber-950 bg-white px-2.5 py-0.5 rounded border border-amber-200">
+                {displayOrderNo}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs pb-2 border-b border-amber-200/60">
+              <span className="text-neutral-600 font-medium">Bölgesel Lojistik Kodu:</span>
+              <span className="font-bold text-neutral-900 bg-white px-2 py-0.5 rounded border border-neutral-200">
+                {placedOrder?.regionCode || '34-MAR'}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-neutral-600 font-medium">Teslimat & Montaj Şekli:</span>
+              <span className="font-bold text-emerald-800">
+                Ermay Kendi Aracı & Kendi Ustamız
+              </span>
+            </div>
           </div>
 
-          <div className="pt-4 space-y-3">
+          {/* Social Share & Action Buttons */}
+          <div className="space-y-3 pt-2 print:hidden">
+            <div className="flex flex-col sm:flex-row gap-2">
+              {/* PDF Print Button */}
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="flex-1 flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold py-3 px-4 rounded-md transition-colors cursor-pointer shadow-sm"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Sipariş Özetini PDF İndir / Yazdır</span>
+              </button>
+
+              {/* WhatsApp Share / Ask Workshop */}
+              <a
+                href={`https://wa.me/905320000000?text=${encodeURIComponent(`Merhaba Ermay Mobilya, ${displayOrderNo} nolu siparişim hakkında üretim ve montaj planını öğrenmek istiyorum.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-4 rounded-md transition-colors cursor-pointer shadow-sm"
+              >
+                <Share2 className="h-4 w-4" />
+                <span>Atölyeye WhatsApp'tan Bildir</span>
+              </a>
+            </div>
+
+            {/* Share link to friends/family */}
+            <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex items-center justify-between gap-2">
+              <span className="text-[11px] text-neutral-500 truncate text-left font-mono">
+                {shareUrl}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof navigator !== 'undefined') {
+                    navigator.clipboard.writeText(shareUrl);
+                    setIsCopiedShareLink(true);
+                    setTimeout(() => setIsCopiedShareLink(false), 3000);
+                  }
+                }}
+                className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 hover:text-amber-950 bg-white border border-neutral-300 px-3 py-1.5 rounded cursor-pointer whitespace-nowrap"
+              >
+                {isCopiedShareLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                <span>{isCopiedShareLink ? 'Kopyalandı' : 'Bağlantıyı Kopyala'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-2 space-y-2 print:hidden">
             <Link
               href="/hesabim"
-              className="block w-full bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold uppercase tracking-widest py-3.5 rounded-xs transition-colors"
+              className="block w-full bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-md transition-colors"
             >
               Siparişimi Hesabımda Takip Et
             </Link>
             <Link
               href="/"
-              className="block text-xs text-neutral-500 hover:text-brand-camel transition-colors"
+              className="block text-xs font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
             >
-              Ana Sayfaya Dön
+              Alışverişe Devam Et
             </Link>
           </div>
+
         </div>
       </div>
     );
@@ -957,22 +1057,63 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm font-extrabold text-neutral-900 pt-3 border-t border-neutral-200">
                   <span>Toplam (KDV Dahil):</span>
-                  <span className="text-brand-dark text-base">{formatPrice(Math.max(0, totalCartAmount - discountAmount))}</span>
+                  <span className="text-amber-950 text-base">{formatPrice(Math.max(0, totalCartAmount - discountAmount))}</span>
                 </div>
+              </div>
+
+              {/* KVKK & Contract Acceptance Checkbox */}
+              <div className="pt-3 border-t border-neutral-100 space-y-2">
+                <label className="flex items-start gap-2 text-[11px] text-neutral-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={kvkkAccepted}
+                    onChange={(e) => setKvkkAccepted(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 text-amber-700 rounded border-neutral-300 focus:ring-amber-600 accent-amber-700 cursor-pointer"
+                  />
+                  <span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowKvkkModal(true);
+                      }}
+                      className="font-bold text-amber-900 underline hover:text-amber-700 mr-1 inline"
+                    >
+                      6698 sayılı KVKK Aydınlatma Metni'ni
+                    </button>
+                    ve Mesafeli Satış Sözleşmesi'ni okudum, kişisel verilerimin sipariş ve lojistik süreçleri kapsamında işlenmesini onaylıyorum.
+                  </span>
+                </label>
               </div>
 
               {/* Complete Order CTA */}
               <button
                 type="submit"
-                className="w-full bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold uppercase tracking-widest py-4 rounded-xs transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                disabled={isSubmittingOrder}
+                className="w-full bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white text-xs font-bold uppercase tracking-widest py-4 rounded-md transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
               >
-                <Lock className="h-4 w-4" />
-                <span>Siparişi Tamamla</span>
+                {isSubmittingOrder ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Sipariş Hazırlanıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-4 w-4" />
+                    <span>Siparişi Onayla ve Tamamla</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
 
         </form>
+
+        {/* KVKK Reading Modal */}
+        <KvkkModal
+          isOpen={showKvkkModal}
+          onClose={() => setShowKvkkModal(false)}
+        />
 
       </div>
     </div>

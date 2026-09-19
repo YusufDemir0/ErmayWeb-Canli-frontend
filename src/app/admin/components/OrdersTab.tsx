@@ -26,6 +26,13 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
 }) => {
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<Order | null>(null);
   const [previewReceiptUrl, setPreviewReceiptUrl] = useState<string | null>(null);
+  const [revealedDeviceOrderIds, setRevealedDeviceOrderIds] = useState<string[]>([]);
+
+  const toggleRevealDevice = (orderId: string) => {
+    setRevealedDeviceOrderIds(prev => 
+      prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
+    );
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -85,6 +92,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                       <span className="text-xs text-neutral-500 font-mono">
                         ({order.createdAt})
                       </span>
+                      {order.regionCode && (
+                        <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded shadow-2xs" title="Bölgesel Lojistik & Plaka Kodu">
+                          📍 {order.regionCode}
+                        </span>
+                      )}
                       {order.invoiceDetails?.invoiceType === 'CORPORATE' ? (
                         <span className="text-[10px] font-bold uppercase bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <Building className="h-3 w-3" />
@@ -100,6 +112,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                     <p className="text-xs text-neutral-700 font-semibold">
                       Müşteri: {order.customerName} ({order.customerEmail} - {order.customerPhone})
                     </p>
+                    {order.shippingAddress && (
+                      <p className="text-[11px] text-neutral-600">
+                        Teslimat: {order.shippingAddress.addressLine}, {order.shippingAddress.district} / {order.shippingAddress.city}
+                      </p>
+                    )}
                     {order.invoiceDetails?.companyTitle && (
                       <p className="text-[11px] text-neutral-500 font-mono">
                         Ünvan: {order.invoiceDetails.companyTitle} (VKN: {order.invoiceDetails.taxNo} - {order.invoiceDetails.taxOffice})
@@ -108,7 +125,21 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                   </div>
 
                   {/* Actions & Status Control */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Secret Device Footprint Button */}
+                    <button
+                      type="button"
+                      onClick={() => toggleRevealDevice(order.id)}
+                      className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xs border transition-all cursor-pointer shadow-2xs ${
+                        revealedDeviceOrderIds.includes(order.id)
+                          ? 'bg-neutral-900 text-amber-400 border-neutral-900'
+                          : 'bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-300'
+                      }`}
+                      title="Gizli Yönetici Erişimi: Satın Alım Cihaz İzi"
+                    >
+                      <span>🕵️ {revealedDeviceOrderIds.includes(order.id) ? 'Cihaz İzini Kapat' : 'Cihaz İzi (Gizli)'}</span>
+                    </button>
+
                     <button
                       onClick={() => setSelectedInvoiceOrder(order)}
                       className="inline-flex items-center gap-1.5 bg-white hover:bg-neutral-100 text-neutral-800 text-xs font-bold uppercase px-3 py-2 rounded-xs border border-neutral-300 transition-colors cursor-pointer shadow-2xs"
@@ -149,6 +180,63 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                     </div>
                   </div>
                 </div>
+
+                {/* Hidden Device & Security Footprint Panel (Admin Only) */}
+                {revealedDeviceOrderIds.includes(order.id) && (
+                  <div className="bg-neutral-900 text-neutral-100 p-4 rounded border border-neutral-800 text-xs font-mono space-y-3 animate-fade-in shadow-inner">
+                    <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span className="text-amber-400 font-bold uppercase tracking-wider">
+                          🔒 Gizli Yönetici Erişimi: Müşteri Cihaz & Güvenlik İzi
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
+                        Sipariş ID: #{order.id}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
+                        <span className="text-neutral-400 block text-[10px] uppercase">Cihaz Türü</span>
+                        <span className="text-amber-300 font-bold text-sm">
+                          {order.deviceInfo?.deviceType === 'mobile' ? '📱 Akıllı Telefon (Mobil)' :
+                           order.deviceInfo?.deviceType === 'laptop' ? '💻 Dizüstü Bilgisayar (Laptop)' :
+                           order.deviceInfo?.deviceType === 'desktop' ? '🖥️ Masaüstü PC' :
+                           order.deviceInfo?.deviceType === 'tablet' ? '📱 Tablet' : '💻 Masaüstü / Web'}
+                        </span>
+                      </div>
+
+                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
+                        <span className="text-neutral-400 block text-[10px] uppercase">İşletim Sistemi</span>
+                        <span className="text-white font-semibold">
+                          {order.deviceInfo?.os || 'Bilinmiyor'}
+                        </span>
+                      </div>
+
+                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
+                        <span className="text-neutral-400 block text-[10px] uppercase">Tarayıcı & Motor</span>
+                        <span className="text-white font-semibold">
+                          {order.deviceInfo?.browser || 'Web Browser'}
+                        </span>
+                      </div>
+
+                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
+                        <span className="text-neutral-400 block text-[10px] uppercase">Ekran & Çözünürlük</span>
+                        <span className="text-white font-semibold">
+                          {order.deviceInfo?.screenResolution || '1920x1080 (Standart)'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between pt-2 border-t border-neutral-800 text-[11px] text-neutral-400">
+                      <span>İstemci IP Bilgisi: <strong className="text-neutral-200">{order.deviceInfo?.ip || '127.0.0.1 (Yerel/Cloudflare)'}</strong></span>
+                      <span className={order.kvkkAccepted ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
+                        {order.kvkkAccepted ? '✓ 6698 Sayılı KVKK Onaylı Kayıt' : '⚠ KVKK Onayı Bilgisi Yok'}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Wire Payment Approval Notification Banner */}
                 {(order.paymentMethod === 'BANK_TRANSFER' || order.paymentMethod === 'bank_transfer') && 

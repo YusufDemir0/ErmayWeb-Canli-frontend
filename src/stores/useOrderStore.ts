@@ -50,6 +50,9 @@ export interface Order {
   trackingNumber?: string;
   shippingCarrier?: string;
   cargoCompany?: string;
+  deviceInfo?: any;
+  regionCode?: string;
+  kvkkAccepted?: boolean;
   createdAt: string;
 }
 
@@ -125,6 +128,9 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
             couponCode: orderData.discountAmount && orderData.discountAmount > 0 ? (orderData as any).couponCode : undefined,
             totalAmount: orderData.totalAmount,
             discountAmount: orderData.discountAmount || 0,
+            deviceInfo: (orderData as any).deviceInfo,
+            regionCode: (orderData as any).regionCode,
+            kvkkAccepted: (orderData as any).kvkkAccepted ?? true,
           });
 
           if (response.data?.success && response.data.order) {
