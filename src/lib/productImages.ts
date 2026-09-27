@@ -1,29 +1,40 @@
 import type { Product, ProductImages } from '../types';
 
 /**
+ * Resolve image URLs for display.
+ * /uploads/... paths are left as relative paths — Next.js rewrites in next.config.ts
+ * proxy them to the backend automatically.
+ * Full URLs (https://...) are returned as-is.
+ */
+export function resolveImageUrl(url?: string | null): string {
+  if (!url || typeof url !== 'string' || url.trim().length === 0) return '';
+  return url.trim();
+}
+
+/**
  * Standard Product Image Resolver with robust fallbacks
  */
 export function getProductImage(
   product?: Product | { image?: string; images?: string[] | ProductImages; image1?: string } | null
 ): string {
   if (!product) {
-    return 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800';
+    return '';
   }
   if (product.image && typeof product.image === 'string' && product.image.trim().length > 0) {
-    return product.image;
+    return resolveImageUrl(product.image);
   }
   if ('image1' in product && typeof product.image1 === 'string' && product.image1.trim().length > 0) {
-    return product.image1;
+    return resolveImageUrl(product.image1);
   }
   if (product.images) {
     if (Array.isArray(product.images) && product.images.length > 0 && typeof product.images[0] === 'string') {
-      return product.images[0];
+      return resolveImageUrl(product.images[0]);
     }
     if (typeof product.images === 'object' && 'main' in product.images && typeof product.images.main === 'string') {
-      return product.images.main;
+      return resolveImageUrl(product.images.main);
     }
   }
-  return 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800';
+  return '';
 }
 
 /**
@@ -33,14 +44,17 @@ export function getProductImages(
   product?: Product | { image?: string; images?: string[] | ProductImages; image1?: string; image2?: string; image3?: string } | null
 ): string[] {
   if (!product) {
-    return ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'];
+    return [];
   }
 
   const list: string[] = [];
 
   const add = (url?: string) => {
-    if (url && typeof url === 'string' && url.trim().length > 0 && !list.includes(url.trim())) {
-      list.push(url.trim());
+    if (url && typeof url === 'string' && url.trim().length > 0) {
+      const resolved = resolveImageUrl(url);
+      if (!list.includes(resolved)) {
+        list.push(resolved);
+      }
     }
   };
 
@@ -64,9 +78,8 @@ export function getProductImages(
     }
   }
 
-  return list.length > 0
-    ? list
-    : ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'];
+  return list;
 }
 
 export default getProductImage;
+

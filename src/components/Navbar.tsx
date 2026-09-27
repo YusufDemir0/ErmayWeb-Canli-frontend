@@ -38,17 +38,27 @@ export const Navbar: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  // Mount & Scroll Listener with Hysteresis for Smooth Sticky Header
+  // Mount & Scroll Listener with Hysteresis for Smooth Sticky Header (60-120 FPS RAF throttled)
   useEffect(() => {
     setMounted(true);
 
+    let isScrolledLocal = window.scrollY > 70;
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      // Hysteresis prevents flickering/glitching when hovering around the threshold pixel
-      if (currentScrollY > 70) {
-        setIsScrolled(true);
-      } else if (currentScrollY < 20) {
-        setIsScrolled(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          if (currentScrollY > 70 && !isScrolledLocal) {
+            isScrolledLocal = true;
+            setIsScrolled(true);
+          } else if (currentScrollY < 20 && isScrolledLocal) {
+            isScrolledLocal = false;
+            setIsScrolled(false);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -137,7 +147,8 @@ export const Navbar: React.FC = () => {
 
           {/* Right Section: Actions & Cart */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* User Account Link */}
+            {/* User Account Link - Temporarily hidden under KVKK guest compliance */}
+            {/* 
             <Link
               href={isAuthenticated ? '/hesabim' : '/giris'}
               className="flex items-center gap-1.5 p-2 text-neutral-700 hover:text-[#C5A880] hover:bg-neutral-100/80 rounded-full transition-colors cursor-pointer text-xs font-semibold"
@@ -150,6 +161,7 @@ export const Navbar: React.FC = () => {
                 </span>
               )}
             </Link>
+            */}
 
             {/* Expandable Search Trigger */}
             <div className="relative">

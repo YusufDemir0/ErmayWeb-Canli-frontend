@@ -5,8 +5,10 @@ import {
   FileText, CheckCircle2, ExternalLink, ShieldCheck, 
   Truck, Building, AlertCircle, Eye, Printer, ArrowUpRight 
 } from 'lucide-react';
-import type { Order, OrderStatus } from '../../../stores/useOrderStore';
+import type { Order, OrderStatus, OrderItem } from '../../../stores/useOrderStore';
 import { InvoiceModal } from '../../../components/InvoiceModal';
+import { Pagination } from '../../../components/Pagination';
+import { toast } from '../../../stores/useToastStore';
 
 interface OrdersTabProps {
   orders: Order[];
@@ -28,6 +30,10 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
   const [previewReceiptUrl, setPreviewReceiptUrl] = useState<string | null>(null);
   const [revealedDeviceOrderIds, setRevealedDeviceOrderIds] = useState<string[]>([]);
 
+  // Pagination state (default 10 orders per page)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
   const toggleRevealDevice = (orderId: string) => {
     setRevealedDeviceOrderIds(prev => 
       prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
@@ -46,7 +52,9 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
 
   const handleApproveWirePayment = (order: Order) => {
     onUpdateOrderStatus(order.id, 'PREPARING' as OrderStatus);
-    onShowSuccess(`Sipariş #${order.orderNumber || order.id} havale ödemesi onaylandı ve Hazırlanıyor aşamasına alındı.`);
+    const msg = `Sipariş #${order.orderNumber || order.id} havale ödemesi onaylandı ve Hazırlanıyor aşamasına alındı.`;
+    toast.success('Ödeme Onaylandı', msg);
+    onShowSuccess(msg);
   };
 
   return (
@@ -77,7 +85,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
               <p className="text-xs">Henüz sipariş kaydı bulunmamaktadır.</p>
             </div>
           ) : (
-            orders.map((order) => (
+            (() => {
+              const paginatedOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+              return (
+                <>
+                  {paginatedOrders.map((order) => (
               <div
                 key={order.id}
                 className="border border-neutral-200 rounded-sm p-6 space-y-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors"
@@ -163,10 +175,12 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                         Durum:
                       </label>
                       <select
-                        value={order.orderStatus}
                         onChange={(e) => {
-                          onUpdateOrderStatus(order.id, e.target.value as OrderStatus);
-                          onShowSuccess(`Sipariş #${order.orderNumber || order.id} durumu güncellendi: ${e.target.value}`);
+                          const newStatus = e.target.value as OrderStatus;
+                          onUpdateOrderStatus(order.id, newStatus);
+                          const msg = `Sipariş #${order.orderNumber || order.id} durumu güncellendi: ${newStatus}`;
+                          toast.success('Durum Güncellendi', msg);
+                          onShowSuccess(msg);
                         }}
                         className="text-xs font-bold bg-white border border-neutral-300 p-2 rounded-xs focus:ring-1 focus:ring-[#C5A880] cursor-pointer"
                       >
@@ -320,7 +334,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {order.items.map((item, idx) => {
-                      const itemUnitPrice = Number((item as any).unitPrice || item.price || item.product?.price || 0);
+                      const itemUnitPrice = Number(item.unitPrice || item.price || item.product?.price || 0);
                       const itemTotalPrice = itemUnitPrice * item.quantity;
                       return (
                         <div
@@ -328,11 +342,17 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                           className="flex items-center justify-between bg-white p-3 rounded-xs border border-neutral-200"
                         >
                           <div className="flex items-center gap-3">
-                            <img
-                              src={item.product?.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1000'}
-                              alt=""
-                              className="h-10 w-10 object-cover rounded-xs border border-neutral-200"
-                            />
+                            {item.product?.image ? (
+                              <img
+                                src={item.product.image}
+                                alt=""
+                                className="h-10 w-10 object-cover rounded-xs border border-neutral-200"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 flex items-center justify-center bg-neutral-100 rounded-xs border border-neutral-200 text-[8px] font-bold text-neutral-400 text-center">
+                                Görsel Yok
+                              </div>
+                            )}
                             <div className="text-xs">
                               <p className="font-semibold text-neutral-800">{item.product?.name || 'Ürün'}</p>
                               <p className="text-[10px] text-neutral-500 font-mono">
@@ -350,11 +370,25 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                 </div>
 
               </div>
-            ))
-          )}
-        </div>
-
-      </div>
+            ))}
+            <Pagination
+              totalItems={orders.length}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[5, 10, 20]}
+              itemLabel="sipariş"
+            />
+          </>
+        );
+      })()
+    )}
+  </div>
+</div>
 
       {/* Invoice Modal */}
       <InvoiceModal

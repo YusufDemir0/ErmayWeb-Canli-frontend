@@ -6,8 +6,8 @@ import CategoryList from '../components/CategoryList';
 import CuratedSets from '../components/CuratedSets';
 import PromoBannerGrid from '../components/PromoBannerGrid';
 import ProductGridClient from './ProductGridClient';
-import { PRODUCTS } from '../data/mockData';
 import { productService } from '../services/productService';
+import type { Product } from '../types';
 import Link from 'next/link';
 
 export const revalidate = 60; // Incremental Static Regeneration (ISR) every 60s
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     siteName: 'Ermay Mobilya',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+        url: '/default-furniture.webp',
         width: 1200,
         height: 800,
         alt: 'Ermay Mobilya Seçkin Koleksiyonu',
@@ -38,14 +38,14 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  let products = PRODUCTS;
+  let products: Product[] = [];
   try {
-    const fetched = await productService.getProducts();
+    const fetched = await productService.getProducts({ limit: 24 });
     if (fetched && fetched.length > 0) {
       products = fetched;
     }
   } catch (e) {
-    // Fallback to static mock products on SSR error
+    console.warn('HomePage SSR ürün çekme uyarısı:', e);
   }
 
   // Schema.org Structured Data (JSON-LD) for Rich Google Search Results

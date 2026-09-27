@@ -1,26 +1,37 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import Link from 'next/link';
 import { Timer, Zap, ShoppingBag, Heart, ArrowRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
+import { OptimizedImage } from './OptimizedImage';
 import type { Product, ProductImages } from '../types';
 
-export const FlashDeals: React.FC = () => {
-  const products = useCMSStore((state) => state.products);
-  const addToCart = useCartStore((state) => state.addToCart);
-  const isFavorite = useFavoritesStore((state) => state.isFavorite);
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+// Module-level cached price formatter
+const flashCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
+  style: 'currency',
+  currency: 'TRY',
+  maximumFractionDigits: 0,
+});
 
-  // Filter products with discount or deal badge
-  const dealProducts = products.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 4);
+const formatPrice = (price: number): string => {
+  return flashCurrencyFormatter.format(price).replace('TRY', 'TL');
+};
 
-  // Fallback to first 4 products if no explicit discount products
-  const displayProducts = dealProducts.length > 0 ? dealProducts : products.slice(0, 4);
+const getProductImage = (product: Product): string => {
+  if (product.images && typeof product.images === 'object' && 'main' in product.images) {
+    return (product.images as ProductImages).main;
+  }
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return product.images[0];
+  }
+  return product.image || '';
+};
 
-  // Countdown timer state (e.g. 08:42:15)
+// Isolated countdown component - ticks every second without re-rendering deal product cards
+const FlashCountdownBadge = memo(() => {
   const [timeLeft, setTimeLeft] = useState({ hours: 8, minutes: 42, seconds: 15 });
 
   useEffect(() => {
@@ -38,23 +49,40 @@ export const FlashDeals: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0,
-    }).format(price).replace('TRY', 'TL');
-  };
+  return (
+    <div className="flex items-center gap-2.5 bg-white border border-[#E5DEC9] rounded-xs px-4 py-2 shadow-xs">
+      <Timer className="h-4 w-4 text-[#C5A880]" />
+      <span className="text-xs uppercase tracking-wider font-semibold text-neutral-600">Süre:</span>
+      <div className="flex items-center gap-1 font-mono font-extrabold text-sm text-neutral-800">
+        <span className="bg-[#FBF9F5] text-[#B4966E] px-2 py-1 rounded-xs border border-[#E5DEC9]">
+          {String(timeLeft.hours).padStart(2, '0')}
+        </span>
+        <span className="text-[#C5A880]">:</span>
+        <span className="bg-[#FBF9F5] text-[#B4966E] px-2 py-1 rounded-xs border border-[#E5DEC9]">
+          {String(timeLeft.minutes).padStart(2, '0')}
+        </span>
+        <span className="text-[#C5A880]">:</span>
+        <span className="bg-[#C5A880] text-white px-2 py-1 rounded-xs animate-pulse">
+          {String(timeLeft.seconds).padStart(2, '0')}
+        </span>
+      </div>
+    </div>
+  );
+});
 
-  const getProductImage = (product: Product): string => {
-    if (product.images && typeof product.images === 'object' && 'main' in product.images) {
-      return (product.images as ProductImages).main;
-    }
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images[0];
-    }
-    return product.image || '';
-  };
+FlashCountdownBadge.displayName = 'FlashCountdownBadge';
+
+export const FlashDeals: React.FC = () => {
+  const products = useCMSStore((state) => state.products);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const isFavorite = useFavoritesStore((state) => state.isFavorite);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+
+  // Memoize deal products to prevent re-filtering during unrelated store changes
+  const displayProducts = useMemo(() => {
+    const dealProducts = products.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 4);
+    return dealProducts.length > 0 ? dealProducts : products.slice(0, 4);
+  }, [products]);
 
   if (displayProducts.length === 0) return null;
 
@@ -83,24 +111,8 @@ export const FlashDeals: React.FC = () => {
             </div>
           </div>
 
-          {/* Clean Light Countdown Timer */}
-          <div className="flex items-center gap-2.5 bg-white border border-[#E5DEC9] rounded-xs px-4 py-2 shadow-xs">
-            <Timer className="h-4 w-4 text-[#C5A880]" />
-            <span className="text-xs uppercase tracking-wider font-semibold text-neutral-600">Süre:</span>
-            <div className="flex items-center gap-1 font-mono font-extrabold text-sm text-neutral-800">
-              <span className="bg-[#FBF9F5] text-[#B4966E] px-2 py-1 rounded-xs border border-[#E5DEC9]">
-                {String(timeLeft.hours).padStart(2, '0')}
-              </span>
-              <span className="text-[#C5A880]">:</span>
-              <span className="bg-[#FBF9F5] text-[#B4966E] px-2 py-1 rounded-xs border border-[#E5DEC9]">
-                {String(timeLeft.minutes).padStart(2, '0')}
-              </span>
-              <span className="text-[#C5A880]">:</span>
-              <span className="bg-[#C5A880] text-white px-2 py-1 rounded-xs animate-pulse">
-                {String(timeLeft.seconds).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
+          {/* Clean Light Countdown Timer - Isolated from cards */}
+          <FlashCountdownBadge />
         </div>
 
         {/* Product Cards Grid - Clean Warm Palette */}
@@ -113,19 +125,20 @@ export const FlashDeals: React.FC = () => {
             return (
               <div
                 key={product.id}
-                className="group relative bg-white border border-[#E5DEC9] hover:border-[#C5A880] rounded-xs overflow-hidden transition-all duration-300 shadow-xs hover:shadow-md flex flex-col justify-between"
+                className="group relative bg-white border border-[#E5DEC9] hover:border-[#C5A880] rounded-xs overflow-hidden transition-[border-color,box-shadow] duration-300 shadow-xs hover:shadow-md flex flex-col justify-between"
               >
                 <div>
                   {/* Image Container */}
                   <div className="relative aspect-[4/3] bg-[#F9F7F2] overflow-hidden">
-                    <img
+                    <OptimizedImage
                       src={getProductImage(product)}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
                     />
 
                     {/* Discount Badge */}
-                    <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1">
+                    <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
                       <span className="bg-[#C5A880] text-white font-extrabold text-xs px-2.5 py-1 rounded-xs uppercase tracking-wider shadow-xs">
                         %{discountPercent} İNDİRİM
                       </span>
@@ -134,7 +147,7 @@ export const FlashDeals: React.FC = () => {
                     {/* Favorite Button */}
                     <button
                       onClick={() => toggleFavorite(product)}
-                      className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5DEC9] shadow-xs transition-all duration-300 hover:scale-110 cursor-pointer ${
+                      className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5DEC9] shadow-xs transition-transform duration-200 hover:scale-110 cursor-pointer transform-gpu ${
                         fav ? 'text-rose-500' : 'text-neutral-400 hover:text-[#C5A880]'
                       }`}
                       aria-label="Favorilere Ekle"
@@ -150,7 +163,7 @@ export const FlashDeals: React.FC = () => {
                     </span>
                     <Link
                       href={`/urun/${product.id}`}
-                      className="font-semibold text-sm text-neutral-800 hover:text-[#C5A880] transition-colors line-clamp-1 block"
+                      className="font-semibold text-sm text-neutral-800 hover:text-[#C5A880] transition-colors duration-200 line-clamp-1 block"
                     >
                       {product.name}
                     </Link>
@@ -182,7 +195,7 @@ export const FlashDeals: React.FC = () => {
                 <div className="p-4 pt-0">
                   <button
                     onClick={() => addToCart(product, 1)}
-                    className="w-full bg-[#C5A880] hover:bg-[#B4966E] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                    className="w-full bg-[#C5A880] hover:bg-[#B4966E] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xs transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
                     <ShoppingBag className="h-4 w-4" />
                     <span>Hemen Sepete Ekle</span>
@@ -197,7 +210,7 @@ export const FlashDeals: React.FC = () => {
         <div className="text-center pt-2">
           <Link
             href="/indirimler"
-            className="inline-flex items-center gap-2 border border-[#C5A880] text-[#B4966E] hover:bg-[#C5A880] hover:text-white text-xs font-bold uppercase tracking-widest py-3 px-8 rounded-xs transition-all"
+            className="inline-flex items-center gap-2 border border-[#C5A880] text-[#B4966E] hover:bg-[#C5A880] hover:text-white text-xs font-bold uppercase tracking-widest py-3 px-8 rounded-xs transition-colors duration-200"
           >
             <span>Tüm Fırsat Ürünlerini Gör</span>
             <ArrowRight className="h-4 w-4" />

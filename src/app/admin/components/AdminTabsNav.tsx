@@ -3,15 +3,17 @@
 import React from 'react';
 import { 
   LayoutGrid, Truck, FolderTree, Package, Tag, Sliders, FileText, 
-  Megaphone, Sparkles, Phone, Building2 
+  Megaphone, Sparkles, Phone, Building2, RefreshCw, MapPin 
 } from 'lucide-react';
 import { AdminModuleMode } from './AdminHeader';
 
 export type AdminTabId = 
   | 'overview' 
   | 'orders' 
+  | 'products'
+  | 'erpSync'
+  | 'deliveryZones'
   | 'categories' 
-  | 'products' 
   | 'coupons'
   | 'homeCMS' 
   | 'corporateCMS' 
@@ -43,7 +45,9 @@ export const AdminTabsNav: React.FC<AdminTabsNavProps> = ({
   const ecommerceTabs = [
     { id: 'overview', label: 'Genel Bakış', icon: LayoutGrid },
     { id: 'orders', label: 'Siparişler', count: counts.orders, icon: Truck },
-    { id: 'products', label: 'Ürün Kataloğu', count: counts.products, icon: Package },
+    { id: 'products', label: 'Web Kataloğu', count: counts.products, icon: Package },
+    { id: 'erpSync', label: 'CRM / ERP Senkronizasyonu', icon: RefreshCw },
+    { id: 'deliveryZones', label: 'Teslimat & Şehirler', icon: MapPin },
     { id: 'categories', label: 'Kategoriler', count: counts.categories, icon: FolderTree },
     { id: 'coupons', label: 'Kuponlar', count: counts.coupons, icon: Tag },
   ];

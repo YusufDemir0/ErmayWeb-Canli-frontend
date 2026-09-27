@@ -29,7 +29,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
       ? (p.category as { slug?: string }).slug 
       : String(p.category || '');
     return catSlug.toLowerCase().includes(selectedCategory.toLowerCase()) || 
-           (p as any).categoryId === selectedCategory;
+           p.categoryId === selectedCategory;
   });
 
   const handlePrint = () => {

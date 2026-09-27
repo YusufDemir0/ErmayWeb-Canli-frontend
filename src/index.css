@@ -208,5 +208,18 @@
   }
 }
 
+/* High-Performance Rendering & GPU Acceleration */
+.transform-gpu {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 
+.will-change-transform {
+  will-change: transform;
+}
+
+.contain-paint {
+  contain: paint;
+}
 

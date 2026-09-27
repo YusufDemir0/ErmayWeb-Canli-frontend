@@ -58,7 +58,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
       title: '2026 Yönetici ve Makam Koleksiyonu',
       subtitle: 'Masif iskelet ve hakiki deri işçiliğiyle üretilmiş zamansız parçalar.',
       badge: 'YENİ SEZON İMALAT',
-      image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1200',
+      image: '/default-furniture.webp',
       buttonText: 'Koleksiyonu Keşfet',
       buttonLink: '/katalog',
     };

@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
+import OptimizedImage from './OptimizedImage';
 
 interface CategoryListProps {
   title?: string;
@@ -25,12 +26,9 @@ export const CategoryList: React.FC<CategoryListProps> = ({
   const subtitle = propSubtitle || homeConfig.categoriesSubtitle || 'Eviniz ve yaşam alanınız için en seçkin koleksiyonlar';
 
   const categoryItems = storeCategories.length > 0 ? storeCategories : [
-    { id: 'cat-1', name: 'Koltuk Takımları', slug: 'koltuk-takimlari', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
-    { id: 'cat-2', name: 'Yemek Odası', slug: 'yemek-odalari', image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=600' },
-    { id: 'cat-3', name: 'Makam Takımları', slug: 'makam-takimlari', image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=600' },
-    { id: 'cat-4', name: 'Yatak Odası', slug: 'yatak-odalari', image: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=600' },
-    { id: 'cat-5', name: 'TV Üniteleri', slug: 'tv-uniteleri', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=600' },
-    { id: 'cat-6', name: 'Aksesuarlar', slug: 'aksesuarlar', image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=600' },
+    { id: 'f2143ac4-7df4-4dc3-8cb3-fef2fccfee72', name: 'Oturma Odası', slug: 'oturma-odasi', image: '/default-furniture.webp' },
+    { id: 'b4a01ede-5120-4c19-ad0a-292d4918922a', name: 'Yemek Odası', slug: 'yemek-odasi', image: '/default-furniture.webp' },
+    { id: '1db98bad-99c0-44ac-8737-91d3457a0d5a', name: 'Yatak Odası', slug: 'yatak-odasi', image: '/default-furniture.webp' },
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -173,11 +171,11 @@ export const CategoryList: React.FC<CategoryListProps> = ({
                 </span>
 
                 <div className="w-full h-full rounded-full overflow-hidden relative bg-[#FBF9F5]">
-                  <img
+                  <OptimizedImage
                     src={cat.image}
                     alt={cat.name}
+                    fill
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-115 pointer-events-none"
-                    loading="lazy"
                   />
                   <div 
                     className={`absolute inset-0 bg-neutral-900/10 transition-opacity duration-300 ${

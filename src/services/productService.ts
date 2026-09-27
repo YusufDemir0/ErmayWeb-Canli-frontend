@@ -1,12 +1,25 @@
+import { cache } from 'react';
 import type { Product, Category } from '../types';
 import apiClient from './api';
 
+export interface ProductQueryParams {
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const productService = {
-  async getProducts(category?: string, search?: string): Promise<Product[]> {
+  async getProducts(paramsOrCategory?: ProductQueryParams | string, search?: string): Promise<Product[]> {
     try {
-      const response = await apiClient.get('/products', {
-        params: { category, search },
-      });
+      const params = typeof paramsOrCategory === 'object' && paramsOrCategory !== null
+        ? paramsOrCategory
+        : { category: paramsOrCategory, search };
+
+      const response = await apiClient.get('/products', { params });
 
       if (response.data?.success && Array.isArray(response.data.products)) {
         return response.data.products;
@@ -53,3 +66,11 @@ export const productService = {
     }
   },
 };
+
+/**
+ * Server-Side deduplicated product fetcher using React's cache().
+ * Prevents redundant HTTP requests between generateMetadata and Page component in Next.js App Router.
+ */
+export const getProductByIdCached = cache(async (id: string): Promise<Product | null> => {
+  return productService.getProductById(id);
+});

@@ -35,6 +35,8 @@ export interface Product {
   name: string;
   category: string | { id: string; name: string; slug: string };
   category_id?: string;
+  categoryId?: string;
+  color?: string;
   price: number;
   originalPrice?: number;
   stock?: number;
@@ -56,6 +58,8 @@ export interface Product {
   drawerCount?: number; // Çekmece sayısı (örn: 2, 3, 4, 6)
   unitCount?: number;   // Takım/ünite parça sayısı (örn: 1, 2, 3, 4)
   colorOptions?: string[]; // Çoklu renk isimleri (örn: ['Siyah', 'Antrasit', 'Ceviz', 'Gri'])
+  createdAt?: string;
+  updatedAt?: string;
   material: string; // Malzeme & Kumaş
   setContents?: string[] | string; // Takım İçeriği
   setPieces?: ProductSetPiece[]; // Yapılandırılmış Takım Parçaları
@@ -66,6 +70,8 @@ export interface Product {
   inStock?: boolean;
   salesCount?: number;
   vatRate?: number;
+  erpItemId?: string;
+  erpItemCode?: string;
 }
 
 export interface SocialLinksConfig {

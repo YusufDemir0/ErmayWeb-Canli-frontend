@@ -12,12 +12,16 @@ import { useDiscountStore } from '../stores/useDiscountStore';
  */
 export default function AppInitializer({ children }: { children: ReactNode }) {
   useEffect(() => {
-    useAuthStore.getState().checkAuthSession();
+    const init = async () => {
+      await useAuthStore.getState().checkAuthSession();
+      if (typeof window !== 'undefined' && localStorage.getItem('auth_token')) {
+        useOrderStore.getState().fetchOrders();
+      }
+    };
+    init();
+    // Only fetch minimal CMS layout blocks (header/ticker/contact/popup) globally.
+    // Heavy product, category, coupon and store collections are fetched on-demand per page.
     useCMSStore.getState().fetchCmsBlocks();
-    useCMSStore.getState().fetchProductsAndCategories();
-    useCMSStore.getState().fetchStores();
-    useOrderStore.getState().fetchOrders();
-    useDiscountStore.getState().fetchCoupons();
   }, []);
 
   return <>{children}</>;

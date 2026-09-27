@@ -1,9 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Clock, Store, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Store, ExternalLink, Building } from 'lucide-react';
 import { DEFAULT_STORES } from '../../stores/useCMSStore';
 import { cmsService } from '../../services/cmsService';
+import type { StoreItem } from '../../types';
 
 export const revalidate = 60; // ISR
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     siteName: 'Ermay Mobilya',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+        url: '/default-furniture.webp',
         width: 1200,
         height: 800,
         alt: 'Ermay Mobilya Modoko Mağazası',
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
 export default async function BayilerPage() {
   const remoteStores = await cmsService.getStores();
   const allStores = remoteStores && remoteStores.length > 0 ? remoteStores : DEFAULT_STORES;
-  const activeStores = allStores.filter((s: any) => s.isActive !== false);
+  const activeStores = allStores.filter((s: StoreItem) => s.isActive !== false);
 
   return (
     <div className="w-full bg-[#FAF8F5] min-h-screen py-12">
@@ -81,11 +82,18 @@ export default async function BayilerPage() {
             >
               <div>
                 <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
-                  <img
-                    src={store.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'}
-                    alt={store.name}
-                    className="w-full h-full object-cover"
-                  />
+                  {store.image ? (
+                    <img
+                      src={store.image}
+                      alt={store.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-100 text-neutral-400">
+                      <Building className="h-8 w-8 text-neutral-300 mb-1" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Ermay Mağazası</span>
+                    </div>
+                  )}
                   <span className="absolute top-3 left-3 bg-[#FAF8F5] text-neutral-900 font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-xs shadow-xs border border-[#EAE3D2]">
                     {store.city} {store.district ? `/ ${store.district}` : ''}
                   </span>

@@ -9,7 +9,7 @@ import {
   ShieldCheck, Sparkles, ChevronRight, Eye, EyeOff, Lock, FileText, Upload, Printer
 } from 'lucide-react';
 import { useAuthStore, type UserAddress, type SavedCard } from '../../stores/useAuthStore';
-import { useOrderStore, type Order } from '../../stores/useOrderStore';
+import { useOrderStore, type Order, type OrderItem } from '../../stores/useOrderStore';
 import IntlPhoneInput from '../../components/IntlPhoneInput';
 import AddressModal from '../../components/AddressModal';
 import AnimatedCreditCard from '../../components/AnimatedCreditCard';
@@ -56,12 +56,10 @@ function AccountPageContent() {
     router.push(`/hesabim?tab=${tab}`, { scroll: false });
   };
 
-  // Auth Protection Guard
+  // Auth Protection Guard (KVKK compliance: user accounts paused)
   useEffect(() => {
-    if (!isAuthLoading && (!isAuthenticated || !user)) {
-      router.push('/giris?redirect=/hesabim');
-    }
-  }, [isAuthenticated, user, isAuthLoading, router]);
+    // No-op for KVKK guest compliance
+  }, []);
 
   // Profile Settings Form State
   const [profileName, setProfileName] = useState('');
@@ -127,7 +125,34 @@ function AccountPageContent() {
   }
 
   if (!isAuthenticated || !user) {
-    return null;
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center bg-neutral-50 p-4 py-16">
+        <div className="max-w-md w-full bg-white border border-neutral-200 rounded-sm shadow-md p-8 text-center space-y-5">
+          <div className="inline-flex p-3 bg-amber-100 text-amber-800 rounded-full">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-lg font-bold uppercase tracking-wider text-neutral-900">
+              KVKK & Veri Güvenliği Bildirimi
+            </h1>
+            <p className="text-xs text-neutral-600 leading-relaxed font-normal">
+              Kişisel Verilerin Korunması Kanunu (KVKK) uyum ilkelerimiz gereği, bireysel kullanıcı paneli ve oturum açma işlemleri geçici olarak askıya alınmıştır.
+            </p>
+            <p className="text-xs text-neutral-800 font-semibold pt-1">
+              Siparişlerinizi doğrudan misafir olarak oluşturabilir, sipariş ve üretim durumunuzu WhatsApp Sipariş Hattımız (<strong>0532 419 41 51</strong>) üzerinden sorgulayabilirsiniz.
+            </p>
+          </div>
+          <div className="pt-2">
+            <Link
+              href="/"
+              className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3 px-4 rounded-xs transition-colors flex items-center justify-center gap-2 shadow-xs"
+            >
+              <span>Ana Sayfaya Dön</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Handle Profile Update Submission
@@ -591,14 +616,20 @@ function AccountPageContent() {
                         {order.items.map((item, idx) => (
                           <div key={idx} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
                             <div className="flex items-center gap-3">
-                              <img src={item.product?.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1000'} alt="" className="w-14 h-14 rounded-xs object-cover border border-neutral-200 bg-white" />
+                              {item.product?.image ? (
+                                <img src={item.product.image} alt="" className="w-14 h-14 rounded-xs object-cover border border-neutral-200 bg-white" />
+                              ) : (
+                                <div className="w-14 h-14 rounded-xs border border-neutral-200 bg-neutral-100 flex items-center justify-center text-[8px] font-bold text-neutral-400 text-center">
+                                  Görsel Yok
+                                </div>
+                              )}
                               <div>
                                 <p className="font-bold text-neutral-800">{item.product?.name || 'Ürün'}</p>
                                 <span className="text-neutral-500 text-[11px]">{item.quantity} Adet</span>
                               </div>
                             </div>
                             <span className="font-semibold text-brand-dark">
-                              {formatPrice(Number((item as any).unitPrice || item.price || item.product?.price || 0) * item.quantity)}
+                              {formatPrice(Number(item.unitPrice || item.price || item.product?.price || 0) * item.quantity)}
                             </span>
                           </div>
                         ))}

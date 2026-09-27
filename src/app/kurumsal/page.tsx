@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     siteName: 'Ermay Mobilya',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+        url: '/default-furniture.webp',
         width: 1200,
         height: 800,
         alt: 'Ermay Mobilya Atölyesi',
@@ -39,7 +39,7 @@ const DEFAULT_CORP_DATA = {
   heroSubtitle: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen lüks ev ve ofis mobilyaları.',
   experienceYears: '40+ Yıl',
   experienceSubtitle: 'Kesintisiz İmalat Güvencesi',
-  storyImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+  storyImage: '/default-furniture.webp',
   storyTitle: 'İmalat Felsefemiz ve Zanaat Geleneğimiz',
   storyContent: `Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün modern üretim tesisleri ve geniş satış ağı ile sürdürmektedir.\n\nHer bir parçada kullanılan %100 fırınlanmış gürgen ağacı, birinci sınıf çelik konstrüksiyon ve hakiki döşemelik kumaşlar, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.`,
   visionTitle: 'İmalat Vizyonumuz',

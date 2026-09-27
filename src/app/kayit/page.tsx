@@ -72,101 +72,49 @@ function RegisterForm() {
         </p>
       </div>
 
-      {errorMsg && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          <span>{errorMsg}</span>
+      {/* KVKK Bilgilendirme ve Misafir Alışverişi Uyarısı */}
+      <div className="bg-amber-50 border border-amber-300 rounded-sm p-5 space-y-4 text-left">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h2 className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+              KVKK & Veri Güvenliği Bilgilendirmesi
+            </h2>
+            <p className="text-xs text-amber-800 leading-relaxed font-normal">
+              6698 Sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyum süreci kapsamında bireysel üyelik kayıtları geçici olarak durdurulmuştur.
+            </p>
+            <p className="text-xs text-amber-900 font-semibold pt-1">
+              Tüm mobilya modellerimizi üyelik zorunluluğu olmaksızın <strong>Misafir Alışverişi</strong> ile doğrudan sipariş edebilirsiniz.
+            </p>
+          </div>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-            Ad Soyad
-          </label>
-          <div className="relative">
+        <Link
+          href="/sepet"
+          className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3 px-4 rounded-xs transition-colors flex items-center justify-center gap-2 text-center shadow-xs"
+        >
+          <span>Sepete & Alışverişe Dön</span>
+        </Link>
+      </div>
+
+      {/* Kayıt Formu - KVKK Kapsamında Geçici Olarak Gizlenmiştir */}
+      <div className="hidden">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              Ad Soyad
+            </label>
             <input
               type="text"
-              required
               value={name}
-              onChange={(e) => setName(e.target.value.replace(/[0-9]/g, ''))}
-              placeholder="Ahmet Yılmaz"
-              className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+              onChange={(e) => setName(e.target.value)}
+              className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs"
             />
-            <User className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
           </div>
-        </div>
-
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-            E-Posta Adresi
-          </label>
-          <div className="relative">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ahmet@example.com"
-              className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
-            />
-            <Mail className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-            Telefon Numarası (Alan Kodlu)
-          </label>
-          <IntlPhoneInput value={phone} onChange={setPhone} />
-        </div>
-
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-            Şifre (En az 6 karakter)
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full pl-9 pr-10 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
-            />
-            <KeyRound className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 transition-colors cursor-pointer"
-              title={showPassword ? 'Şifreyi Gizle' : 'Şifreyi Göster'}
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold uppercase tracking-widest py-3.5 rounded-xs transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Hesap Oluşturuluyor...</span>
-            </>
-          ) : (
-            <span>Kayıt Ol ve Giriş Yap</span>
-          )}
-        </button>
-      </form>
-
-      <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-xs">
-        <span className="text-neutral-500">Zaten hesabınız var mı?</span>
-        <Link href={`/giris?redirect=${encodeURIComponent(redirectPath)}`} className="text-brand-camel font-bold hover:underline">
-          Giriş Yap
-        </Link>
+          <button type="submit" disabled className="w-full bg-neutral-400 text-white text-xs py-3.5 rounded-xs">
+            Kayıt Ol
+          </button>
+        </form>
       </div>
     </div>
   );

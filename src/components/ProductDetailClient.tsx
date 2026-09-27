@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, use, useRef } from 'react';
+import React, { useState, useEffect, use, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, 
   CheckCircle2, ArrowLeft, Layers, Ruler, Loader2, Compass, 
   Sparkles, Eye, Check, MessageSquare, CreditCard, Box,
-  Info, CornerDownRight, Send, CheckCircle, Award, Factory
+  Info, CornerDownRight, Send, CheckCircle, Award, Factory,
+  Tag, PlusCircle, Percent, CheckSquare, Square
 } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useCartStore } from '../stores/useCartStore';
@@ -17,21 +18,43 @@ import apiClient from '../services/api';
 import { getProductImages } from '../lib/productImages';
 import type { Product, ProductColorVariant, ProductSetPiece } from '../types';
 import ProductCard from './ProductCard';
+import { toast } from '../stores/useToastStore';
 
 interface ProductDetailClientProps {
   id: string;
+  initialProduct?: Product | null;
 }
 
-// Fallback Luxury Fabric & Leather Color Palette
-const DEFAULT_SWATCHES: ProductColorVariant[] = [
-  { id: 'taba-deri', name: 'İtalyan Taba Hakiki Deri', color: '#8A4B20', hex: '#8A4B20', tag: 'Hakiki Deri' },
-  { id: 'antrasit-nubuk', name: 'Antrasit Mat Nubuk', color: '#2C323B', hex: '#2C323B', tag: 'Nubuk' },
-  { id: 'krem-keten', name: 'Krem Doğal Dokuma Keten', color: '#E4DAC6', hex: '#E4DAC6', tag: 'Keten' },
-  { id: 'vizon-boucle', name: 'Vizon Lüks Bouclé', color: '#877569', hex: '#877569', tag: 'Bouclé' },
-  { id: 'zumrut-kadife', name: 'Zümrüt İtalyan Kadife', color: '#1B382B', hex: '#1B382B', tag: 'Kadife' },
+export interface LuxurySwatch extends ProductColorVariant {
+  category: 'deri' | 'nubuk' | 'keten' | 'boucle' | 'ahsap';
+  categoryLabel: string;
+  description: string;
+}
+
+// 1. Sınıf Mimari ve Lüks Mobilya Kumaş / Deri / Ahşap Kartelası
+export const LUXURY_SWATCHES: LuxurySwatch[] = [
+  { id: 'taba-deri', name: 'İtalyan Taba Hakiki Deri', color: '#8A4B20', hex: '#8A4B20', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: '1. Sınıf nefes alabilir İtalyan dana derisi. Pürüzsüz tuşe ve doğal damarlı doku.' },
+  { id: 'siyah-deri', name: 'Asil Siyah Hakiki Deri', color: '#18181B', hex: '#18181B', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: 'Yüksek sürtünme dayanımlı, lüks mat siyah deri yüzeyi.' },
+  { id: 'antrasit-nubuk', name: 'Antrasit Mat Nubuk', color: '#2C323B', hex: '#2C323B', tag: 'Nubuk', category: 'nubuk', categoryLabel: 'Mat Nubuk', description: 'Su ve leke itici mikrofiber teknolojili yumuşak dokulu nubuk.' },
+  { id: 'duman-nubuk', name: 'Duman Grisi Nubuk', color: '#4B5563', hex: '#4B5563', tag: 'Nubuk', category: 'nubuk', categoryLabel: 'Mat Nubuk', description: 'Yumuşak tuşeli kadifemsi nubuk dokusu, kolay temizlenebilir.' },
+  { id: 'krem-keten', name: 'Krem Doğal Dokuma Keten', color: '#E4DAC6', hex: '#E4DAC6', tag: 'Keten', category: 'keten', categoryLabel: 'Doğal Keten', description: '%100 doğal keten ve pamuk lifi harmanı. Terletmez ve nefes alır.' },
+  { id: 'kum-keten', name: 'Kum Beji Doğal Keten', color: '#D4C5B0', hex: '#D4C5B0', tag: 'Keten', category: 'keten', categoryLabel: 'Doğal Keten', description: 'Aşınmaya dayanıklı sık dokuma keten kumaş, sıcak tonlar.' },
+  { id: 'vizon-boucle', name: 'Vizon Lüks Bouclé', color: '#877569', hex: '#877569', tag: 'Bouclé', category: 'boucle', categoryLabel: 'Lüks Buklet', description: 'Son trend sıcak ve kabarık dokulu buklet kumaş.' },
+  { id: 'zumrut-kadife', name: 'Zümrüt İtalyan Kadife', color: '#1B382B', hex: '#1B382B', tag: 'Kadife', category: 'boucle', categoryLabel: 'İtalyan Kadife', description: 'Zengin parlaklık ve lüks yumuşaklık sunan asil kadife döşeme.' },
+  { id: 'ceviz-ahsap', name: 'Doğal Amerikan Ceviz', color: '#5C381E', hex: '#5C381E', tag: 'Ahşap', category: 'ahsap', categoryLabel: 'Masif Ahşap', description: 'Doğal damarlı Amerikan ceviz kaplama, fırınlanmış dayanıklı gövde.' },
+  { id: 'mese-ahsap', name: 'Açık İskandinav Meşe', color: '#C8A87B', hex: '#C8A87B', tag: 'Ahşap', category: 'ahsap', categoryLabel: 'Masif Ahşap', description: 'Mat vernikli İskandinav açık meşe masif ahşap yüzey.' },
 ];
 
-export default function ProductDetailClient({ id }: ProductDetailClientProps) {
+const DEFAULT_SWATCHES = LUXURY_SWATCHES;
+
+// Module-level cached price formatter
+const detailCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
+  style: 'currency',
+  currency: 'TRY',
+  maximumFractionDigits: 0,
+});
+
+export default function ProductDetailClient({ id, initialProduct }: ProductDetailClientProps) {
   const router = useRouter();
   const storeProducts = useCMSStore((state) => state.products);
   const contactInfo = useCMSStore((state) => state.contactInfo);
@@ -40,22 +63,21 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const isFavorite = useFavoritesStore((state) => state.isFavorite(id));
 
   const [product, setProduct] = useState<Product | null>(() => {
-    return storeProducts.find((p) => p.id === id || p.slug === id) || null;
+    return initialProduct || storeProducts.find((p) => p.id === id || p.slug === id) || null;
   });
-  const [loading, setLoading] = useState(!product);
-  const [notFoundState, setNotFoundState] = useState(false);
+  const [loading, setLoading] = useState(!initialProduct && !product);
+  const [notFoundState, setNotFoundState] = useState(!initialProduct && !product && initialProduct === null);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSwatch, setSelectedSwatch] = useState<ProductColorVariant>(DEFAULT_SWATCHES[0]);
   const [quantity, setQuantity] = useState(1);
   const [addedToCartSuccess, setAddedToCartSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'reviews' | 'payment' | 'delivery'>('desc');
+  const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'reviews' | 'delivery'>('desc');
+  const [activeFabricCategory, setActiveFabricCategory] = useState<'all' | 'deri' | 'nubuk' | 'keten' | 'boucle' | 'ahsap'>('all');
+  const [selectedComplementaryIds, setSelectedComplementaryIds] = useState<string[]>([]);
 
-  // Customer Reviews State
-  const [reviews, setReviews] = useState<Array<{ id: string; name: string; rating: number; date: string; comment: string }>>([
-    { id: 'rev-1', name: 'Murat K.', rating: 5, date: '12 Şubat 2026', comment: 'İmalat kalitesi ve malzeme işçiliği kusursuz. Doğrudan fabrikadan gelmesi ve montaj ekibinin titizliği çok memnun etti.' },
-    { id: 'rev-2', name: 'Selin A.', rating: 5, date: '28 Ocak 2026', comment: 'Döşeme kumaşı ve iskelet dayanımı fotoğraflardan çok daha kaliteli duruyor. Tam istediğimiz ölçülerde teslim edildi.' },
-  ]);
+  // Customer Reviews State (Real authenticated feedback only)
+  const [reviews, setReviews] = useState<Array<{ id: string; name: string; rating: number; date: string; comment: string }>>([]);
   const [newReviewName, setNewReviewName] = useState('');
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState('');
@@ -64,10 +86,17 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   // Fetch real reviews from Backend REST API
   useEffect(() => {
     if (!product?.id) return;
+    interface ApiReview {
+      id: string;
+      userName?: string;
+      rating?: number;
+      createdAt: string;
+      comment: string;
+    }
     apiClient.get(`/reviews/product/${product.id}`)
       .then((res) => {
         if (res.data?.success && Array.isArray(res.data.reviews) && res.data.reviews.length > 0) {
-          const mapped = res.data.reviews.map((r: any) => ({
+          const mapped = res.data.reviews.map((r: ApiReview) => ({
             id: r.id,
             name: r.userName || 'Müşteri',
             rating: r.rating || 5,
@@ -80,21 +109,49 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
       .catch(() => {});
   }, [product?.id]);
 
-  // Hover Lens Zoom States
+  // Hover Lens Zoom States - zero-re-render RAF DOM mutation for 60-120 FPS
   const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+  const zoomImageRef = useRef<HTMLImageElement>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current) return;
+    if (!imageContainerRef.current || !zoomImageRef.current) return;
     const rect = imageContainerRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomOrigin({ x, y });
+
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+    }
+    rafIdRef.current = requestAnimationFrame(() => {
+      if (zoomImageRef.current) {
+        zoomImageRef.current.style.transformOrigin = `${x}% ${y}%`;
+      }
+    });
   };
 
-  // Resilient async load from REST API if not found in store immediately
+  const handleMouseLeave = () => {
+    setIsZoomed(false);
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+    }
+    if (zoomImageRef.current) {
+      zoomImageRef.current.style.transformOrigin = 'center center';
+    }
+  };
+
+  // Resilient async load from REST API if not found in store or initial props immediately
   useEffect(() => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+      if (initialProduct.colors && initialProduct.colors.length > 0) {
+        setSelectedSwatch(initialProduct.colors[0]);
+      }
+      setLoading(false);
+      return;
+    }
+
     let isMounted = true;
     const storeItem = storeProducts.find((p) => p.id === id || p.slug === id);
     if (storeItem) {
@@ -168,7 +225,40 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const imagesList = getProductImages(product);
   const currentImage = imagesList[selectedImageIndex] || imagesList[0];
 
-  const productColors = product.colors && product.colors.length > 0 ? product.colors : DEFAULT_SWATCHES;
+  const productColors: LuxurySwatch[] = useMemo(() => {
+    if (product.colors && product.colors.length > 0) {
+      return product.colors.map((c, idx) => {
+        const cObj = c as unknown as (string | ProductColorVariant);
+        const colStr = typeof cObj === 'string' ? cObj : cObj?.name || '';
+        const colId = typeof cObj === 'string' ? cObj : cObj?.id || '';
+        const colHex = typeof cObj === 'object' && cObj !== null ? (cObj.hex || cObj.color || '#8A4B20') : '#8A4B20';
+
+        const matched = LUXURY_SWATCHES.find(
+          (s) =>
+            (colStr && s.name.toLowerCase().includes(colStr.toLowerCase())) ||
+            (colId && s.id.toLowerCase().includes(colId.toLowerCase()))
+        );
+        if (matched) return matched;
+
+        return {
+          id: colId || `col-${idx}`,
+          name: colStr || 'Özel Renk',
+          color: colHex,
+          hex: colHex,
+          tag: 'Özel Seri',
+          category: 'deri' as const,
+          categoryLabel: 'Döşeme',
+          description: `${colStr || 'Özel Renk'} 1. sınıf döşeme kaplaması.`,
+        };
+      });
+    }
+    return LUXURY_SWATCHES;
+  }, [product.colors]);
+
+  const displayedSwatches = useMemo(() => {
+    if (activeFabricCategory === 'all') return productColors;
+    return productColors.filter((s) => s.category === activeFabricCategory);
+  }, [productColors, activeFabricCategory]);
 
   const handleSelectColor = (swatch: ProductColorVariant) => {
     setSelectedSwatch(swatch);
@@ -251,12 +341,78 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
     })
     .slice(0, 4);
 
+  // "Takımı Tamamla" Bundle Detection
+  const complementaryPieces = useMemo(() => {
+    if (!product) return [];
+    const firstWord = product.name.trim().split(' ')[0].toUpperCase();
+    
+    let matches = storeProducts.filter((p) => {
+      if (p.id === product.id) return false;
+      const pFirstWord = p.name.trim().split(' ')[0].toUpperCase();
+      return pFirstWord === firstWord && pFirstWord.length > 2;
+    });
+
+    if (matches.length < 2) {
+      const catMatches = storeProducts.filter((p) => {
+        if (p.id === product.id) return false;
+        if (matches.some((m) => m.id === p.id)) return false;
+        const cSlug = typeof p.category === 'object' && p.category !== null 
+          ? (p.category as { slug?: string }).slug 
+          : String(p.category || '');
+        return cSlug === productCatSlug;
+      });
+      matches = [...matches, ...catMatches];
+    }
+
+    return matches.slice(0, 3);
+  }, [product, storeProducts, productCatSlug]);
+
+  useEffect(() => {
+    if (complementaryPieces.length > 0) {
+      setSelectedComplementaryIds(complementaryPieces.map((p) => p.id));
+    }
+  }, [complementaryPieces]);
+
+  const toggleComplementaryItem = (pieceId: string) => {
+    setSelectedComplementaryIds((prev) =>
+      prev.includes(pieceId) ? prev.filter((id) => id !== pieceId) : [...prev, pieceId]
+    );
+  };
+
+  const bundleItems = useMemo(() => {
+    return complementaryPieces.filter((p) => selectedComplementaryIds.includes(p.id));
+  }, [complementaryPieces, selectedComplementaryIds]);
+
+  const mainProductPrice = Number(product.price || 0);
+  const bundleSubtotal = bundleItems.reduce((acc, item) => acc + Number(item.price || 0), 0);
+  const rawTotal = mainProductPrice + bundleSubtotal;
+  const bundleDiscount = bundleItems.length > 0 ? Math.round(rawTotal * 0.10) : 0;
+  const finalBundleTotal = rawTotal - bundleDiscount;
+
+  const handleAddBundleToCart = () => {
+    if (!product) return;
+    const customizedMain = {
+      ...product,
+      selectedColor: selectedSwatch.name,
+      selectedVariant: selectedSwatch.id || selectedSwatch.name,
+      variantId: selectedSwatch.id || undefined,
+    };
+    addToCart(customizedMain, quantity);
+
+    for (const item of bundleItems) {
+      addToCart(item, 1);
+    }
+
+    toast.success(
+      'Takım Sepete Eklendi',
+      `${product.name} ve ${bundleItems.length} tamamlayıcı parça %10 Takım Avantajı ile sepetinize eklendi.`
+    );
+    setAddedToCartSuccess(true);
+    setTimeout(() => setAddedToCartSuccess(false), 3000);
+  };
+
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0
-    }).format(price).replace('TRY', 'TL');
+    return detailCurrencyFormatter.format(price).replace('TRY', 'TL');
   };
 
   const cashDiscountPrice = Math.round(product.price * 0.95);
@@ -279,16 +435,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
       itemCondition: 'https://schema.org/NewCondition',
     },
   };
-
-  // Bank Installment Rates Setup
-  const INSTALLMENT_BANKS = [
-    { name: 'World', logo: '💳 Worldcard', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.04 }, { m: 9, r: 0.08 }, { m: 12, r: 0.12 } ] },
-    { name: 'Axess', logo: '💳 Axess', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.04 }, { m: 9, r: 0.08 }, { m: 12, r: 0.12 } ] },
-    { name: 'Maximum', logo: '💳 Maximum', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.04 }, { m: 9, r: 0.08 }, { m: 12, r: 0.12 } ] },
-    { name: 'Bonus', logo: '💳 Bonus', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.04 }, { m: 9, r: 0.08 }, { m: 12, r: 0.12 } ] },
-    { name: 'CardFinans', logo: '💳 CardFinans', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.05 }, { m: 9, r: 0.09 }, { m: 12, r: 0.13 } ] },
-    { name: 'Paraf', logo: '💳 Paraf', rates: [ { m: 1, r: 0 }, { m: 3, r: 0 }, { m: 6, r: 0.04 }, { m: 9, r: 0.08 }, { m: 12, r: 0.12 } ] },
-  ];
 
   return (
     <div className="w-full bg-[#FCFAF6] min-h-screen py-8 md:py-12">
@@ -333,18 +479,19 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
             <div 
               ref={imageContainerRef}
               onMouseEnter={() => setIsZoomed(true)}
-              onMouseLeave={() => setIsZoomed(false)}
+              onMouseLeave={handleMouseLeave}
               onMouseMove={handleMouseMove}
               className="relative aspect-[16/11] bg-neutral-100 rounded-2xs overflow-hidden border border-neutral-200 cursor-crosshair group select-none"
             >
               <img
+                ref={zoomImageRef}
                 src={currentImage}
                 alt={product.name}
                 style={{
-                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transformOrigin: 'center center',
                   transform: isZoomed ? 'scale(2.2)' : 'scale(1)',
                 }}
-                className="w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none"
+                className="w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none transform-gpu will-change-transform"
               />
 
               {/* Zoom Instruction Badge */}
@@ -427,20 +574,45 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
             </p>
 
             {/* Material / Leather Swatch Color Picker */}
-            <div className="space-y-2.5 pt-1 border-t border-neutral-100">
+            <div className="space-y-3 pt-1 border-t border-neutral-100">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-800 flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5 text-[#C5A880]" />
-                  <span>Döşeme / Renk Seçeneği:</span>
+                  <span>Kumaş, Deri & Ahşap Kartelası:</span>
                 </label>
                 <span className="text-xs font-bold text-[#C5A880]">
                   {selectedSwatch.name}
                 </span>
               </div>
 
+              {/* Doku Kategorileri Hızlı Seçim */}
+              <div className="flex flex-wrap items-center gap-1.5 pb-1">
+                {[
+                  { id: 'all' as const, label: 'Tüm Kartela' },
+                  { id: 'deri' as const, label: 'Hakiki Deri' },
+                  { id: 'nubuk' as const, label: 'Mat Nubuk' },
+                  { id: 'keten' as const, label: 'Doğal Keten' },
+                  { id: 'boucle' as const, label: 'Buklet & Kadife' },
+                  { id: 'ahsap' as const, label: 'Masif Ahşap' },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setActiveFabricCategory(cat.id)}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-xs transition-colors cursor-pointer ${
+                      activeFabricCategory === cat.id
+                        ? 'bg-[#8A4B20] text-white shadow-2xs'
+                        : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
               {/* Swatches Grid */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                {productColors.map((swatch, idx) => {
+              <div className="flex flex-wrap items-center gap-2">
+                {displayedSwatches.map((swatch, idx) => {
                   const isSelected = selectedSwatch.name === swatch.name || selectedSwatch.id === swatch.id;
                   const swatchColor = swatch.hex || swatch.color || '#8A4B20';
                   return (
@@ -455,15 +627,41 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                     >
                       <div 
                         style={{ backgroundColor: swatchColor }}
-                        className="w-4 h-4 rounded-full border border-black/10 shadow-2xs"
+                        className="w-3.5 h-3.5 rounded-full border border-black/15 shadow-2xs shrink-0"
                       />
                       <span className="text-[11px] font-semibold text-neutral-800">
                         {swatch.name}
                       </span>
-                      {isSelected && <Check className="h-3 w-3 text-[#C5A880]" />}
+                      {swatch.tag && (
+                        <span className="text-[9px] text-neutral-400 font-normal">
+                          ({swatch.tag})
+                        </span>
+                      )}
+                      {isSelected && <Check className="h-3 w-3 text-[#C5A880] shrink-0" />}
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Selected Fabric Description Box */}
+              <div className="bg-[#FAF8F5] border border-[#EAE3D2] p-3.5 rounded-xs space-y-1.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-neutral-900 flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: selectedSwatch.hex || '#8A4B20' }} />
+                    {selectedSwatch.name}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white border border-[#EAE3D2] text-[#8A4B20]">
+                    {selectedSwatch.tag || 'Özel Seri'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-neutral-600 leading-relaxed">
+                  {(selectedSwatch as LuxurySwatch).description || 'Ermay Mobilya atölyelerinde 1. sınıf işçilikle titizlikle uygulanan özel döşeme seçeneği.'}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-1 text-[10px] font-semibold text-neutral-600">
+                  <span className="flex items-center gap-1 text-emerald-800">✓ Leke Tutmaz Kaplama</span>
+                  <span className="flex items-center gap-1 text-emerald-800">✓ Nefes Alabilir Doku</span>
+                  <span className="flex items-center gap-1 text-emerald-800">✓ 5 Yıl Döşeme Garantisi</span>
+                </div>
               </div>
             </div>
 
@@ -502,9 +700,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                     )}
                   </div>
                 </div>
-                <span className="text-[10px] font-bold text-[#B4966E] bg-white px-2.5 py-1 rounded-2xs border border-[#EAE3D2]">
-                  12 Taksit İmkanı
-                </span>
               </div>
               <div className="text-[11px] text-emerald-800 font-medium pt-1 border-t border-[#EAE3D2]/60 flex items-center justify-between">
                 <span>Havale / EFT ile %5 İndirimli:</span>
@@ -584,24 +779,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                   <span>Seçilen <strong>{selectedSwatch.name}</strong> seçeneği ile sepete eklendi!</span>
                 </div>
               )}
-
-              {/* CRAFTSMAN / ESNAF TRUST BADGES */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-200/80 text-[11px] text-neutral-700">
-                <div className="bg-[#FAF8F5] p-2 rounded-xs border border-[#EAE3D2] flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                  <div>
-                    <strong className="block text-neutral-900 font-bold">Kendi Aracımızla Teslimat</strong>
-                    <span className="text-[10px] text-neutral-500">Marmara bölgesi ücretsiz montaj</span>
-                  </div>
-                </div>
-                <div className="bg-[#FAF8F5] p-2 rounded-xs border border-[#EAE3D2] flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                  <div>
-                    <strong className="block text-neutral-900 font-bold">40 Yıllık Atölye Güvencesi</strong>
-                    <span className="text-[10px] text-neutral-500">5 yıl gövde & iskelet garantisi</span>
-                  </div>
-                </div>
-              </div>
 
               {/* DETAILED TECHNICAL SPECIFICATIONS TABLE (XYZ ÖLÇÜLER, ÇEKMECE & ÜNİTE) */}
               <div className="bg-white border border-[#EAE3D2] rounded-xs p-3.5 space-y-2 text-xs">
@@ -711,16 +888,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               }`}
             >
               Yorumlar ({reviews.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('payment')}
-              className={`py-4 px-6 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
-                activeTab === 'payment'
-                  ? 'border-[#C5A880] text-neutral-900 bg-white shadow-xs'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              Ödeme ve Taksit Seçenekleri
             </button>
             <button
               onClick={() => setActiveTab('delivery')}
@@ -844,55 +1011,60 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
             {/* TAB 3: YORUMLAR & DEĞERLENDİRMELER */}
             {activeTab === 'reviews' && (
               <div className="space-y-8 animate-fade-in">
-                
-                {/* Score Summary */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2]">
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <span className="text-4xl font-extrabold text-neutral-900 block">5.0</span>
-                      <span className="text-[10px] text-neutral-400 uppercase font-bold">5 Üzerinden</span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-amber-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-xs text-neutral-600 font-medium block">
-                        %100 Müşteri Memnuniyeti ({reviews.length} Doğrulanmış Yorum)
-                      </span>
-                    </div>
+                {reviews.length === 0 ? (
+                  <div className="p-8 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2] text-center space-y-2">
+                    <p className="text-xs font-semibold text-neutral-700">Henüz bu model için müşteri değerlendirmesi bulunmuyor.</p>
+                    <p className="text-[11px] text-neutral-500 font-light">Sipariş ve imalat deneyiminizi aşağıdaki form üzerinden ilk siz paylaşabilirsiniz.</p>
                   </div>
-
-                  <span className="text-xs text-neutral-500 italic max-w-sm">
-                    Tüm yorumlar fabrikamızdan teslimat ve montaj hizmeti almış gerçek müşterilerimiz tarafından yapılmıştır.
-                  </span>
-                </div>
-
-                {/* Reviews List */}
-                <div className="space-y-4">
-                  {reviews.map((rev) => (
-                    <div key={rev.id} className="p-4 bg-white rounded-xs border border-neutral-200 space-y-2 shadow-2xs">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-neutral-900">{rev.name}</span>
-                          <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-2 py-0.5 rounded-xs">
-                            Doğrulanmış Alıcı
+                ) : (
+                  <>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2]">
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <span className="text-3xl font-extrabold text-neutral-900 block">
+                            {(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)}
+                          </span>
+                          <span className="text-[10px] text-neutral-400 uppercase font-bold">Ortalama Puan</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1 text-amber-500">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-current" />
+                            ))}
+                          </div>
+                          <span className="text-xs text-neutral-600 font-medium block">
+                            {reviews.length} Müşteri Değerlendirmesi
                           </span>
                         </div>
-                        <span className="text-[10px] text-neutral-400">{rev.date}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-amber-500">
-                        {[...Array(rev.rating)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-current" />
-                        ))}
-                      </div>
-                      <p className="text-xs text-neutral-700 font-light leading-relaxed">
-                        "{rev.comment}"
-                      </p>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Reviews List */}
+                    <div className="space-y-4">
+                      {reviews.map((rev) => (
+                        <div key={rev.id} className="p-4 bg-white rounded-xs border border-neutral-200 space-y-2 shadow-2xs">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-neutral-900">{rev.name}</span>
+                              <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-2 py-0.5 rounded-xs">
+                                Doğrulanmış Alıcı
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-neutral-400">{rev.date}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-amber-500">
+                            {[...Array(rev.rating)].map((_, i) => (
+                              <Star key={i} className="h-3 w-3 fill-current" />
+                            ))}
+                          </div>
+                          <p className="text-xs text-neutral-700 font-light leading-relaxed">
+                            "{rev.comment}"
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 {/* Add Review Form */}
                 <div className="pt-6 border-t border-neutral-100 space-y-4">
@@ -961,70 +1133,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               </div>
             )}
 
-            {/* TAB 4: ÖDEME VE TAKSİT SEÇENEKLERİ */}
-            {activeTab === 'payment' && (
-              <div className="space-y-8 animate-fade-in">
-                
-                {/* Havale / EFT Cash Discount Banner */}
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xs flex items-center justify-between text-xs">
-                  <div className="space-y-1">
-                    <span className="font-bold text-emerald-900 uppercase tracking-wider block">
-                      Banka Havalesi / EFT ile %5 Ekstra İndirim Fırsatı
-                    </span>
-                    <span className="text-emerald-700 font-light">
-                      Siparişinizi havale ile tamamlayarak doğrudan üretici peşin fiyat avantajından yararlanabilirsiniz.
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-emerald-600 block">Peşin Fiyat</span>
-                    <span className="text-lg font-extrabold text-emerald-900">{formatPrice(cashDiscountPrice)}</span>
-                  </div>
-                </div>
-
-                {/* Credit Card Installment Tables */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-[#C5A880]" />
-                    Anlaşmalı Banka Kredi Kartı Taksit Tablosu
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {INSTALLMENT_BANKS.map((bank, bIdx) => (
-                      <div key={bIdx} className="border border-neutral-200 rounded-xs overflow-hidden shadow-2xs">
-                        <div className="bg-[#FAF8F5] p-3 border-b border-neutral-200 font-bold text-xs text-neutral-900 flex items-center justify-between">
-                          <span>{bank.logo}</span>
-                          <span className="text-[10px] text-neutral-500 font-normal">Vade Farksız 3 Taksit</span>
-                        </div>
-                        <table className="w-full text-xs text-left">
-                          <thead className="bg-neutral-50 text-[9px] uppercase text-neutral-500 font-bold border-b border-neutral-100">
-                            <tr>
-                              <th className="py-2 px-3">Taksit</th>
-                              <th className="py-2 px-3">Aylık Tutar</th>
-                              <th className="py-2 px-3 text-right">Toplam</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-neutral-100 text-neutral-700">
-                            {bank.rates.map((rate, rIdx) => {
-                              const totalWithRate = product.price * (1 + rate.r);
-                              const monthly = totalWithRate / rate.m;
-                              return (
-                                <tr key={rIdx} className="hover:bg-neutral-50">
-                                  <td className="py-2 px-3 font-semibold">{rate.m === 1 ? 'Tek Çekim' : `${rate.m} Taksit`}</td>
-                                  <td className="py-2 px-3 font-mono">{formatPrice(monthly)}</td>
-                                  <td className="py-2 px-3 font-mono text-right font-bold text-neutral-900">{formatPrice(totalWithRate)}</td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-            )}
-
             {/* TAB 5: TESLİMAT VE İADE KOŞULLARI */}
             {activeTab === 'delivery' && (
               <div className="space-y-6 animate-fade-in text-neutral-700 text-xs md:text-sm leading-relaxed">
@@ -1065,6 +1173,204 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
           </div>
 
         </div>
+
+        {/* TAKIMI TAMAMLA (FREQUENTLY BOUGHT TOGETHER / BUNDLE) SECTION */}
+        {complementaryPieces.length > 0 && (
+          <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-6 md:p-8 space-y-6 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#EAE3D2] pb-5">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xs bg-[#C5A880]/15 text-[#917248] text-[10px] font-bold uppercase tracking-wider">
+                    <Sparkles className="h-3 w-3" />
+                    Koleksiyon Sinerjisi
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xs bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+                    <Percent className="h-3 w-3" />
+                    %10 Takım Avantajı
+                  </span>
+                </div>
+                <h3 className="font-serif text-xl md:text-2xl font-bold text-neutral-900 tracking-tight">
+                  Takımı Tamamla & Koleksiyon Uyumu
+                </h3>
+                <p className="text-xs text-neutral-500 font-light mt-1">
+                  Mekanınızda kusursuz tasarım bütünlüğü oluşturun. Birlikte seçilen tamamlayıcı parçalarda anında %10 indirim uygulanır.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              {/* Product Cards Row */}
+              <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Main Product Card */}
+                <div className="relative bg-white border-2 border-[#C5A880] rounded-xs p-3 flex flex-col justify-between shadow-xs">
+                  <div className="absolute -top-2.5 left-3 bg-[#C5A880] text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-xs tracking-wider">
+                    Ana Parça
+                  </div>
+                  <div>
+                    <div className="aspect-4/3 w-full bg-[#FCFAF6] rounded-xs overflow-hidden relative mb-2.5 mt-1">
+                      <img
+                        src={currentImage}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <h4 className="text-xs font-bold text-neutral-900 line-clamp-1">
+                      {product.name}
+                    </h4>
+                    <p className="text-[11px] text-[#C5A880] font-medium mt-0.5">
+                      Seçilen Doku: {selectedSwatch.name}
+                    </p>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-neutral-900">
+                      ₺{mainProductPrice.toLocaleString('tr-TR')}
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs">
+                      Dahil
+                    </span>
+                  </div>
+                </div>
+
+                {/* Complementary Pieces Cards */}
+                {complementaryPieces.map((piece) => {
+                  const isSelected = selectedComplementaryIds.includes(piece.id);
+                  const pieceImages = getProductImages(piece);
+                  const pieceThumb = pieceImages[0] || '/images/placeholder.webp';
+                  const pPrice = Number(piece.price || 0);
+
+                  return (
+                    <div
+                      key={piece.id}
+                      onClick={() => toggleComplementaryItem(piece.id)}
+                      className={`relative bg-white border rounded-xs p-3 flex flex-col justify-between cursor-pointer transition-all duration-200 select-none ${
+                        isSelected
+                          ? 'border-neutral-900 ring-1 ring-neutral-900 shadow-xs'
+                          : 'border-neutral-200 opacity-60 hover:opacity-100 hover:border-neutral-300'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-500">
+                            Tamamlayıcı
+                          </span>
+                          <button
+                            type="button"
+                            aria-label={isSelected ? 'Çıkar' : 'Ekle'}
+                            className="text-neutral-900"
+                          >
+                            {isSelected ? (
+                              <CheckSquare className="h-4 w-4 text-[#C5A880]" />
+                            ) : (
+                              <Square className="h-4 w-4 text-neutral-400" />
+                            )}
+                          </button>
+                        </div>
+
+                        <div className="aspect-4/3 w-full bg-[#FCFAF6] rounded-xs overflow-hidden relative mb-2.5">
+                          <img
+                            src={pieceThumb}
+                            alt={piece.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+
+                        <h4 className="text-xs font-bold text-neutral-900 line-clamp-1">
+                          {piece.name}
+                        </h4>
+                        <p className="text-[10px] text-neutral-400 font-light mt-0.5 line-clamp-1">
+                          {typeof piece.category === 'object' && piece.category !== null
+                            ? (piece.category as { name?: string }).name || 'Koleksiyon Parçası'
+                            : String(piece.category || 'Koleksiyon Parçası')}
+                        </p>
+                      </div>
+
+                      <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between">
+                        <span className="text-xs font-bold text-neutral-900">
+                          ₺{pPrice.toLocaleString('tr-TR')}
+                        </span>
+                        <span
+                          className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-xs ${
+                            isSelected
+                              ? 'bg-neutral-900 text-white'
+                              : 'bg-neutral-100 text-neutral-500'
+                          }`}
+                        >
+                          {isSelected ? 'Eklendi' : 'Ekle'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bundle Checkout Summary Box */}
+              <div className="lg:col-span-4 bg-white border border-[#EAE3D2] rounded-xs p-5 space-y-4 shadow-xs">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880]">
+                    Takım Özeti
+                  </span>
+                  <h4 className="text-sm font-bold text-neutral-900">
+                    1 Ana Ürün + {bundleItems.length} Tamamlayıcı Parça
+                  </h4>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-neutral-100 text-xs">
+                  <div className="flex justify-between text-neutral-600">
+                    <span>Toplam Liste Fiyatı:</span>
+                    <span className={bundleDiscount > 0 ? 'line-through text-neutral-400' : 'font-semibold text-neutral-900'}>
+                      ₺{rawTotal.toLocaleString('tr-TR')}
+                    </span>
+                  </div>
+
+                  {bundleDiscount > 0 && (
+                    <div className="flex justify-between items-center text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-xs font-medium">
+                      <span className="flex items-center gap-1">
+                        <Percent className="h-3 w-3" />
+                        Koleksiyon İndirimi (%10):
+                      </span>
+                      <span className="font-bold">
+                        -₺{bundleDiscount.toLocaleString('tr-TR')}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-baseline pt-2 border-t border-neutral-100">
+                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+                      Takım Fiyatı:
+                    </span>
+                    <span className="text-lg font-black text-neutral-900 font-serif">
+                      ₺{finalBundleTotal.toLocaleString('tr-TR')}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddBundleToCart}
+                  className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>
+                    {bundleItems.length > 0 ? 'Tüm Takımı Sepete Ekle' : 'Sadece Ana Ürünü Ekle'}
+                  </span>
+                </button>
+
+                <div className="space-y-1 text-[10px] text-neutral-500 font-light border-t border-neutral-100 pt-3">
+                  <p className="flex items-center gap-1.5">
+                    <Check className="h-3 w-3 text-[#C5A880]" />
+                    Ücretsiz teslimat ve uzman ekip montajı
+                  </p>
+                  <p className="flex items-center gap-1.5">
+                    <Check className="h-3 w-3 text-[#C5A880]" />
+                    Tüm parçalar aynı parti kumaş/ahşap tonunda hazırlanır
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* RELATED PRODUCTS SECTION */}
         {relatedProducts.length > 0 && (

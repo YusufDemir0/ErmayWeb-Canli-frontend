@@ -4,10 +4,9 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import AppInitializer from '../providers/AppInitializer';
 import Navbar from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import CartDrawer from '../components/CartDrawer';
-import FavoritesDrawer from '../components/FavoritesDrawer';
-import ProductQuickView from '../components/ProductQuickView';
+import ClientModals from '../components/ClientModals';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
+import ToastContainer from '../components/ToastContainer';
 import '../index.css';
 
 // Optimize Inter (Modern Sans for UI & body)
@@ -26,6 +25,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ermaymobilya.com'),
   title: 'ERMAY Mobilya | Modoko Masif Ahşap & Atölye İmalatı',
   description: 'Ermay Mobilya - Modoko atölyelerimizde 40 yıllık ustalıkla imal edilen masif ahşap koltuk takımları, yemek odaları, makam takımları ve TV üniteleri. Kendi aracımızla adrese teslim ve montaj.',
   keywords: 'ermay mobilya, masif ahşap, modoko mobilya, koltuk takımı, yemek odası, makam takımı, ahşap atölyesi, istanbul mobilya teslimat',
@@ -43,10 +43,9 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
-          <CartDrawer />
-          <FavoritesDrawer />
-          <ProductQuickView />
+          <ClientModals />
           <FloatingWhatsApp />
+          <ToastContainer />
         </AppInitializer>
       </body>
     </html>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, memo } from 'react';
 import Image from 'next/image';
 
 interface OptimizedImageProps {
@@ -13,11 +13,18 @@ interface OptimizedImageProps {
   priority?: boolean;
   aspectRatio?: string;
   fallbackSrc?: string;
+  sizes?: string;
 }
 
-const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200';
+const cleanImageSrc = (src: string): string => {
+  if (!src) return '';
+  if (src.includes('%252F')) {
+    return src.replace(/%252F/g, '%2F');
+  }
+  return src;
+};
 
-export const OptimizedImage: React.FC<OptimizedImageProps> = ({
+export const OptimizedImage: React.FC<OptimizedImageProps> = memo(({
   src: initialSrc,
   alt,
   className = '',
@@ -26,40 +33,30 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   fill = false,
   priority = false,
   aspectRatio,
-  fallbackSrc = DEFAULT_FALLBACK_IMAGE,
+  fallbackSrc,
+  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string>(initialSrc || '');
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    let cleaned = initialSrc || '';
-    if (cleaned.includes('%252F')) {
-      cleaned = cleaned.replace(/%252F/g, '%2F');
-    }
-    setCurrentSrc(cleaned);
-    setHasError(false);
-    setIsLoading(true);
-  }, [initialSrc, fallbackSrc]);
+  const cleanedSrc = cleanImageSrc(initialSrc);
+  const activeSrc = hasError && fallbackSrc ? fallbackSrc : cleanedSrc;
 
   const handleError = () => {
-    if (currentSrc !== fallbackSrc && fallbackSrc) {
-      setCurrentSrc(fallbackSrc);
-    } else {
+    if (!hasError) {
       setHasError(true);
     }
-    setIsLoading(false);
   };
 
-  // If no source is provided or image failed to load even after fallback
-  if (!currentSrc || (hasError && currentSrc === fallbackSrc)) {
+  // If no source is provided or image failed to load with no valid fallback
+  if (!activeSrc || (hasError && !fallbackSrc)) {
     return (
       <div
-        className={`bg-neutral-800 text-neutral-400 flex flex-col items-center justify-center p-4 text-center select-none ${className}`}
+        className={`bg-neutral-100 text-neutral-400 flex flex-col items-center justify-center p-4 text-center select-none ${className}`}
         style={aspectRatio ? { aspectRatio } : undefined}
       >
         <svg
-          className="h-8 w-8 text-brand-camel/60 mb-2"
+          className="h-8 w-8 text-neutral-300 mb-1"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -68,60 +65,63 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={1.5}
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-          ERMAY MOBİLYA
+        <span className="text-[9px] uppercase font-bold tracking-wider text-neutral-400">
+          Görsel Eklenmedi
         </span>
       </div>
     );
   }
 
-  const isDataUri = currentSrc.startsWith('data:');
-  const isSvg = currentSrc.endsWith('.svg') || currentSrc.includes('image/svg+xml');
+  const isDataUri = activeSrc.startsWith('data:');
+  const isSvg = activeSrc.endsWith('.svg') || activeSrc.includes('image/svg+xml');
 
   // Handle data URIs and inline SVGs directly
   if (isDataUri || isSvg) {
     return (
       <img
-        src={currentSrc}
+        src={activeSrc}
         alt={alt}
-        className={`${className} ${isLoading ? 'blur-sm scale-102' : 'blur-0 scale-100'} transition-all duration-500`}
-        onLoad={() => setIsLoading(false)}
+        className={`${className} ${!isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 transform-gpu`}
+        onLoad={() => setIsLoaded(true)}
         onError={handleError}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
       />
     );
   }
-
-  const isFirebaseStorage = currentSrc.includes('firebasestorage.googleapis.com');
 
   return (
     <div
       className={`relative overflow-hidden ${fill ? 'w-full h-full' : ''}`}
       style={aspectRatio ? { aspectRatio } : undefined}
     >
-      {isLoading && (
-        <div className="absolute inset-0 bg-neutral-200 animate-pulse z-10" />
+      {!isLoaded && !priority && (
+        <div className="absolute inset-0 bg-neutral-100 animate-pulse z-10" />
       )}
       <Image
-        src={currentSrc}
+        src={activeSrc}
         alt={alt}
         width={!fill ? width || 800 : undefined}
         height={!fill ? height || 600 : undefined}
         fill={fill}
         priority={priority}
-        unoptimized={isFirebaseStorage}
-        className={`${className} transition-all duration-700 ease-in-out ${
-          isLoading ? 'scale-105 blur-sm opacity-50' : 'scale-100 blur-0 opacity-100'
+        loading={priority ? undefined : 'lazy'}
+        decoding="async"
+        quality={75}
+        className={`${className} transition-opacity duration-300 transform-gpu ${
+          !isLoaded && !priority ? 'opacity-0' : 'opacity-100'
         }`}
-        onLoad={() => setIsLoading(false)}
+        onLoad={() => setIsLoaded(true)}
         onError={handleError}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        sizes={sizes}
       />
     </div>
   );
-};
+});
+
+OptimizedImage.displayName = 'OptimizedImage';
 
 export default OptimizedImage;
-

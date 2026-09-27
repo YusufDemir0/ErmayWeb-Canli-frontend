@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import KatalogClient from './KatalogClient';
-import { PRODUCTS } from '../../data/mockData';
 import { productService } from '../../services/productService';
+import type { Product } from '../../types';
 
 export const revalidate = 60; // ISR every 60 seconds
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: 'Ermay Mobilya',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+        url: '/default-furniture.webp',
         width: 1200,
         height: 800,
         alt: 'Ermay Mobilya 2026 Kataloğu',
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
 };
 
 export default async function KatalogPage() {
-  let products = PRODUCTS;
+  let products: Product[] = [];
   try {
     const fetched = await productService.getProducts();
     if (fetched && fetched.length > 0) {
       products = fetched;
     }
   } catch (e) {
-    // Fallback to static mock products
+    console.warn('Katalog SSR ürün çekme uyarısı:', e);
   }
 
   return <KatalogClient initialProducts={products} />;

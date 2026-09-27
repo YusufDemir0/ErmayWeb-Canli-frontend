@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -12,6 +12,18 @@ import { useCMSStore } from '../stores/useCMSStore';
 import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
+import { OptimizedImage } from './OptimizedImage';
+
+// Module-level cached price formatter
+const categoryCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
+  style: 'currency',
+  currency: 'TRY',
+  maximumFractionDigits: 0
+});
+
+const formatPrice = (price: number): string => {
+  return categoryCurrencyFormatter.format(price).replace('TRY', 'TL');
+};
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -75,131 +87,169 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
 
   // Resolve Category Name & Category List
   const categoryList = firebaseCategories.length > 0 ? firebaseCategories : [
-    { id: 'cat-1', name: 'Koltuk Takımları', slug: 'koltuk-takimlari', image: '' },
-    { id: 'cat-2', name: 'Yemek Odası', slug: 'yemek-odalari', image: '' },
-    { id: 'cat-3', name: 'Makam Takımları', slug: 'makam-takimlari', image: '' },
-    { id: 'cat-4', name: 'Yatak Odası', slug: 'yatak-odalari', image: '' },
-    { id: 'cat-5', name: 'TV Üniteleri', slug: 'tv-uniteleri', image: '' },
-    { id: 'cat-6', name: 'Aksesuarlar', slug: 'aksesuarlar', image: '' },
+    { id: 'f2143ac4-7df4-4dc3-8cb3-fef2fccfee72', name: 'Oturma Odası', slug: 'oturma-odasi', image: '' },
+    { id: 'b4a01ede-5120-4c19-ad0a-292d4918922a', name: 'Yemek Odası', slug: 'yemek-odasi', image: '' },
+    { id: '1db98bad-99c0-44ac-8737-91d3457a0d5a', name: 'Yatak Odası', slug: 'yatak-odasi', image: '' },
   ];
 
   const currentCategory = categoryList.find(c => c.slug === selectedCatSlug || c.id === selectedCatSlug);
   const categoryName = currentCategory ? currentCategory.name : (selectedCatSlug === 'hepsi' || selectedCatSlug === 'all' ? 'Tüm Ürünler' : 'Koleksiyonlar');
 
-  // Filter products
-  const filteredProducts = allProducts.filter((p) => {
-    // Güvenli slug ve ID çözümleme:
-    const productCatSlug = typeof p.category === 'object' && p.category !== null
-      ? (p.category as { slug?: string }).slug
-      : String(p.category || '');
+  // Filter products - memoized to prevent re-filtering during UI state updates
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((p) => {
+      // Güvenli slug ve ID çözümleme:
+      const productCatSlug = typeof p.category === 'object' && p.category !== null
+        ? (p.category as { slug?: string }).slug
+        : String(p.category || '');
 
-    const pCatId = (p as any).categoryId || (p as any).category_id;
+      const pCatId = p.categoryId || p.category_id;
 
-    // 1. Matches Category
-    const matchesCategory =
-      selectedCatSlug === 'hepsi' ||
-      selectedCatSlug === 'all' ||
-      productCatSlug === selectedCatSlug ||
-      pCatId === selectedCatSlug ||
-      (currentCategory && (pCatId === currentCategory.id || productCatSlug === currentCategory.slug));
+      // 1. Matches Category
+      const matchesCategory =
+        selectedCatSlug === 'hepsi' ||
+        selectedCatSlug === 'all' ||
+        productCatSlug === selectedCatSlug ||
+        pCatId === selectedCatSlug ||
+        (currentCategory && (pCatId === currentCategory.id || productCatSlug === currentCategory.slug));
 
-    // 2. Matches search query
-    const matchesSearch =
-      !effectiveSearch ||
-      p.name.toLowerCase().includes(effectiveSearch) ||
-      (p.description && p.description.toLowerCase().includes(effectiveSearch)) ||
-      (p.material && p.material.toLowerCase().includes(effectiveSearch));
+      // 2. Matches search query
+      const pName = typeof p.name === 'string' ? p.name.toLowerCase() : '';
+      const pDesc = typeof p.description === 'string' ? p.description.toLowerCase() : '';
+      const pMat = typeof p.material === 'string' ? p.material.toLowerCase() : '';
 
-    // 3. Price inputs
-    const matchesMin = appliedMinPrice === '' || p.price >= appliedMinPrice;
-    const matchesMax = appliedMaxPrice === '' || p.price <= appliedMaxPrice;
+      const matchesSearch =
+        !effectiveSearch ||
+        pName.includes(effectiveSearch) ||
+        pDesc.includes(effectiveSearch) ||
+        pMat.includes(effectiveSearch);
 
-    // 4. Material filter
-    const matchesMaterial = selectedMaterials.length === 0 || selectedMaterials.some(m => p.material?.toLowerCase().includes(m.toLowerCase()));
+      // 3. Price inputs
+      const pPriceNum = typeof p.price === 'number' ? p.price : parseFloat(String(p.price || 0));
+      const matchesMin = appliedMinPrice === '' || pPriceNum >= Number(appliedMinPrice);
+      const matchesMax = appliedMaxPrice === '' || pPriceNum <= Number(appliedMaxPrice);
 
-    // 5. Color filter
-    const pColors: string[] = [
-      ...(p.colors || []),
-      ...(p.colorOptions || []),
-      ...((p as any).color ? [(p as any).color] : [])
-    ].map(c => c.toLowerCase());
+      // 4. Material filter
+      const matchesMaterial =
+        selectedMaterials.length === 0 ||
+        selectedMaterials.some(
+          (m) => typeof m === 'string' && pMat.includes(m.toLowerCase())
+        );
 
-    const matchesColor = selectedColors.length === 0 || selectedColors.some(sc => {
-      const scLower = sc.toLowerCase();
-      return pColors.some(pc => pc.includes(scLower) || scLower.includes(pc));
+      // 5. Color filter safely extracted
+      const rawColorList = [
+        ...(Array.isArray(p.colors) ? p.colors : []),
+        ...(Array.isArray(p.colorOptions) ? p.colorOptions : []),
+        ...(p.color ? [p.color] : []),
+      ];
+      const pColors: string[] = rawColorList
+        .map((c) => {
+          if (typeof c === 'string') return c.toLowerCase();
+          if (c && typeof c === 'object' && 'name' in c && typeof (c as { name: unknown }).name === 'string') {
+            return (c as { name: string }).name.toLowerCase();
+          }
+          return '';
+        })
+        .filter((c) => c.length > 0);
+
+      const matchesColor =
+        selectedColors.length === 0 ||
+        selectedColors.some((sc) => {
+          if (typeof sc !== 'string') return false;
+          const scLower = sc.toLowerCase();
+          return pColors.some((pc) => pc.includes(scLower) || scLower.includes(pc));
+        });
+
+      // 6. Width (Boyut X cm) filter
+      const width = p.widthCm || 0;
+      let matchesWidth = true;
+      if (selectedWidthRange === 'compact') {
+        matchesWidth = width > 0 && width < 150;
+      } else if (selectedWidthRange === 'medium') {
+        matchesWidth = width >= 150 && width <= 210;
+      } else if (selectedWidthRange === 'large') {
+        matchesWidth = width > 210;
+      }
+
+      // 7. Drawer count filter
+      const drawers = p.drawerCount || 0;
+      let matchesDrawers = true;
+      if (selectedDrawerFilter === 'none') {
+        matchesDrawers = drawers === 0;
+      } else if (selectedDrawerFilter === '1-2') {
+        matchesDrawers = drawers >= 1 && drawers <= 2;
+      } else if (selectedDrawerFilter === '3-4') {
+        matchesDrawers = drawers >= 3 && drawers <= 4;
+      } else if (selectedDrawerFilter === '5plus') {
+        matchesDrawers = drawers >= 5;
+      }
+
+      // 8. Unit count filter
+      const units = p.unitCount || 1;
+      let matchesUnits = true;
+      if (selectedUnitFilter === '1') {
+        matchesUnits = units === 1;
+      } else if (selectedUnitFilter === '2-3') {
+        matchesUnits = units >= 2 && units <= 3;
+      } else if (selectedUnitFilter === '4plus') {
+        matchesUnits = units >= 4;
+      }
+
+      // 9. Rating filter
+      const matchesRating = minRating === null || p.rating >= minRating;
+
+      // 10. Stock filter
+      const matchesStock = !inStockOnly || p.inStock;
+
+      return (
+        matchesCategory &&
+        matchesSearch &&
+        matchesMin &&
+        matchesMax &&
+        matchesMaterial &&
+        matchesColor &&
+        matchesWidth &&
+        matchesDrawers &&
+        matchesUnits &&
+        matchesRating &&
+        matchesStock
+      );
     });
+  }, [
+    allProducts,
+    selectedCatSlug,
+    currentCategory,
+    effectiveSearch,
+    appliedMinPrice,
+    appliedMaxPrice,
+    selectedMaterials,
+    selectedColors,
+    selectedWidthRange,
+    selectedDrawerFilter,
+    selectedUnitFilter,
+    minRating,
+    inStockOnly
+  ]);
 
-    // 6. Width (Boyut X cm) filter
-    const width = p.widthCm || 0;
-    let matchesWidth = true;
-    if (selectedWidthRange === 'compact') {
-      matchesWidth = width > 0 && width < 150;
-    } else if (selectedWidthRange === 'medium') {
-      matchesWidth = width >= 150 && width <= 210;
-    } else if (selectedWidthRange === 'large') {
-      matchesWidth = width > 210;
-    }
-
-    // 7. Drawer count filter
-    const drawers = p.drawerCount || 0;
-    let matchesDrawers = true;
-    if (selectedDrawerFilter === 'none') {
-      matchesDrawers = drawers === 0;
-    } else if (selectedDrawerFilter === '1-2') {
-      matchesDrawers = drawers >= 1 && drawers <= 2;
-    } else if (selectedDrawerFilter === '3-4') {
-      matchesDrawers = drawers >= 3 && drawers <= 4;
-    } else if (selectedDrawerFilter === '5plus') {
-      matchesDrawers = drawers >= 5;
-    }
-
-    // 8. Unit count filter
-    const units = p.unitCount || 1;
-    let matchesUnits = true;
-    if (selectedUnitFilter === '1') {
-      matchesUnits = units === 1;
-    } else if (selectedUnitFilter === '2-3') {
-      matchesUnits = units >= 2 && units <= 3;
-    } else if (selectedUnitFilter === '4plus') {
-      matchesUnits = units >= 4;
-    }
-
-    // 9. Rating filter
-    const matchesRating = minRating === null || p.rating >= minRating;
-
-    // 10. Stock filter
-    const matchesStock = !inStockOnly || p.inStock;
-
-    return (
-      matchesCategory &&
-      matchesSearch &&
-      matchesMin &&
-      matchesMax &&
-      matchesMaterial &&
-      matchesColor &&
-      matchesWidth &&
-      matchesDrawers &&
-      matchesUnits &&
-      matchesRating &&
-      matchesStock
-    );
-  });
-
-  // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === 'price-asc') return a.price - b.price;
-    if (sortBy === 'price-desc') return b.price - a.price;
-    if (sortBy === 'popular') return (b.salesCount || 0) - (a.salesCount || 0);
-    if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-    return 0;
-  });
+  // Sort products - memoized
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      if (sortBy === 'price-asc') return a.price - b.price;
+      if (sortBy === 'price-desc') return b.price - a.price;
+      if (sortBy === 'popular') return (b.salesCount || 0) - (a.salesCount || 0);
+      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      return 0;
+    });
+  }, [filteredProducts, sortBy]);
 
   // Pagination
   const totalItems = sortedProducts.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentProducts = useMemo(() => {
+    return sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  }, [sortedProducts, indexOfFirstItem, indexOfLastItem]);
 
   const handlePriceFilterSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -247,14 +297,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     setCurrentPage(1);
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0
-    }).format(price).replace('TRY', 'TL');
-  };
-
   const getProductImage = (product: Product): string => {
     if (product.images && typeof product.images === 'object' && 'main' in product.images) {
       return (product.images as ProductImages).main;
@@ -294,10 +336,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                 {categoryName}
               </h1>
               <p className="text-xs text-neutral-500 mt-0.5">Modoko İmalatçısı Güvencesiyle Fabrikadan Doğrudan Satış</p>
-            </div>
-            <div className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1.5 rounded-sm inline-flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>İstanbul & Kocaeli İçi Ücretsiz Kendi Aracımızla Teslimat & Montaj</span>
             </div>
           </div>
         </div>
@@ -714,14 +752,15 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="group relative flex flex-col bg-white border border-[#E5DEC9] rounded-xs overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#C5A880]"
+                    className="group relative flex flex-col bg-white border border-[#E5DEC9] rounded-xs overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-md hover:border-[#C5A880]"
                   >
                     {/* Image */}
                     <Link href={`/urun/${product.id}`} className="relative aspect-[4/3] bg-[#FBF9F5] overflow-hidden block">
-                      <img
+                      <OptimizedImage
                         src={getProductImage(product)}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        fill
+                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
                       />
 
                       {/* Favorite Button */}
@@ -731,7 +770,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                           e.stopPropagation();
                           toggleFavorite(product);
                         }}
-                        className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5DEC9] shadow-xs transition-all hover:scale-110 cursor-pointer ${
+                        className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5DEC9] shadow-xs transition-transform duration-200 hover:scale-110 cursor-pointer transform-gpu ${
                           fav ? 'text-rose-500' : 'text-neutral-400 hover:text-[#C5A880]'
                         }`}
                       >

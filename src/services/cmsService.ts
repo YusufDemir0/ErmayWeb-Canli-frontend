@@ -1,5 +1,6 @@
 import apiClient from './api';
 import type { HeroConfig, CategoryListConfig, PageConfig } from '../types/cms';
+import type { StoreItem } from '../types';
 
 export const DEFAULT_HERO_CONFIG: HeroConfig = {
   autoPlayIntervalMs: 6000,
@@ -109,7 +110,7 @@ export const cmsService = {
     }
   },
 
-  async getCorporateConfig(): Promise<any> {
+  async getCorporateConfig(): Promise<Record<string, unknown> | null> {
     try {
       const response = await apiClient.get('/cms');
       if (response.data?.success && response.data.cms?.corporate_config) {
@@ -121,7 +122,7 @@ export const cmsService = {
     return null;
   },
 
-  async getStores(): Promise<any[]> {
+  async getStores(): Promise<StoreItem[]> {
     try {
       const response = await apiClient.get('/stores');
       if (response.data?.success && Array.isArray(response.data.stores) && response.data.stores.length > 0) {

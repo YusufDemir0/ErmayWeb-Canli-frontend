@@ -16,6 +16,7 @@ import { OverviewTab } from './components/OverviewTab';
 import { OrdersTab } from './components/OrdersTab';
 import { CategoriesTab } from './components/CategoriesTab';
 import { ProductsTab } from './components/ProductsTab';
+import { ErpSyncTab } from './components/ErpSyncTab';
 import { CouponsTab } from './components/CouponsTab';
 import { HomeCMSTab } from './components/HomeCMSTab';
 import { CorporateCMSTab } from './components/CorporateCMSTab';
@@ -23,6 +24,8 @@ import { TickerTab } from './components/TickerTab';
 import { PopupTab } from './components/PopupTab';
 import { ContactTab } from './components/ContactTab';
 import { StoresTab } from './components/StoresTab';
+import { DeliveryZonesTab } from './components/DeliveryZonesTab';
+import { toast } from '../../stores/useToastStore';
 
 export default function AdminPage() {
   // Authentication State
@@ -52,12 +55,14 @@ export default function AdminPage() {
   const showSaveSuccess = (msg: string) => {
     setSavedSuccessMsg(msg);
     setErrorMessage('');
+    toast.success('İşlem Başarılı', msg);
     setTimeout(() => setSavedSuccessMsg(''), 3500);
   };
 
   const showError = (msg: string) => {
     setErrorMessage(msg);
     setSavedSuccessMsg('');
+    toast.error('Hata Oluştu', msg);
   };
 
   // CMS Store Selectors
@@ -358,8 +363,23 @@ export default function AdminPage() {
               />
             )}
 
+            {activeTab === 'erpSync' && (
+              <ErpSyncTab
+                categories={categories}
+                onShowSuccess={showSaveSuccess}
+                onShowError={showError}
+              />
+            )}
+
             {activeTab === 'coupons' && (
               <CouponsTab onShowSuccess={showSaveSuccess} />
+            )}
+
+            {activeTab === 'deliveryZones' && (
+              <DeliveryZonesTab
+                onShowSuccess={showSaveSuccess}
+                onShowError={showError}
+              />
             )}
           </>
         )}

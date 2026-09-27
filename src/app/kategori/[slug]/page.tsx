@@ -1,6 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { CategoryPage } from '../../../components/CategoryPage';
+import { productService } from '../../../services/productService';
+import type { Product } from '../../../types';
+
+export const revalidate = 60; // Incremental Static Regeneration every 60 seconds
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -32,6 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryRoute({ params }: Props) {
   const { slug } = await params;
+  let initialProducts: Product[] = [];
+  try {
+    const fetched = await productService.getProducts(slug === 'hepsi' || slug === 'all' ? undefined : slug);
+    if (Array.isArray(fetched)) {
+      initialProducts = fetched;
+    }
+  } catch (err) {
+    console.warn('CategoryRoute SSR error:', err);
+  }
 
-  return <CategoryPage categorySlug={slug} />;
+  return <CategoryPage categorySlug={slug} initialProducts={initialProducts} />;
 }

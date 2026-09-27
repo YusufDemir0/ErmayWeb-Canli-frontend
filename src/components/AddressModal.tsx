@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, Check } from 'lucide-react';
 import type { UserAddress } from '../stores/useAuthStore';
 import { TURKEY_CITIES, getDistrictsByCityName } from '../lib/turkeyData';
+import apiClient from '../services/api';
 
 interface AddressModalProps {
   isOpen: boolean;
@@ -35,6 +36,17 @@ export const AddressModal: React.FC<AddressModalProps> = ({
   const [title, setTitle] = useState(initialValues?.title || 'Ev Adresi');
   const [zipCode, setZipCode] = useState(initialValues?.zipCode || '34000');
   const [errorMsg, setErrorMsg] = useState('');
+  const [disabledCityNames, setDisabledCityNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    apiClient.get('/geo/delivery-zones')
+      .then(res => {
+        if (res.data?.data?.disabledCityNames) {
+          setDisabledCityNames(res.data.data.disabledCityNames);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const availableDistricts = getDistrictsByCityName(city);
 
@@ -173,12 +185,20 @@ export const AddressModal: React.FC<AddressModalProps> = ({
                 onChange={(e) => handleCityChange(e.target.value)}
                 className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none bg-white font-medium cursor-pointer"
               >
-                {TURKEY_CITIES.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
+                {TURKEY_CITIES.map((c) => {
+                  const isCityDisabled = disabledCityNames.some(d => d.trim().toLowerCase() === c.name.trim().toLowerCase());
+                  return (
+                    <option key={c.id} value={c.name}>
+                      {c.name} {isCityDisabled ? '⚠️ (Teslimat Kapalı)' : ''}
+                    </option>
+                  );
+                })}
               </select>
+              {disabledCityNames.some(d => d.trim().toLowerCase() === city.trim().toLowerCase()) && (
+                <p className="text-[10px] text-amber-700 mt-1 font-medium">
+                  ⚠️ Bu ile geçici olarak web teslimatı kapalıdır.
+                </p>
+              )}
             </div>
             <div>
               <label className="text-xs font-bold text-neutral-800 block mb-1">

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X, Printer, Download, CheckCircle2, ShieldCheck, QrCode } from 'lucide-react';
-import type { Order } from '../stores/useOrderStore';
+import type { Order, OrderItem } from '../stores/useOrderStore';
 
 interface InvoiceModalProps {
   order: Order | null;
@@ -156,7 +156,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ order, isOpen, onClo
               </thead>
               <tbody className="divide-y divide-neutral-200">
                 {order.items.map((item, idx) => {
-                  const unitPrice = Number((item as any).unitPrice || item.price || (item.product ? item.product.price : 0));
+                  const unitPrice = Number(item.unitPrice || item.price || (item.product ? item.product.price : 0));
                   const itemTotal = unitPrice * item.quantity;
                   const itemTax = (itemTotal / 1.20) * 0.20;
                   const itemMatrah = itemTotal - itemTax;

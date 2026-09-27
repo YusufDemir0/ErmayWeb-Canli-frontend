@@ -60,7 +60,7 @@ export const CampaignPopup: React.FC = () => {
         {/* Image Banner */}
         <div className="relative h-48 bg-neutral-900 overflow-hidden">
           <img
-            src={popupConfig.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'}
+            src={popupConfig.image || '/default-furniture.webp'}
             alt={popupConfig.title}
             className="w-full h-full object-cover opacity-85"
           />

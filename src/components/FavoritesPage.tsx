@@ -120,18 +120,13 @@ export const FavoritesPage: React.FC = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (product.inStock) {
-                            addToCart(product, 1);
-                            removeFavorite(product.id);
-                          }
+                          addToCart(product, 1);
+                          removeFavorite(product.id);
                         }}
-                        disabled={!product.inStock}
-                        className={`flex items-center gap-1.5 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all cursor-pointer ${
-                          product.inStock ? 'bg-brand-camel hover:bg-brand-camel-dark' : 'bg-neutral-400 cursor-not-allowed'
-                        }`}
+                        className="flex items-center gap-1.5 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all cursor-pointer bg-brand-camel hover:bg-brand-camel-dark"
                       >
                         <ShoppingBag className="h-3.5 w-3.5" />
-                        <span>{product.inStock ? 'Ekle' : 'Stok Yok'}</span>
+                        <span>Sepete Ekle</span>
                       </button>
                     </div>
                   </div>
@@ -171,17 +166,10 @@ export const FavoritesPage: React.FC = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (product.inStock) {
-                            addToCart(product, 1);
-                            removeFavorite(product.id);
-                          }
+                          addToCart(product, 1);
+                          removeFavorite(product.id);
                         }}
-                        disabled={!product.inStock}
-                        className={`hidden sm:flex items-center gap-1 border text-[10px] tracking-widest font-semibold uppercase py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer ${
-                          product.inStock 
-                            ? 'border-neutral-200 text-neutral-700 hover:border-brand-camel hover:bg-brand-camel hover:text-white' 
-                            : 'border-neutral-200 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                        }`}
+                        className="hidden sm:flex items-center gap-1 border text-[10px] tracking-widest font-semibold uppercase py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-neutral-200 text-neutral-700 hover:border-brand-camel hover:bg-brand-camel hover:text-white"
                       >
                         <ShoppingBag className="h-3 w-3" />
                         <span>Ekle</span>

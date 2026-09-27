@@ -1,32 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { LayoutGrid, List, SlidersHorizontal, Star, ShoppingBag, Eye, Heart, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '../types';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
+import { OptimizedImage } from './OptimizedImage';
 
 interface SalePageProps {
   initialProducts?: Product[];
 }
 
-export const SalePage: React.FC<SalePageProps> = ({
-  initialProducts = [],
-}) => {
-  // Use Firebase-synced products from CMS store
-  const firebaseProducts = useCMSStore((state) => state.products);
-  const allProducts = firebaseProducts.length > 0 ? firebaseProducts : initialProducts;
-  const searchQuery = useUIStore((state) => state.searchQuery);
-  const searchCategory = useUIStore((state) => state.searchCategory);
-  const openQuickView = useUIStore((state) => state.openQuickView);
+// Module-level cached price formatter
+const saleCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
+  style: 'currency',
+  currency: 'TRY',
+  maximumFractionDigits: 0
+});
 
-  const favorites = useFavoritesStore((state) => state.favorites);
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
-  const addToCart = useCartStore((state) => state.addToCart);
+const formatPrice = (price: number): string => {
+  return saleCurrencyFormatter.format(price).replace('TRY', 'TL');
+};
 
-  // --- COUNTDOWN TIMER STATE ---
+const getDiscountRate = (price: number, originalPrice?: number) => {
+  if (!originalPrice) return 0;
+  return Math.round(((originalPrice - price) / originalPrice) * 100);
+};
+
+// Isolated countdown clock: ticks every second without re-rendering the whole catalog
+const SaleCountdownBanner = memo(() => {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
@@ -55,6 +59,42 @@ export const SalePage: React.FC<SalePageProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-light text-neutral-100 uppercase tracking-widest">Kalan Süre:</span>
+      <div className="flex gap-1.5 text-xs font-semibold">
+        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
+          <span>{timeLeft.hours.toString().padStart(2, '0')}</span>
+        </div>
+        <span className="text-white font-bold text-center self-center">:</span>
+        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
+          <span>{timeLeft.minutes.toString().padStart(2, '0')}</span>
+        </div>
+        <span className="text-white font-bold text-center self-center">:</span>
+        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
+          <span>{timeLeft.seconds.toString().padStart(2, '0')}</span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+SaleCountdownBanner.displayName = 'SaleCountdownBanner';
+
+export const SalePage: React.FC<SalePageProps> = ({
+  initialProducts = [],
+}) => {
+  // Use Firebase-synced products from CMS store
+  const firebaseProducts = useCMSStore((state) => state.products);
+  const allProducts = firebaseProducts.length > 0 ? firebaseProducts : initialProducts;
+  const searchQuery = useUIStore((state) => state.searchQuery);
+  const searchCategory = useUIStore((state) => state.searchCategory);
+  const openQuickView = useUIStore((state) => state.openQuickView);
+
+  const favorites = useFavoritesStore((state) => state.favorites);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const addToCart = useCartStore((state) => state.addToCart);
+
   // --- FILTERS STATE ---
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number | ''>('');
@@ -73,62 +113,63 @@ export const SalePage: React.FC<SalePageProps> = ({
   const itemsPerPage = 6;
 
   // Filter ONLY discounted items (i.e. originalPrice exists)
-  const campaignBaseProducts = allProducts.filter(p => !!p.originalPrice);
+  const campaignBaseProducts = useMemo(() => allProducts.filter(p => !!p.originalPrice), [allProducts]);
 
-  const getDiscountRate = (price: number, originalPrice?: number) => {
-    if (!originalPrice) return 0;
-    return Math.round(((originalPrice - price) / originalPrice) * 100);
-  };
+  // Filter application - memoized for performance
+  const filteredProducts = useMemo(() => {
+    return campaignBaseProducts.filter((product) => {
+      // 1. Navbar Search query matching
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const catSlug = typeof product.category === 'object' && product.category !== null ? product.category.slug : String(product.category || '');
+      
+      // 2. Navbar Category dropdown matching
+      const matchesNavbarCategory = searchCategory === 'all' || catSlug === searchCategory;
 
-  // Filter application
-  const filteredProducts = campaignBaseProducts.filter((product) => {
-    // 1. Navbar Search query matching
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const catSlug = typeof product.category === 'object' && product.category !== null ? product.category.slug : String(product.category || '');
-    
-    // 2. Navbar Category dropdown matching
-    const matchesNavbarCategory = searchCategory === 'all' || catSlug === searchCategory;
+      // 3. Sidebar Category matching
+      const matchesSidebarCategory = selectedCats.length === 0 || selectedCats.includes(catSlug);
 
-    // 3. Sidebar Category matching
-    const matchesSidebarCategory = selectedCats.length === 0 || selectedCats.includes(catSlug);
+      // 4. Sidebar Price inputs
+      const matchesMinPrice = appliedMinPrice === '' || product.price >= appliedMinPrice;
+      const matchesMaxPrice = appliedMaxPrice === '' || product.price <= appliedMaxPrice;
 
-    // 4. Sidebar Price inputs
-    const matchesMinPrice = appliedMinPrice === '' || product.price >= appliedMinPrice;
-    const matchesMaxPrice = appliedMaxPrice === '' || product.price <= appliedMaxPrice;
+      // 5. Sidebar Discount threshold
+      const discount = getDiscountRate(product.price, product.originalPrice);
+      const matchesDiscount = discount >= minDiscount;
 
-    // 5. Sidebar Discount threshold
-    const discount = getDiscountRate(product.price, product.originalPrice);
-    const matchesDiscount = discount >= minDiscount;
+      // 6. Sidebar Stock
+      const matchesStock = !inStockOnly || product.inStock;
 
-    // 6. Sidebar Stock
-    const matchesStock = !inStockOnly || product.inStock;
+      return matchesSearch && matchesNavbarCategory && matchesSidebarCategory && matchesMinPrice && matchesMaxPrice && matchesDiscount && matchesStock;
+    });
+  }, [campaignBaseProducts, searchQuery, searchCategory, selectedCats, appliedMinPrice, appliedMaxPrice, minDiscount, inStockOnly]);
 
-    return matchesSearch && matchesNavbarCategory && matchesSidebarCategory && matchesMinPrice && matchesMaxPrice && matchesDiscount && matchesStock;
-  });
-
-  // Sorting
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === 'price-asc') return a.price - b.price;
-    if (sortBy === 'price-desc') return b.price - a.price;
-    if (sortBy === 'popular') return b.salesCount - a.salesCount;
-    if (sortBy === 'rating') return b.rating - a.rating;
-    if (sortBy === 'discount') {
-      const discA = getDiscountRate(a.price, a.originalPrice);
-      const discB = getDiscountRate(b.price, b.originalPrice);
-      return discB - discA;
-    }
-    return 0; // default order
-  });
+  // Sorting - memoized
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      if (sortBy === 'price-asc') return a.price - b.price;
+      if (sortBy === 'price-desc') return b.price - a.price;
+      if (sortBy === 'popular') return b.salesCount - a.salesCount;
+      if (sortBy === 'rating') return b.rating - a.rating;
+      if (sortBy === 'discount') {
+        const discA = getDiscountRate(a.price, a.originalPrice);
+        const discB = getDiscountRate(b.price, b.originalPrice);
+        return discB - discA;
+      }
+      return 0; // default order
+    });
+  }, [filteredProducts, sortBy]);
 
   // Pagination bounds
   const totalItems = sortedProducts.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentProducts = useMemo(() => {
+    return sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  }, [sortedProducts, indexOfFirstItem, indexOfLastItem]);
 
   const handleCategoryCheckboxChange = (catId: string) => {
     setSelectedCats((prev) => {
@@ -157,14 +198,6 @@ export const SalePage: React.FC<SalePageProps> = ({
     setCurrentPage(1);
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0
-    }).format(price).replace('TRY', 'TL');
-  };
-
   return (
     <div className="w-full bg-neutral-50 min-h-screen">
       {/* FLASH CAMPAIGN TICKER */}
@@ -179,23 +212,8 @@ export const SalePage: React.FC<SalePageProps> = ({
             </h2>
           </div>
           
-          {/* Countdown Clock */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-light text-neutral-100 uppercase tracking-widest">Kalan Süre:</span>
-            <div className="flex gap-1.5 text-xs font-semibold">
-              <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-                <span>{timeLeft.hours.toString().padStart(2, '0')}</span>
-              </div>
-              <span className="text-white font-bold text-center self-center">:</span>
-              <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-                <span>{timeLeft.minutes.toString().padStart(2, '0')}</span>
-              </div>
-              <span className="text-white font-bold text-center self-center">:</span>
-              <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-                <span>{timeLeft.seconds.toString().padStart(2, '0')}</span>
-              </div>
-            </div>
-          </div>
+          {/* Isolated High-Performance Countdown Clock */}
+          <SaleCountdownBanner />
         </div>
       </div>
 
@@ -388,15 +406,15 @@ export const SalePage: React.FC<SalePageProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="group relative flex flex-col bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-neutral-300"
+                    className="group relative flex flex-col bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-neutral-300"
                   >
                     {/* Image Box */}
                     <div className="relative aspect-[4/5] bg-neutral-50 overflow-hidden cursor-pointer" onClick={() => openQuickView(product)}>
-                      <img
-                        src={product.image}
+                      <OptimizedImage
+                        src={product.image || ''}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                        loading="lazy"
+                        fill
+                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
                       />
                       {/* Floating Badges */}
                       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
@@ -439,15 +457,12 @@ export const SalePage: React.FC<SalePageProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (product.inStock) addToCart(product, 1);
+                            addToCart(product, 1);
                           }}
-                          disabled={!product.inStock}
-                          className={`flex items-center gap-1.5 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all cursor-pointer ${
-                            product.inStock ? 'bg-brand-camel hover:bg-brand-camel-dark' : 'bg-neutral-400 cursor-not-allowed'
-                          }`}
+                          className="flex items-center gap-1.5 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all cursor-pointer bg-brand-camel hover:bg-brand-camel-dark"
                         >
                           <ShoppingBag className="h-3.5 w-3.5" />
-                          <span>{product.inStock ? 'Ekle' : 'Stok Yok'}</span>
+                          <span>Sepete Ekle</span>
                         </button>
                       </div>
                     </div>
@@ -483,17 +498,12 @@ export const SalePage: React.FC<SalePageProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (product.inStock) addToCart(product, 1);
+                            addToCart(product, 1);
                           }}
-                          disabled={!product.inStock}
-                          className={`hidden sm:flex items-center gap-1 border text-[10px] tracking-widest font-semibold uppercase py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer ${
-                            product.inStock 
-                              ? 'border-neutral-200 text-neutral-700 hover:border-brand-camel hover:bg-brand-camel hover:text-white' 
-                              : 'border-neutral-200 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                          }`}
+                          className="hidden sm:flex items-center gap-1 border text-[10px] tracking-widest font-semibold uppercase py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-neutral-200 text-neutral-700 hover:border-brand-camel hover:bg-brand-camel hover:text-white"
                         >
                           <ShoppingBag className="h-3 w-3" />
-                          <span>{product.inStock ? 'Ekle' : 'Stok Yok'}</span>
+                          <span>Ekle</span>
                         </button>
                       </div>
                     </div>
@@ -510,15 +520,15 @@ export const SalePage: React.FC<SalePageProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="group relative flex flex-col md:flex-row bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-neutral-300"
+                    className="group relative flex flex-col md:flex-row bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-neutral-300"
                   >
                     {/* Left Column: Image Box */}
-                    <div className="relative w-full md:w-64 xl:w-72 bg-neutral-50 flex-shrink-0 cursor-pointer" onClick={() => openQuickView(product)}>
-                      <img
-                        src={product.image}
+                    <div className="relative w-full md:w-64 xl:w-72 aspect-[4/3] md:aspect-auto bg-neutral-50 flex-shrink-0 cursor-pointer overflow-hidden min-h-[200px]" onClick={() => openQuickView(product)}>
+                      <OptimizedImage
+                        src={product.image || ''}
                         alt={product.name}
-                        className="w-full h-full object-cover aspect-[4/3] md:aspect-auto"
-                        loading="lazy"
+                        fill
+                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
                       />
                       {/* Floating Badges */}
                       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">

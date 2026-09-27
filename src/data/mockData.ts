@@ -39,11 +39,11 @@ export const PRODUCTS: Product[] = [
     name: 'Milano Köşe Koltuk Takımı',
     category: 'living-room',
     price: 24500,
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Yeni',
     description: 'Minimalist hatları ve yüksek konforlu yapısıyla salonunuza İtalyan şıklığı getirin. Leke tutmayan keten dokulu ithal kumaş ve masif fırınlanmış gürgen iskelet yapısına sahiptir.',
@@ -79,11 +79,11 @@ export const PRODUCTS: Product[] = [
     category: 'dining',
     price: 12000,
     originalPrice: 14500,
-    image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1577140917170-285929fb55b7?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%17 İndirim',
     description: 'Doğal ceviz kaplamanın eşsiz dokusu, modern metal ayaklar ile buluşuyor. 6-8 kişilik genişleme kapasitesi ve mat ipeksi cila korumasıyla yemek odanızın yıldızı olmaya aday.',
@@ -117,11 +117,11 @@ export const PRODUCTS: Product[] = [
     name: 'Luna Lüks Yatak Odası Seti',
     category: 'bedroom',
     price: 35000,
-    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Popüler',
     description: 'Huzurlu bir uyku alanı için tasarlanan Luna Yatak Odası Takımı, bazalı karyola, iki adet komodin ve 6 kapaklı aynalı dolabı içermektedir. Dokunmatik LED aydınlatma detaylarıyla premium konfor sunar.',
@@ -156,10 +156,10 @@ export const PRODUCTS: Product[] = [
     category: 'living-room',
     price: 4200,
     originalPrice: 4900,
-    image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%15 İndirim',
     description: 'Sade çizgiler, yüksek işlevsellik. İskandinav meşe dokusu ve mat beyaz kapak geçişleriyle salonunuzda ferah ve düzenli bir görünüm sağlar. Kablo geçiş kanalları mevcuttur.',
@@ -192,10 +192,10 @@ export const PRODUCTS: Product[] = [
     name: 'Toscana Deri Tekli Koltuk',
     category: 'living-room',
     price: 8900,
-    image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Özel Tasarım',
     description: 'Hakiki İtalyan derisinin eskitme dokusu, masif meşe çerçeve ile mükemmel bir denge oluşturuyor. Çalışma odanızda veya salonunuzda okuma köşelerinin vazgeçilmezi.',
@@ -228,10 +228,10 @@ export const PRODUCTS: Product[] = [
     name: 'Oniks Mermer Orta Sehpa',
     category: 'living-room',
     price: 6500,
-    image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Tükendi',
     description: 'Her biri kendine özgü damar yapısına sahip doğal Oniks mermer tabla, fırçalanmış pirinç ayaklar üzerinde yükseliyor. Evinize organik bir lüks dokunuş getirin.',
@@ -263,10 +263,10 @@ export const PRODUCTS: Product[] = [
     name: 'Minimalist Sarkıt Avize',
     category: 'accessories',
     price: 1800,
-    image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Yeni',
     description: 'Yemek masanızın veya mutfak adanızın üzerinde sıcak ve davetkar bir atmosfer yaratın. Fırçalanmış şampanya altın rengi metal gövde ve üfleme opal cam küre.',
@@ -298,10 +298,10 @@ export const PRODUCTS: Product[] = [
     name: 'Traverten Taş Vazo',
     category: 'accessories',
     price: 950,
-    image: 'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'El Yapımı',
     description: 'Denizli traverten bloklarından oyularak tamamen el işçiliği ile üretilmiştir. Pürüzlü doğal gözenekli yapısı ile wabi-sabi felsefesini ev dekorasyonunuza yansıtır.',
@@ -333,10 +333,10 @@ export const PRODUCTS: Product[] = [
     category: 'living-room',
     price: 5600,
     originalPrice: 6800,
-    image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%17 İndirim',
     description: 'İthal kadife kaplamalı, derin oturum alanına sahip döner berjer koltuk. Yumuşak sırt desteği ve şık pirinç çember ayak detayıyla salonunuza estetik bir dokunuş katar.',
@@ -370,10 +370,10 @@ export const PRODUCTS: Product[] = [
     category: 'dining',
     price: 9200,
     originalPrice: 11000,
-    image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%16 İndirim',
     description: 'Geniş iç depolama hacmi ve hazeran detaylı kapak tasarımı ile modern-bohem çizgisini yansıtır. Yemek takımlarınız için şık ve işlevsel bir yerleşim sunar.',
@@ -407,10 +407,10 @@ export const PRODUCTS: Product[] = [
     category: 'bedroom',
     price: 18500,
     originalPrice: 22000,
-    image: 'https://images.unsplash.com/photo-1505693395321-883724634266?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1505693395321-883724634266?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Tükendi',
     description: 'Doğal ahşap dokusunun ön planda olduğu, yüzer hissi veren gizli ayaklı karyola tasarımı. Keten kaplamalı yumuşak başlığı ve sağlam ahşap latalı taşıyıcı sistemi ile kaliteli uyku sunar.',
@@ -443,10 +443,10 @@ export const PRODUCTS: Product[] = [
     category: 'bedroom',
     price: 3800,
     originalPrice: 4500,
-    image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%15 İndirim',
     description: 'Evden çalışma alanlarınız için kompakt, işlevsel ve asil bir masa. Masif ayaklar ve 2 çekmeceli ceviz gövdesiyle bilgisayar ve not defterleriniz için ideal çalışma alanını oluşturur.',
@@ -478,10 +478,10 @@ export const PRODUCTS: Product[] = [
     name: 'Aura Masif Lambader',
     category: 'accessories',
     price: 2100,
-    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: 'Yeni',
     description: 'Tripod yapıda masif ahşap ayakları ve keten abajur şapkasıyla oturma odanıza loş ve sıcak bir aydınlatma konforu sunar. Ayak aralarında dekoratif raf mevcuttur.',
@@ -514,10 +514,10 @@ export const PRODUCTS: Product[] = [
     category: 'accessories',
     price: 850,
     originalPrice: 1200,
-    image: 'https://images.unsplash.com/photo-1531835551805-16d864c8d311?auto=format&fit=crop&q=80&w=1200',
+    image: '/default-furniture.webp',
     images: [
-      'https://images.unsplash.com/photo-1531835551805-16d864c8d311?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=1200'
+      '/default-furniture.webp',
+      '/default-furniture.webp'
     ],
     badge: '%30 İndirim',
     description: '3 farklı boyuttan oluşan doğal jüt hasır sepet seti. Battaniyelerinizi, çocuk oyuncaklarını veya saksılarınızı organize etmek için dekoratif ve pratik bir depolama.',

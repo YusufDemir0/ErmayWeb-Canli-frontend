@@ -18,17 +18,17 @@ export default function ProductGridClient({
   const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'new'>('featured');
 
   const products = initialProducts;
-  const featuredProducts = products.filter((p) => p.badge?.includes('Öne Çıkan') || p.rating >= 4.8);
-  const newArrivals = products.slice(0, 8);
 
-  const displayedProducts =
-    activeTab === 'all'
-      ? products.slice(0, 8)
-      : activeTab === 'featured'
-      ? featuredProducts.length > 0
-        ? featuredProducts.slice(0, 8)
-        : products.slice(0, 8)
-      : newArrivals;
+  const displayedProducts = React.useMemo(() => {
+    const featuredProducts = products.filter((p) => p.badge?.includes('Öne Çıkan') || p.rating >= 4.8);
+    const newArrivals = products.slice(0, 8);
+
+    if (activeTab === 'all') return products.slice(0, 8);
+    if (activeTab === 'featured') {
+      return featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : products.slice(0, 8);
+    }
+    return newArrivals;
+  }, [products, activeTab]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">

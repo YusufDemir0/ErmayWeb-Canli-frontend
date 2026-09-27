@@ -1,9 +1,15 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+  }
+  const backendInternal = process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000';
+  return `${backendInternal.replace(/\/+$/, '')}/api/v1`;
+};
 
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   timeout: 45000, // 45s for serverless & cold-start resilience
   headers: {
     'Content-Type': 'application/json',
@@ -11,9 +17,10 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request Interceptor: Attach JWT Bearer token if present
+// Request Interceptor: Attach JWT Bearer token if present & set baseURL dynamically
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    config.baseURL = getApiBaseUrl();
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('admin_jwt_token');
       if (token && config.headers) {

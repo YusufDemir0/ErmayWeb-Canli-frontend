@@ -6,9 +6,13 @@ import apiClient from '../services/api';
 import { isAxiosError } from 'axios';
 
 export interface OrderItem {
+  id?: string;
+  productId?: string;
   product: Product;
   quantity: number;
   price: number;
+  unitPrice?: number;
+  totalPrice?: number;
 }
 
 export type OrderStatus = 
@@ -28,6 +32,16 @@ export interface InvoiceDetails {
   taxOffice?: string;
 }
 
+export interface DeviceInfo {
+  deviceType?: string;
+  os?: string;
+  browser?: string;
+  screenResolution?: string;
+  userAgent?: string;
+  ip?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
 export interface Order {
   id: string;
   orderNumber?: string;
@@ -35,7 +49,19 @@ export interface Order {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
-  shippingAddress: UserAddress;
+  customerPhone2?: string;
+  orderNote?: string;
+  shippingAddress?: UserAddress;
+  shippingCity?: string;
+  shippingDistrict?: string;
+  shippingAddressLine?: string;
+  erpSaleId?: string;
+  erpSaleCode?: string;
+  invoiceType?: 'INDIVIDUAL' | 'CORPORATE' | string;
+  tcKn?: string;
+  companyTitle?: string;
+  taxNo?: string;
+  taxOffice?: string;
   invoiceDetails?: InvoiceDetails;
   items: OrderItem[];
   totalAmount: number;
@@ -50,7 +76,7 @@ export interface Order {
   trackingNumber?: string;
   shippingCarrier?: string;
   cargoCompany?: string;
-  deviceInfo?: any;
+  deviceInfo?: DeviceInfo | null;
   regionCode?: string;
   kvkkAccepted?: boolean;
   createdAt: string;
@@ -112,6 +138,14 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
       createOrderAsync: async (orderData) => {
         try {
           const response = await apiClient.post('/orders', {
+            customerName: orderData.customerName || orderData.shippingAddress?.fullName,
+            customerEmail: orderData.customerEmail,
+            customerPhone: orderData.customerPhone || orderData.shippingAddress?.phone,
+            customerPhone2: orderData.customerPhone2,
+            shippingCity: orderData.shippingAddress?.city,
+            shippingDistrict: orderData.shippingAddress?.district,
+            shippingAddressLine: orderData.shippingAddress?.addressLine,
+            orderNote: orderData.orderNote,
             items: orderData.items.map((i) => ({
               productId: i.product.id,
               variantId: i.product.variantId || undefined,
@@ -124,13 +158,13 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
             companyTitle: orderData.invoiceDetails?.companyTitle,
             taxNo: orderData.invoiceDetails?.taxNo,
             taxOffice: orderData.invoiceDetails?.taxOffice,
-            paymentMethod: typeof orderData.paymentMethod === 'string' ? orderData.paymentMethod.toUpperCase() : 'CREDIT_CARD',
-            couponCode: orderData.discountAmount && orderData.discountAmount > 0 ? (orderData as any).couponCode : undefined,
+            paymentMethod: typeof orderData.paymentMethod === 'string' ? orderData.paymentMethod.toUpperCase() : 'WHATSAPP_ORDER',
+            couponCode: orderData.discountAmount && orderData.discountAmount > 0 ? orderData.couponCode : undefined,
             totalAmount: orderData.totalAmount,
             discountAmount: orderData.discountAmount || 0,
-            deviceInfo: (orderData as any).deviceInfo,
-            regionCode: (orderData as any).regionCode,
-            kvkkAccepted: (orderData as any).kvkkAccepted ?? true,
+            deviceInfo: orderData.deviceInfo,
+            regionCode: orderData.regionCode,
+            kvkkAccepted: orderData.kvkkAccepted ?? true,
           });
 
           if (response.data?.success && response.data.order) {

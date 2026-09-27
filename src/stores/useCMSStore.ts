@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product, Category, StoreItem, SocialLinksConfig } from '../types';
-import { PRODUCTS } from '../data/mockData';
 import apiClient from '../services/api';
 
 export interface CampaignPopupConfig {
@@ -135,7 +134,7 @@ const DEFAULT_POPUP: CampaignPopupConfig = {
   subtitle: 'Özel tasarım ürünlerimizde sepette ekstra %15 indirim fırsatı!',
   discountCode: 'YENISEZON15',
   badgeText: 'FIRSAT',
-  image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600',
+  image: '/default-furniture.webp',
   buttonText: 'Koleksiyonu İncele',
   buttonLink: '/katalog'
 };
@@ -159,7 +158,7 @@ export const DEFAULT_STORES: StoreItem[] = [
     phone: '0532 419 41 51',
     email: 'istanbul@ermaymobilya.com',
     hours: 'Hafta içi: 09:00 - 20:00 | Hafta sonu: 10:00 - 19:00',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800'
+    image: '/default-furniture.webp'
   },
   {
     id: 'store-2',
@@ -170,7 +169,7 @@ export const DEFAULT_STORES: StoreItem[] = [
     phone: '0532 419 41 51',
     email: 'kocaeli@ermaymobilya.com',
     hours: 'Hafta içi: 09:00 - 19:00 | Cumartesi: 09:00 - 18:00',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'
+    image: '/default-furniture.webp'
   },
   {
     id: 'store-3',
@@ -181,7 +180,7 @@ export const DEFAULT_STORES: StoreItem[] = [
     phone: '0532 419 41 51',
     email: 'sakarya@ermaymobilya.com',
     hours: 'Hafta içi: 09:00 - 19:00 | Cumartesi: 09:00 - 18:00',
-    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800'
+    image: '/default-furniture.webp'
   }
 ];
 
@@ -192,7 +191,7 @@ const DEFAULT_HOME_CONFIG: HomeConfig = {
       title: 'Zamansız Tasarım & Lüks Konfor',
       subtitle: 'Ermay Mobilya ile yaşam alanlarınıza İtalyan zarafeti katın.',
       badge: '2026 ÖZEL KOLEKSİYON',
-      image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1600',
+      image: '/default-furniture.webp',
       buttonText: 'Koleksiyonu Keşfet',
       buttonLink: '/katalog'
     }
@@ -208,14 +207,14 @@ const DEFAULT_CORPORATE_CONFIG: CorporateConfig = {
   heroTitle: 'Geleneksel Ahşap Ustalığı,',
   heroHighlight: 'Modern İtalyan Çizgisi.',
   heroSubtitle: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen lüks mobilyalar.',
-  heroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+  heroImage: '/default-furniture.webp',
   storyTitle: 'Zanaat ve Estetiğin Buluşması',
   storyContent: `Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün modern üretim tesisleri ve geniş satış ağı ile sürdürmektedir.\n\nHer bir parçada kullanılan %100 fırınlanmış gürgen ağacı, birinci sınıf çelik konstrüksiyon ve hakiki döşemelik kumaşlar, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.`,
   storyParagraph1: 'Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün geniş satış ağı ile sürdürmektedir.',
   storyParagraph2: 'Her bir parçada kullanılan %100 fırınlanmış gürgen ağacı ve hakiki döşemeler, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.',
   experienceYears: '40+',
   experienceSubtitle: 'Yıllık İmalat Tecrübesi',
-  storyImage: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1000',
+  storyImage: '/default-furniture.webp',
   visionTitle: 'Vizyonumuz',
   visionText: 'Türk mobilya zanaatını dünya ölçeğinde lüks ve kalite standartlarıyla temsil eden öncü marka olmak.',
   missionTitle: 'Misyonumuz',
@@ -226,46 +225,25 @@ const DEFAULT_CORPORATE_CONFIG: CorporateConfig = {
 
 export const DEFAULT_CATEGORIES: Category[] = [
   {
-    id: 'cat-1',
-    name: 'Koltuk Takımları',
-    slug: 'koltuk-takimlari',
-    description: 'İtalyan deri ve kumaş köşe koltuklar',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600',
+    id: 'f2143ac4-7df4-4dc3-8cb3-fef2fccfee72',
+    name: 'Oturma Odası',
+    slug: 'oturma-odasi',
+    description: 'Masif iskeletli lüks koltuk takımları ve berjerler',
+    image: '/default-furniture.webp',
   },
   {
-    id: 'cat-2',
+    id: 'b4a01ede-5120-4c19-ad0a-292d4918922a',
     name: 'Yemek Odası',
-    slug: 'yemek-odalari',
-    description: 'Masif ahşap ve mermer masalar',
-    image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=600',
+    slug: 'yemek-odasi',
+    description: 'Masif ahşap yemek masaları, sandalyeler ve konsollar',
+    image: '/default-furniture.webp',
   },
   {
-    id: 'cat-3',
-    name: 'Makam Takımları',
-    slug: 'makam-takimlari',
-    description: 'Ergonomik ve prestijli ofis takımları',
-    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 'cat-4',
+    id: '1db98bad-99c0-44ac-8737-91d3457a0d5a',
     name: 'Yatak Odası',
-    slug: 'yatak-odalari',
-    description: 'Lüks karyola ve gardırop çözümleri',
-    image: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 'cat-5',
-    name: 'TV Üniteleri',
-    slug: 'tv-uniteleri',
-    description: 'Modüler yaşam alanı konsolları',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 'cat-6',
-    name: 'Aksesuarlar',
-    slug: 'aksesuarlar',
-    description: 'Aydınlatma, ayna ve sehpa çeşitleri',
-    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=600',
+    slug: 'yatak-odasi',
+    description: 'Özel tasarım karyolalar, komodinler ve gardıroplar',
+    image: '/default-furniture.webp',
   },
 ];
 
@@ -273,7 +251,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
       tickerItems: DEFAULT_TICKER,
       campaignPopup: DEFAULT_POPUP,
       contactInfo: DEFAULT_CONTACT,
-      products: PRODUCTS,
+      products: [],
       categories: DEFAULT_CATEGORIES,
       stores: DEFAULT_STORES,
       homeConfig: DEFAULT_HOME_CONFIG,
@@ -331,8 +309,6 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
 
           if (prodRes.data?.success && Array.isArray(prodRes.data.products) && prodRes.data.products.length > 0) {
             set({ products: prodRes.data.products });
-          } else if (!get().products || get().products.length === 0) {
-            set({ products: PRODUCTS });
           }
 
           if (catRes.data?.success && Array.isArray(catRes.data.categories) && catRes.data.categories.length > 0) {
@@ -342,9 +318,6 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
           }
         } catch (err) {
           console.warn('REST API ürün/kategori çekme uyarısı:', err);
-          if (!get().products || get().products.length === 0) {
-            set({ products: PRODUCTS });
-          }
         }
       },
 
@@ -401,30 +374,36 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
       },
 
       deleteCategory: async (id) => {
-        const hasProducts = get().products.some((p) => p.category_id === id || p.category === id);
-        if (hasProducts) {
-          return { success: false, message: 'Bu kategoriye ait ürünler olduğu için silinemez!' };
-        }
-        set((state) => ({
-          categories: state.categories.filter((c) => c.id !== id)
-        }));
         try {
-          await apiClient.delete(`/categories/${id}`);
-        } catch (e) {
-          console.warn('Kategori silme hatası:', e);
+          const res = await apiClient.delete(`/categories/${id}`);
+          if (res.data?.success) {
+            set((state) => ({
+              categories: state.categories.filter((c) => c.id !== id)
+            }));
+            await get().fetchProductsAndCategories();
+            return { success: true, message: res.data.message || 'Kategori silindi.' };
+          }
+          return { success: false, message: res.data?.message || 'Kategori silinemedi.' };
+        } catch (e: unknown) {
+          const msg = e && typeof e === 'object' && 'response' in e
+            ? ((e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Kategori silinemedi.')
+            : (e instanceof Error ? e.message : 'Kategori silinirken bir hata oluştu.');
+          console.warn('Kategori silme hatası:', msg);
+          return { success: false, message: msg };
         }
-        return { success: true, message: 'Kategori silindi.' };
       },
 
       addProduct: async (product) => {
-        set((state) => ({ products: [product, ...state.products] }));
         try {
           const res = await apiClient.post('/products', product);
           if (res.data?.success && res.data.product) {
-            get().fetchProductsAndCategories();
+            await get().fetchProductsAndCategories();
           }
-        } catch (e) {
-          console.warn('Ürün ekleme hatası:', e);
+        } catch (e: unknown) {
+          const msg = e && typeof e === 'object' && 'response' in e
+            ? ((e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Ürün ekleme hatası.')
+            : (e instanceof Error ? e.message : 'Ürün eklenirken bir hata oluştu.');
+          console.warn('Ürün ekleme hatası:', msg);
         }
       },
 

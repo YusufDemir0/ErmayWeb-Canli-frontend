@@ -61,6 +61,22 @@ const DEFAULT_COUPONS: DiscountCoupon[] = [
   },
 ];
 
+interface RawCoupon {
+  id: string;
+  code: string;
+  discountType?: string;
+  discount?: number | string;
+  discountAmount?: number | string;
+  minAmount?: number | string;
+  maxDiscountAmount?: number | string;
+  maxUses?: number;
+  usedCount?: number;
+  expiryDate?: string;
+  isActive?: boolean;
+  enabled?: boolean;
+  description?: string;
+}
+
 export const useDiscountStore = create<DiscountState>()((set, get) => ({
       coupons: DEFAULT_COUPONS,
       isLoading: false,
@@ -70,7 +86,7 @@ export const useDiscountStore = create<DiscountState>()((set, get) => ({
         try {
           const res = await apiClient.get('/coupons').catch(() => apiClient.get('/cms/coupons')).catch(() => ({ data: { success: false, coupons: [] } }));
           if (res.data?.success && Array.isArray(res.data.coupons)) {
-            const normalizedCoupons: DiscountCoupon[] = res.data.coupons.map((c: any) => ({
+            const normalizedCoupons: DiscountCoupon[] = res.data.coupons.map((c: RawCoupon) => ({
               id: c.id,
               code: c.code,
               type: c.discountType === 'fixed' ? 'fixed' : 'percentage',

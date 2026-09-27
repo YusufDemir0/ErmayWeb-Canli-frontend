@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: 'Ermay Mobilya',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+        url: '/default-furniture.webp',
         width: 1200,
         height: 800,
         alt: 'Ermay Mobilya İletişim',

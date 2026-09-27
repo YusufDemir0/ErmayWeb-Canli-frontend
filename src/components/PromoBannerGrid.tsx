@@ -3,36 +3,37 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 
 export const PromoBannerGrid: React.FC = () => {
   const topBanners = [
     {
-      title: 'İTALYAN DERİ KOLTUKLAR',
-      subtitle: 'Hakiki Dana Derisi • Özel Üretim',
+      title: 'LÜKS OTURMA ODALARI',
+      subtitle: 'Hakiki Deri & İthal Kumaş • Özel İmalat',
       badge: 'POPÜLER',
-      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
-      link: '/kategori/koltuk-takimlari',
+      image: '/default-furniture.webp',
+      link: '/kategori/oturma-odasi',
     },
     {
-      title: 'MASİF AHŞAP YEMEK MASALARI',
-      subtitle: 'Doğal Ceviz & Meşe Kaplama',
+      title: 'MASİF AHŞAP YEMEK ODALARI',
+      subtitle: 'Doğal Ceviz & Meşe Kaplama Masalar',
       badge: 'YENİ SEZON',
-      image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=800',
-      link: '/kategori/yemek-odalari',
+      image: '/default-furniture.webp',
+      link: '/kategori/yemek-odasi',
     },
     {
-      title: 'LÜKS MAKAM VE OFİS TAKIMLARI',
-      subtitle: 'Ergonomik & Prestijli Çözümler',
-      badge: '%20 İNDİRİM',
-      image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800',
-      link: '/kategori/makam-takimlari',
+      title: 'ÖZEL TASARIM YATAK ODALARI',
+      subtitle: 'Masif Ahşap Karyola & Şifonyer Çözümleri',
+      badge: 'ATÖLYE',
+      image: '/default-furniture.webp',
+      link: '/kategori/yatak-odasi',
     },
     {
-      title: 'AYDINLATMA & AKSESUARLAR',
-      subtitle: 'Mekanınıza Şıklık Katın',
+      title: '2026 MODOKO KOLEKSİYONU',
+      subtitle: 'Fabrikadan Doğrudan Yaşam Alanınıza',
       badge: 'FIRSAT',
-      image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=800',
-      link: '/kategori/aksesuarlar',
+      image: '/default-furniture.webp',
+      link: '/katalog',
     },
   ];
 
@@ -41,14 +42,14 @@ export const PromoBannerGrid: React.FC = () => {
       title: 'SEZONUN ÖNE ÇIKAN İNDİRİMLERİ',
       subtitle: 'Seçili Modüler Takımlarda Özel Fırsatlar',
       buttonText: 'KAMPANYAYI İNCELE',
-      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1200',
+      image: '/default-furniture.webp',
       link: '/indirimler',
     },
     {
       title: 'İÇ MİMARLIK DANIŞMANLIĞI',
       subtitle: 'Eviniz İçin Ücretsiz 3D Projelendirme Hizmeti',
       buttonText: 'İLETİŞİME GEÇİN',
-      image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+      image: '/default-furniture.webp',
       link: '/iletisim',
     },
   ];
@@ -75,9 +76,10 @@ export const PromoBannerGrid: React.FC = () => {
               href={banner.link}
               className="group relative h-64 rounded-xs overflow-hidden shadow-xs border border-[#E5DEC9] block"
             >
-              <img
+              <OptimizedImage
                 src={banner.image}
                 alt={banner.title}
+                fill
                 className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
               {/* Soft warm gradient overlay */}
@@ -114,9 +116,10 @@ export const PromoBannerGrid: React.FC = () => {
               key={idx}
               className="group relative h-56 md:h-64 rounded-xs overflow-hidden shadow-xs border border-[#E5DEC9]"
             >
-              <img
+              <OptimizedImage
                 src={banner.image}
                 alt={banner.title}
+                fill
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/75 via-neutral-900/40 to-transparent" />

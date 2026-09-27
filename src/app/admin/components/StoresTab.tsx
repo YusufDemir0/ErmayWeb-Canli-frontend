@@ -44,7 +44,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       phone: '0532 419 41 51',
       email: 'info@ermaymobilya.com',
       hours: 'Hafta İçi & Cmt: 09:00 - 20:00 | Pazar: 11:00 - 19:00',
-      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+      image: '',
       mapUrl: '',
       isActive: true,
     });
@@ -179,11 +179,18 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
               <div>
                 {/* Store Image */}
                 <div className="aspect-[16/9] bg-neutral-100 relative overflow-hidden">
-                  <img
-                    src={store.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800'}
-                    alt={store.name}
-                    className="w-full h-full object-cover"
-                  />
+                  {store.image ? (
+                    <img
+                      src={store.image}
+                      alt={store.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-100 text-neutral-400">
+                      <Building2 className="h-8 w-8 text-neutral-300 mb-1" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Görsel Yok</span>
+                    </div>
+                  )}
                   <span className="absolute top-2.5 left-2.5 bg-[#FAF8F5] text-neutral-900 font-bold text-[9px] uppercase px-2.5 py-1 rounded-xs border border-[#EAE3D2] shadow-2xs">
                     {store.city} {store.district ? `/ ${store.district}` : ''}
                   </span>

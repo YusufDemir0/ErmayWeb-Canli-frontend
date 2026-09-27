@@ -25,6 +25,7 @@ export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const contactInfo = useCMSStore((state) => state.contactInfo);
   const socialLinks = useCMSStore((state) => state.socialLinks);
+  const categories = useCMSStore((state) => state.categories);
 
   return (
     <footer id="main-footer" className="bg-[#1C1815] text-neutral-400 text-sm font-light mt-auto print:hidden">
@@ -151,11 +152,21 @@ export const Footer: React.FC = () => {
         <div>
           <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Katalog</h4>
           <ul className="space-y-2.5 text-xs text-neutral-300">
-            <li><Link href="/kategori/koltuk-takimlari" className="hover:text-amber-400 transition-colors">Koltuk Takımları</Link></li>
-            <li><Link href="/kategori/yemek-odalari" className="hover:text-amber-400 transition-colors">Yemek Odası</Link></li>
-            <li><Link href="/kategori/yatak-odalari" className="hover:text-amber-400 transition-colors">Yatak Odası</Link></li>
-            <li><Link href="/kategori/makam-takimlari" className="hover:text-amber-400 transition-colors">Makam Takımları</Link></li>
-            <li><Link href="/kategori/tv-uniteleri" className="hover:text-amber-400 transition-colors">TV Üniteleri</Link></li>
+            {categories && categories.length > 0 ? (
+              categories.map((cat) => (
+                <li key={cat.id}>
+                  <Link href={`/kategori/${cat.slug}`} className="hover:text-amber-400 transition-colors">
+                    {cat.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <>
+                <li><Link href="/kategori/oturma-odasi" className="hover:text-amber-400 transition-colors">Oturma Odası</Link></li>
+                <li><Link href="/kategori/yemek-odasi" className="hover:text-amber-400 transition-colors">Yemek Odası</Link></li>
+                <li><Link href="/kategori/yatak-odasi" className="hover:text-amber-400 transition-colors">Yatak Odası</Link></li>
+              </>
+            )}
             <li><Link href="/kategori/hepsi" className="hover:text-amber-400 transition-colors font-semibold text-amber-500">Tüm Ürünler →</Link></li>
           </ul>
         </div>

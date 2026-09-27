@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
+import OptimizedImage from './OptimizedImage';
 
 export const Hero: React.FC = () => {
   const homeConfig = useCMSStore((state) => state.homeConfig);
@@ -50,12 +51,12 @@ export const Hero: React.FC = () => {
             }`}
           >
             {slide.image ? (
-              <img
+              <OptimizedImage
                 src={slide.image}
                 alt={slide.title || 'Ermay Mobilya'}
-                className={`w-full h-full object-cover transition-transform duration-[8000ms] ease-out ${
-                  isCurrent ? 'scale-105' : 'scale-100'
-                }`}
+                fill
+                priority={index === 0}
+                className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900" />

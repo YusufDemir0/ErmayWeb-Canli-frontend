@@ -1,7 +1,9 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import ProductDetailClient from '../../../components/ProductDetailClient';
-import { PRODUCTS } from '../../../data/mockData';
+import { getProductByIdCached } from '../../../services/productService';
+
+export const revalidate = 60; // Incremental Static Regeneration every 60 seconds
 
 interface Props {
   params: Promise<{
@@ -11,7 +13,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const product = PRODUCTS.find((p) => p.id === id || p.slug === id);
+  const product = await getProductByIdCached(id);
 
   if (!product) {
     return {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'Ermay Mobilya',
       images: [
         {
-          url: product.image || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+          url: product.image || '/default-furniture.webp',
           width: 1200,
           height: 800,
           alt: product.name,
@@ -52,6 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
+  const product = await getProductByIdCached(id);
 
-  return <ProductDetailClient id={id} />;
+  return <ProductDetailClient id={id} initialProduct={product} />;
 }

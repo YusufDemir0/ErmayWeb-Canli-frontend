@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Package, ArrowRight, Check, Sparkles, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '../stores/useCartStore';
 import { useCMSStore } from '../stores/useCMSStore';
+import OptimizedImage from './OptimizedImage';
 
 export const CuratedSets: React.FC = () => {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -17,7 +18,7 @@ export const CuratedSets: React.FC = () => {
       title: 'Milano İtalyan Deri Makam Takımı',
       category: 'Makam & Ofis Takımı',
       tag: 'Tam Takım Avantajı',
-      image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=900',
+      image: '/default-furniture.webp',
       description: 'Masif meşe gövde, İtalyan taba deri kaplama ve döküm pirinç detaylı prestijli yönetici seti.',
       items: [
         '1 Adet Milano 240cm Makam Masası',
@@ -35,7 +36,7 @@ export const CuratedSets: React.FC = () => {
       title: 'Floransa Masif Ahşap Salon Takımı',
       category: 'Oturma Grubu & Salon',
       tag: 'Atölye Özel Kombinasyon',
-      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=900',
+      image: '/default-furniture.webp',
       description: '%100 Fırınlanmış gürgen iskelet, leke tutmaz keten dokuma kumaş ve el işçiliği kapitone detaylar.',
       items: [
         '1 Adet Floransa 4\'lü Ana Koltuk (240cm)',
@@ -52,7 +53,7 @@ export const CuratedSets: React.FC = () => {
       title: 'Roma Doğal Mermer Yemek Odası Takımı',
       category: 'Yemek Odası & Davet',
       tag: 'Özel Seri Paket',
-      image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&q=80&w=900',
+      image: '/default-furniture.webp',
       description: 'İtalyan Calacatta mermer tabla, masif ceviz ayaklar ve nubuk kumaş sandalyeler.',
       items: [
         '1 Adet Roma 220cm Mermer Yemek Masası',
@@ -117,9 +118,10 @@ export const CuratedSets: React.FC = () => {
               <div>
                 {/* Visual */}
                 <div className="aspect-[16/10] w-full overflow-hidden bg-neutral-200 relative">
-                  <img
+                  <OptimizedImage
                     src={setObj.image}
                     alt={setObj.title}
+                    fill
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                   />
                   <div className="absolute top-3 left-3 bg-neutral-900/90 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-2xs border border-white/20">

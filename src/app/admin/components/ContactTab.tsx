@@ -66,8 +66,9 @@ export const ContactTab: React.FC<ContactTabProps> = ({
       } else {
         setTelegramStatusMsg(res.data?.message || 'Telegram bildirimi gönderilemedi.');
       }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Telegram servisiyle bağlantı kurulamadı. Lütfen .env dosyasındaki TELEGRAM_BOT_TOKEN ve TELEGRAM_CHAT_ID ayarlarını kontrol ediniz.';
+    } catch (err: unknown) {
+      const errObj = err as { response?: { data?: { message?: string } } };
+      const msg = errObj.response?.data?.message || 'Telegram servisiyle bağlantı kurulamadı. Lütfen .env dosyasındaki TELEGRAM_BOT_TOKEN ve TELEGRAM_CHAT_ID ayarlarını kontrol ediniz.';
       setTelegramStatusMsg(msg);
     } finally {
       setIsTestingTelegram(false);
@@ -85,8 +86,9 @@ export const ContactTab: React.FC<ContactTabProps> = ({
       } else {
         setReportStatusMsg(res.data?.message || 'Satış raporu gönderilemedi.');
       }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Rapor servisi çağrılamadı. Lütfen SMTP ve e-posta ayarlarını kontrol ediniz.';
+    } catch (err: unknown) {
+      const errObj = err as { response?: { data?: { message?: string } } };
+      const msg = errObj.response?.data?.message || 'Rapor servisi çağrılamadı. Lütfen SMTP ve e-posta ayarlarını kontrol ediniz.';
       setReportStatusMsg(msg);
     } finally {
       setIsSendingReport(false);
