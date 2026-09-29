@@ -172,23 +172,18 @@ export const CuratedSets: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleAddSetToCart(setObj)}
-                    className="bg-neutral-900 hover:bg-[#C5A880] text-white p-2.5 rounded-xs transition-colors cursor-pointer"
-                    title="Takımı Sepete Ekle"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                  </button>
+                <div className="w-full">
                   <Link
                     href={setObj.matchedProduct ? `/urun/${setObj.matchedProduct.id}` : '/katalog'}
-                    className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider px-3.5 py-2.5 rounded-xs transition-colors inline-block"
+                    className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-1.5"
                   >
-                    İncele
+                    <span>Takımı İncele</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
             </div>
+
           ))}
         </div>
 

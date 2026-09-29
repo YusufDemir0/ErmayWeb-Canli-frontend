@@ -4,8 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Check, AlertTriangle, Lock, User, KeyRound, AlertCircle } from 'lucide-react';
 import { useCMSStore } from '../../stores/useCMSStore';
-import { useOrderStore } from '../../stores/useOrderStore';
-import { useDiscountStore } from '../../stores/useDiscountStore';
 import apiClient from '../../services/api';
 import { isAxiosError } from 'axios';
 
@@ -17,7 +15,6 @@ import { OrdersTab } from './components/OrdersTab';
 import { CategoriesTab } from './components/CategoriesTab';
 import { ProductsTab } from './components/ProductsTab';
 import { ErpSyncTab } from './components/ErpSyncTab';
-import { CouponsTab } from './components/CouponsTab';
 import { HomeCMSTab } from './components/HomeCMSTab';
 import { CorporateCMSTab } from './components/CorporateCMSTab';
 import { TickerTab } from './components/TickerTab';
@@ -25,6 +22,8 @@ import { PopupTab } from './components/PopupTab';
 import { ContactTab } from './components/ContactTab';
 import { StoresTab } from './components/StoresTab';
 import { DeliveryZonesTab } from './components/DeliveryZonesTab';
+import { LandingPageTab } from './components/LandingPageTab';
+import { BlogTab } from './components/BlogTab';
 import { toast } from '../../stores/useToastStore';
 
 export default function AdminPage() {
@@ -95,11 +94,6 @@ export default function AdminPage() {
 
   const stores = useCMSStore((state) => state.stores);
 
-  // Orders Store & Coupons Store
-  const orders = useOrderStore((state) => state.orders);
-  const updateOrderStatus = useOrderStore((state) => state.updateOrderStatus);
-  const coupons = useDiscountStore((state) => state.coupons);
-
   // Check login session on mount via Backend JWT Verification
   useEffect(() => {
     async function verifyAdminJWT() {
@@ -130,6 +124,15 @@ export default function AdminPage() {
 
     verifyAdminJWT();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const store = useCMSStore.getState();
+      store.fetchProductsAndCategories();
+      store.fetchStores();
+      store.fetchCmsBlocks();
+    }
+  }, [isAuthenticated]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -306,10 +309,9 @@ export default function AdminPage() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           counts={{
-            orders: orders.length,
+            orders: 0,
             categories: categories.length,
             products: products.length,
-            coupons: coupons.length,
             tickerItems: tickerItems.length,
             stores: stores.length,
           }}
@@ -319,7 +321,7 @@ export default function AdminPage() {
           <>
             {activeTab === 'overview' && (
               <OverviewTab
-                orders={orders}
+                orders={[]}
                 products={products}
                 categoriesCount={categories.length}
                 campaignEnabled={campaignPopup.enabled}
@@ -333,11 +335,7 @@ export default function AdminPage() {
             )}
 
             {activeTab === 'orders' && (
-              <OrdersTab
-                orders={orders}
-                onUpdateOrderStatus={updateOrderStatus}
-                onShowSuccess={showSaveSuccess}
-              />
+              <OrdersTab onShowSuccess={showSaveSuccess} />
             )}
 
             {activeTab === 'categories' && (
@@ -371,9 +369,7 @@ export default function AdminPage() {
               />
             )}
 
-            {activeTab === 'coupons' && (
-              <CouponsTab onShowSuccess={showSaveSuccess} />
-            )}
+
 
             {activeTab === 'deliveryZones' && (
               <DeliveryZonesTab
@@ -386,6 +382,20 @@ export default function AdminPage() {
 
         {activeModule === 'cms' && (
           <>
+            {activeTab === 'landingPage' && (
+              <LandingPageTab
+                onShowSuccess={showSaveSuccess}
+                onShowError={showError}
+              />
+            )}
+
+            {activeTab === 'blog' && (
+              <BlogTab
+                onShowSuccess={showSaveSuccess}
+                onShowError={showError}
+              />
+            )}
+
             {activeTab === 'homeCMS' && (
               <HomeCMSTab
                 homeConfig={homeConfig}

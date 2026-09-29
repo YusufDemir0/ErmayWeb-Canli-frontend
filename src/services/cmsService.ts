@@ -7,37 +7,37 @@ export const DEFAULT_HERO_CONFIG: HeroConfig = {
   slides: [
     {
       id: 'slide-1',
-      title: 'İtalyan Zarafeti ile Yaşam Alanınızı Yenileyin',
-      subtitle: 'El işçiliği doğal masif ahşap ve premium döşemelik kumaşların harmanlandığı özel koleksiyonumuzu keşfedin.',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY MOBİLYA</text></svg>',
+      title: 'Doğrudan Fabrikadan Aracısız Ofis Mobilyaları',
+      subtitle: '1. Sınıf E1 melamin ve çelik konstrüksiyon standart seri üretim; aracı komisyonu olmadan doğrudan fabrika fiyatıyla.',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY OFİS MOBİLYASI</text></svg>',
       ctaText: 'Koleksiyonu Keşfet',
       ctaCategoryFilter: 'all',
-      badgeText: '2026 Özel Koleksiyonu',
+      badgeText: 'Fabrika Satış Fiyatları',
     },
     {
       id: 'slide-2',
-      title: 'Zamansız Tasarım, Üstün Konfor',
-      subtitle: 'Salonunuza şıklık ve huzur katacak lüks köşe koltuklar ve berjer modellerinde özel fırsatlar.',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY OTURMA ODASI</text></svg>',
-      ctaText: 'Oturma Odası Modelleri',
-      ctaCategoryFilter: 'living-room',
-      badgeText: 'Yeni Sezon',
+      title: 'Makam ve Yönetici Takımlarında Seri İmalat',
+      subtitle: 'Yönetici odaları için tasarlanan sağlam, fonksiyonel ve prestijli standart seri modellerimizi inceleyin.',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY MAKAM TAKIMLARI</text></svg>',
+      ctaText: 'Makam Takımları',
+      ctaCategoryFilter: 'makam-takimlari',
+      badgeText: 'Stokta Hazır',
     },
     {
       id: 'slide-3',
-      title: 'Doğal Ahşabın Eşsiz Sıcaklığı',
-      subtitle: '%100 fırınlanmış gürgen ve doğal ceviz kaplama yemek masaları ile soflarınızı taçlandırın.',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23475569"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY YEMEK ODASI</text></svg>',
-      ctaText: 'Yemek Odasını İncele',
-      ctaCategoryFilter: 'dining',
-      badgeText: '%20 İndirim Fırsatı',
+      title: 'Toplu Ofis & Şirket Kurulumu İskontosu',
+      subtitle: '10 ve üzeri çalışma alanı veya tam kat ofis projelerinizde doğrudan fabrikamızdan kademeli toptan iskonto.',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23475569"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="24">ERMAY TOPLU OFİS KURULUMU</text></svg>',
+      ctaText: 'Toptan Teklif Al',
+      ctaCategoryFilter: 'toplanti-masasi-modelleri',
+      badgeText: 'Toptan İskonto',
     },
   ],
 };
 
 export const DEFAULT_CATEGORY_LIST_CONFIG: CategoryListConfig = {
-  title: 'Öne Çıkan Koleksiyonlar',
-  subtitle: 'Evinizin her alanı için özenle tasarlanmış kategoriler',
+  title: 'Standart Seri Fabrika Kategorileri',
+  subtitle: 'Çalışma alanlarınız ve kurumsal ofisiniz için standart seri imalat çözümleri',
   categories: [
     {
       id: 'all',
@@ -46,30 +46,36 @@ export const DEFAULT_CATEGORY_LIST_CONFIG: CategoryListConfig = {
       image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Tüm Koleksiyon</text></svg>',
     },
     {
-      id: 'living-room',
-      name: 'Oturma Odası',
-      slug: 'oturma-odasi',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Oturma Odası</text></svg>',
-      badgeText: 'Popüler',
+      id: 'makam-takimlari',
+      name: 'Makam Takımları',
+      slug: 'makam-takimlari',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Makam Takımları</text></svg>',
+      badgeText: 'Çok Satan',
     },
     {
-      id: 'bedroom',
-      name: 'Yatak Odası',
-      slug: 'yatak-odasi',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23475569"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Yatak Odası</text></svg>',
+      id: 'uniteli-makam-takimlari',
+      name: 'Üniteli Makam Takımları',
+      slug: 'uniteli-makam-takimlari',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23475569"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Üniteli Takımlar</text></svg>',
     },
     {
-      id: 'dining',
-      name: 'Yemek Odası',
-      slug: 'yemek-odasi',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Yemek Odası</text></svg>',
+      id: 'toplanti-masasi-modelleri',
+      name: 'Toplantı Masaları',
+      slug: 'toplanti-masasi-modelleri',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Toplantı Masaları</text></svg>',
     },
     {
-      id: 'accessories',
-      name: 'Aksesuar',
-      slug: 'aksesuar',
-      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Aksesuar</text></svg>',
-      badgeText: 'Yeni',
+      id: 'koltuk-takimlari',
+      name: 'Ofis Koltukları',
+      slug: 'koltuk-takimlari',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Ofis Koltukları</text></svg>',
+      badgeText: 'Stokta',
+    },
+    {
+      id: 'sekreter-ekonomik-takimlar',
+      name: 'Personel Masaları',
+      slug: 'sekreter-ekonomik-takimlar',
+      image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23475569"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23d4af37" font-family="sans-serif" font-size="16">Personel Masaları</text></svg>',
     },
   ],
 };
@@ -133,5 +139,23 @@ export const cmsService = {
     }
     return [];
   },
+
+  async getContactConfig(): Promise<{ phone?: string; whatsapp?: string; email?: string; address?: string }> {
+    try {
+      const response = await apiClient.get('/cms/blocks/contact');
+      if (response.data && typeof response.data === 'object') {
+        return response.data;
+      }
+    } catch {
+      // Fallback
+    }
+    return {
+      phone: '+90 216 365 41 51',
+      whatsapp: '+90 532 419 41 51',
+      email: 'bilgi@ermaymobilya.com',
+      address: 'Modoko Mobilyacılar Sitesi 3. Cadde No: 126 Ümraniye / İstanbul',
+    };
+  },
 };
+
 

@@ -67,11 +67,15 @@ export interface Product {
   selectedColor?: string; // Cart selection
   selectedVariant?: string; // Cart variant selection
   variantId?: string; // Cart variant ID
+  selectedPieces?: string[]; // Seçilen Takım Parçaları
   inStock?: boolean;
+  leadTimeDays?: number; // Üretim/termin süresi (gün)
   salesCount?: number;
   vatRate?: number;
   erpItemId?: string;
   erpItemCode?: string;
+  isPublished?: boolean;
+  archivedAt?: string | null;
 }
 
 export interface SocialLinksConfig {
@@ -107,6 +111,7 @@ export interface StoreItem {
 }
 
 export interface CartItem {
+  itemKey?: string;
   product: Product;
   quantity: number;
 }
@@ -139,5 +144,22 @@ export interface InventoryLock {
   user_id: string;
   locked_quantity: number;
   expires_at: number;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  summary?: string | null;
+  content: string;
+  coverImage?: string | null;
+  category?: string | null;
+  tags?: string[];
+  author?: string;
+  readTimeMin?: number;
+  isPublished?: boolean;
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 

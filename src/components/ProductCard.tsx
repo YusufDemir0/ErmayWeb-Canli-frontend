@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import Link from 'next/link';
-import { Heart, ShoppingBag, Eye } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-react';
 import type { Product, ProductImages } from '../types';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
@@ -28,14 +28,29 @@ const formatPrice = (price: number | string): string => {
   return currencyFormatter.format(num).replace('TRY', 'TL');
 };
 
-const getProductImage = (product: Product): string => {
+interface CardProductImages {
+  main: string;
+  secondary?: string;
+}
+
+const getProductImages = (product: Product): CardProductImages => {
   if (product.images && typeof product.images === 'object' && 'main' in product.images) {
-    return (product.images as ProductImages).main;
+    const imgs = product.images as ProductImages;
+    return {
+      main: imgs.main || product.image || '',
+      secondary: imgs.gallery && imgs.gallery.length > 0 ? imgs.gallery[0] : undefined,
+    };
   }
   if (Array.isArray(product.images) && product.images.length > 0) {
-    return product.images[0];
+    return {
+      main: product.images[0] || product.image || '',
+      secondary: product.images.length > 1 ? product.images[1] : undefined,
+    };
   }
-  return product.image || '';
+  return {
+    main: product.image1 || product.image || '',
+    secondary: product.image2 || undefined,
+  };
 };
 
 const getCategoryLabel = (category: Product['category']): string => {
@@ -77,21 +92,36 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
   };
 
   const isDiscounted = !!product.originalPrice;
-  const productImage = getProductImage(product);
+  const { main: mainImage, secondary: secondaryImage } = getProductImages(product);
   const categoryLabel = getCategoryLabel(product.category);
 
   return (
     <div 
-      className="group relative flex flex-col bg-white border border-neutral-100 rounded-sm overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-neutral-200"
+      className="group relative flex flex-col bg-white border border-[#EAE3D2]/80 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-[#C5A880]/60"
     >
       {/* Image and Badges/Actions */}
-      <Link href={`/urun/${product.id}`} className="relative aspect-[4/5] bg-neutral-100 overflow-hidden block">
+      <Link href={`/urun/${product.id}`} className="relative aspect-[4/5] bg-neutral-100/60 overflow-hidden block">
+        {/* Primary Angle Image */}
         <OptimizedImage
-          src={productImage}
+          src={mainImage}
           alt={product.name}
           fill
-          className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
+          className={`object-cover transform-gpu transition-all duration-700 ease-out will-change-transform ${
+            secondaryImage 
+              ? 'group-hover:scale-105 group-hover:opacity-0' 
+              : 'group-hover:scale-105'
+          }`}
         />
+
+        {/* Secondary Angle Image (Reveals on Hover if exists) */}
+        {secondaryImage && (
+          <OptimizedImage
+            src={secondaryImage}
+            alt={`${product.name} - Detay`}
+            fill
+            className="object-cover absolute inset-0 opacity-0 transform-gpu transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-105 will-change-transform"
+          />
+        )}
 
         {/* Brand/Promo Badge */}
         {product.badge && (
@@ -123,24 +153,6 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
           <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
         </button>
 
-        {/* Hover Action Bar */}
-        <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 via-black/20 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out flex items-center justify-center gap-3 transform-gpu">
-          <span className="flex items-center justify-center gap-1.5 bg-white/95 hover:bg-white text-neutral-800 text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-sm transition-colors shadow-lg">
-            <Eye className="h-3 w-3" />
-            <span>Detayları İncele</span>
-          </span>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddToCart();
-            }}
-            className="flex items-center justify-center gap-1.5 bg-brand-camel hover:bg-brand-camel-dark text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-sm transition-colors shadow-lg cursor-pointer"
-          >
-            <ShoppingBag className="h-3.5 w-3.5" />
-            <span>Ekle</span>
-          </button>
-        </div>
       </Link>
 
       {/* Details Section */}

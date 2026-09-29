@@ -26,7 +26,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: '/odeme', destination: '/talep', permanent: true },
+      { source: '/siparis-takip', destination: '/iletisim', permanent: true },
+      { source: '/giris', destination: '/', permanent: true },
+      { source: '/kayit', destination: '/', permanent: true },
+      { source: '/hesabim', destination: '/', permanent: true },
+      { source: '/hesabim/:path*', destination: '/', permanent: true },
+    ];
+  },
   async rewrites() {
+
     // BACKEND_INTERNAL_URL: server-side env for proxying uploads to backend.
     // Docker compose sets this to http://ermayweb_backend:5000.
     const backendInternal = process.env.BACKEND_INTERNAL_URL || 'http://ermayweb_backend:5000';

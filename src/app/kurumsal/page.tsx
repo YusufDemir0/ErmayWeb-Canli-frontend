@@ -8,12 +8,12 @@ import { cmsService } from '../../services/cmsService';
 export const revalidate = 60; // ISR
 
 export const metadata: Metadata = {
-  title: 'Hakkımızda & İmalat Gücümüz | Ermay Mobilya Modoko',
-  description: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen %100 masif fırınlanmış gürgen iskeletli lüks ev ve ofis mobilyaları. İmalat felsefemiz ve üretim standartlarımız.',
-  keywords: 'ermay mobilya hakkında, modoko mobilya üreticisi, masif mobilya atölyesi, kaliteli ofis mobilyası imalatı',
+  title: 'Hakkımızda & İmalat Gücümüz | Ermay Mobilya',
+  description: 'Kendi modern üretim tesislerimizde standart seri olarak imal edilen dayanıklı, kaliteli ofis mobilyaları. Doğrudan fabrikadan aracısız satış güvencesi ve kurumsal çözümler.',
+  keywords: 'ermay mobilya hakkında, ofis mobilyası üreticisi, doğrudan fabrikadan ofis mobilyası, makam takımları imalatı',
   openGraph: {
     title: 'Hakkımızda & İmalat Gücümüz | Ermay Mobilya',
-    description: '40 yıllık ahşap ustalığı ve modern İtalyan çizgisiyle doğrudan fabrikadan satış güvencesi.',
+    description: 'Doğrudan üretim tesislerimizden aracısız fabrika satış güvencesi ve standart seri ofis çözümleri.',
     url: 'https://ermaymobilya.com/kurumsal',
     siteName: 'Ermay Mobilya',
     images: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         url: '/default-furniture.webp',
         width: 1200,
         height: 800,
-        alt: 'Ermay Mobilya Atölyesi',
+        alt: 'Ermay Mobilya Üretim Tesisleri',
       },
     ],
     locale: 'tr_TR',
@@ -33,19 +33,19 @@ export const metadata: Metadata = {
 };
 
 const DEFAULT_CORP_DATA = {
-  heroBadge: '40 YILLIK TECRÜBE',
-  heroTitle: 'Geleneksel Ahşap Ustalığı,',
-  heroHighlight: 'Modern İtalyan Çizgisi.',
-  heroSubtitle: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen lüks ev ve ofis mobilyaları.',
+  heroBadge: 'DOĞRUDAN ÜRETİCİDEN',
+  heroTitle: 'Fabrikadan Aracısız,',
+  heroHighlight: 'Standart Seri Güvencesi.',
+  heroSubtitle: 'Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı ofis mobilyaları ve kurumsal çalışma alanları.',
   experienceYears: '40+ Yıl',
   experienceSubtitle: 'Kesintisiz İmalat Güvencesi',
   storyImage: '/default-furniture.webp',
-  storyTitle: 'İmalat Felsefemiz ve Zanaat Geleneğimiz',
-  storyContent: `Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün modern üretim tesisleri ve geniş satış ağı ile sürdürmektedir.\n\nHer bir parçada kullanılan %100 fırınlanmış gürgen ağacı, birinci sınıf çelik konstrüksiyon ve hakiki döşemelik kumaşlar, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.`,
+  storyTitle: 'İmalat Felsefemiz ve Üretim Standartlarımız',
+  storyContent: `Ermay Mobilya, modern üretim tesislerinde standart seri ofis mobilyası imalatı yaparak doğrudan kurumsal firmalara ve son kullanıcıya aracısız ulaştırmaktadır.\n\nÜrünlerimizde 1. sınıf E1 melamin paneller, darbe emici 2mm PVC kenar bantları ve elektrostatik fırın boyalı DKP çelik profil ayaklar kullanılarak sağlamlık ve uzun ömür güvence altına alınır. Aracı ve mağaza komisyonlarını ortadan kaldırarak en rekabetçi fabrika fiyatlarını sunuyoruz.`,
   visionTitle: 'İmalat Vizyonumuz',
-  visionText: 'Estetik ve ergonomiyi en yüksek malzeme kalitesiyle buluşturarak uzun ömürlü ve zamansız mobilyalar üretmek.',
+  visionText: 'Ofis ve çalışma alanlarında uzun ömürlü, dayanıklı ve ergonomik standart seri mobilyaları en uygun fabrika fiyatıyla müşterilerimize ulaştırmak.',
   missionTitle: 'Üretim Standartlarımız',
-  missionText: 'Her parçada fırınlanmış gürgen iskelet, leke tutmaz birinci sınıf kumaş ve yüksek dansiteli sünger kullanımı.',
+  missionText: '1. Sınıf E1 melamin paneller, 2mm darbe koruyucu PVC ve elektrostatik boyalı çelik konstrüksiyon ile yüksek kalite standartlarında seri üretim.',
 };
 
 export default async function KurumsalPage() {
@@ -119,19 +119,19 @@ export default async function KurumsalPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[#EAE3D2]">
               <div className="flex items-center gap-2.5">
                 <Hammer className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">%100 Masif Gürgen İskelet İmalatı</span>
+                <span className="text-xs font-semibold text-neutral-800">1. Sınıf E1 Melamin & Çelik Profil İmalatı</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">5 Yıl Koşulsuz İskelet Garantisi</span>
+                <span className="text-xs font-semibold text-neutral-800">2 Yıl Resmi Fabrika Garantisi</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Truck className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">Ücretsiz Kurulum & Sevkiyat Desteği</span>
+                <span className="text-xs font-semibold text-neutral-800">İstanbul İçi Kendi Aracımızla Teslimat & Montaj</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <CheckCircle className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">Doğrudan Fabrika Satış Fiyatları</span>
+                <span className="text-xs font-semibold text-neutral-800">Doğrudan Fabrikadan Aracısız Satış</span>
               </div>
             </div>
           </div>

@@ -26,9 +26,9 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ermaymobilya.com'),
-  title: 'ERMAY Mobilya | Modoko Masif Ahşap & Atölye İmalatı',
-  description: 'Ermay Mobilya - Modoko atölyelerimizde 40 yıllık ustalıkla imal edilen masif ahşap koltuk takımları, yemek odaları, makam takımları ve TV üniteleri. Kendi aracımızla adrese teslim ve montaj.',
-  keywords: 'ermay mobilya, masif ahşap, modoko mobilya, koltuk takımı, yemek odası, makam takımı, ahşap atölyesi, istanbul mobilya teslimat',
+  title: 'ERMAY Mobilya | Doğrudan Fabrikadan Ofis Mobilyaları',
+  description: 'Ermay Mobilya - Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları. Aracısız doğrudan fabrika satışı, İstanbul içi kendi personelimizle teslimat & montaj.',
+  keywords: 'ermay mobilya, ofis mobilyası, makam takımı, toplantı masası, çalışma masası, ofis koltukları, banko modelleri, doğrudan fabrikadan satış, toptan ofis mobilyası',
 };
 
 export default function RootLayout({

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 const ANNOUNCEMENTS = [
-  '10.000 TL üzeri alışverişlerde ücretsiz teslimat ve kurulum',
-  'Özel koleksiyonlarda vade farksız 6 taksit imkanı',
-  'Doğrudan üreticiden, fabrikadan birinci el satış ve teslimat'
+  'İstanbul İçi Ücretsiz Teslimat ve Profesyonel Montaj',
+  'Modoko Showroom & İmalat Atölyesi — Doğrudan Üretici Güvencesi',
+  'WhatsApp Üzerinden Fabrika Satış & Toplu Sipariş Temsilcisi'
 ];
 
 export const AnnouncementBar: React.FC = () => {

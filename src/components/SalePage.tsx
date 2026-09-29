@@ -29,57 +29,21 @@ const getDiscountRate = (price: number, originalPrice?: number) => {
   return Math.round(((originalPrice - price) / originalPrice) * 100);
 };
 
-// Isolated countdown clock: ticks every second without re-rendering the whole catalog
-const SaleCountdownBanner = memo(() => {
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
-      const difference = endOfDay.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        return { hours: 0, minutes: 0, seconds: 0 };
-      }
-
-      return {
-        hours: Math.floor(difference / (1000 * 60 * 60)),
-        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((difference % (1000 * 60)) / 1000)
-      };
-    };
-
-    setTimeLeft(calculateTimeLeft());
-    const interval = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+// Modoko Showroom & Workshop atelier badge
+const ShowroomSaleBadge = memo(() => {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-light text-neutral-100 uppercase tracking-widest">Kalan Süre:</span>
-      <div className="flex gap-1.5 text-xs font-semibold">
-        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-          <span>{timeLeft.hours.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-white font-bold text-center self-center">:</span>
-        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-          <span>{timeLeft.minutes.toString().padStart(2, '0')}</span>
-        </div>
-        <span className="text-white font-bold text-center self-center">:</span>
-        <div className="bg-white text-brand-terracotta px-2.5 py-1.5 rounded-xs shadow-sm flex flex-col items-center">
-          <span>{timeLeft.seconds.toString().padStart(2, '0')}</span>
-        </div>
-      </div>
+    <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-3.5 py-1.5 rounded-xs backdrop-blur-xs">
+      <span className="text-xs font-semibold text-neutral-100 uppercase tracking-widest">
+        Modoko Showroom & Atölye:
+      </span>
+      <span className="text-xs font-extrabold text-amber-200 uppercase tracking-wide">
+        Doğrudan Üretici Avantajı
+      </span>
     </div>
   );
 });
 
-SaleCountdownBanner.displayName = 'SaleCountdownBanner';
+ShowroomSaleBadge.displayName = 'ShowroomSaleBadge';
 
 export const SalePage: React.FC<SalePageProps> = ({
   initialProducts = [],
@@ -200,20 +164,20 @@ export const SalePage: React.FC<SalePageProps> = ({
 
   return (
     <div className="w-full bg-neutral-50 min-h-screen">
-      {/* FLASH CAMPAIGN TICKER */}
+      {/* SHOWROOM & WORKSHOP CAMPAIGN TICKER */}
       <div className="bg-gradient-to-r from-brand-terracotta to-brand-terracotta-dark text-white py-4 px-4 shadow-sm border-b border-brand-terracotta-dark">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="bg-white/20 px-3 py-1 rounded-sm text-[10px] uppercase font-bold tracking-widest animate-pulse">
-              Flaş Fırsat
+            <span className="bg-white/20 px-3 py-1 rounded-sm text-[10px] uppercase font-bold tracking-widest">
+              Atölye Seçkisi
             </span>
             <h2 className="text-sm md:text-base font-medium tracking-wide">
-              Seçkin İtalyan & İskandinav Tasarımlarında <strong className="font-extrabold">%30'a Varan Net İndirim</strong>!
+              Showroom Teşhir & Atölye Tasarımlarında <strong className="font-extrabold">Özel İmalat Fiyatları</strong>
             </h2>
           </div>
           
-          {/* Isolated High-Performance Countdown Clock */}
-          <SaleCountdownBanner />
+          {/* Authentic Workshop Badge */}
+          <ShowroomSaleBadge />
         </div>
       </div>
 

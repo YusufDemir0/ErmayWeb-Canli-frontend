@@ -201,7 +201,7 @@ export const PopupTab: React.FC<PopupTabProps> = ({
               rows={2}
               value={localPopup.subtitle}
               onChange={(e) => setLocalPopup({ ...localPopup, subtitle: e.target.value })}
-              placeholder="Özel tasarım mobilyalarımızda geçerli avantajları keşfedin..."
+              placeholder="Standart seri ofis mobilyalarımızda ve toplu alımlarda geçerli fabrika avantajlarını keşfedin..."
               className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white leading-relaxed"
             />
           </div>

@@ -197,7 +197,7 @@ export const PRODUCTS: Product[] = [
       '/default-furniture.webp',
       '/default-furniture.webp'
     ],
-    badge: 'Özel Tasarım',
+    badge: 'Fabrika Satış',
     description: 'Hakiki İtalyan derisinin eskitme dokusu, masif meşe çerçeve ile mükemmel bir denge oluşturuyor. Çalışma odanızda veya salonunuzda okuma köşelerinin vazgeçilmezi.',
     rating: 4.9,
     reviewsCount: 15,

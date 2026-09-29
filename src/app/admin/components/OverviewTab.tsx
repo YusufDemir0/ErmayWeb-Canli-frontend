@@ -1,18 +1,29 @@
 'use client';
 
-import React from 'react';
-import { 
-  Truck, RefreshCw, TrendingUp, AlertTriangle, 
-  DollarSign, ShoppingCart, Clock, CheckCircle2, Box,
-  Package, ChevronRight, ArrowUpRight, ShieldCheck, Tag
+import React, { useState, useEffect } from 'react';
+import {
+  MessageSquare,
+  Building2,
+  RefreshCw,
+  Box,
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowUpRight,
+  Store,
+  Layers,
 } from 'lucide-react';
 import { AdminTabId } from './AdminTabsNav';
-import type { Order } from '../../../stores/useOrderStore';
 import type { Product } from '../../../types';
 import { formatPrice } from '../../../lib/formatPrice';
+import { requestService, AdminOrderRequest } from '../../../services/requestService';
+import apiClient from '../../../services/api';
+import { toast } from '../../../stores/useToastStore';
 
 interface OverviewTabProps {
-  orders: Order[];
+  orders?: unknown[];
   products: Product[];
   categoriesCount: number;
   campaignEnabled: boolean;
@@ -22,245 +33,259 @@ interface OverviewTabProps {
 }
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({
-  orders,
   products,
   categoriesCount,
-  campaignEnabled,
-  discountCode,
   setActiveTab,
   onResetDefault,
 }) => {
-  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-  const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
-  const pendingOrders = orders.filter((o) => o.orderStatus === 'PENDING_PAYMENT');
-  const completedOrders = orders.filter((o) => o.orderStatus === 'DELIVERED');
-  const preparingOrders = orders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'SHIPPED');
-  const lowStockProducts = products.filter((p) => (p.stock !== undefined && p.stock <= 3));
+  const [requests, setRequests] = useState<AdminOrderRequest[]>([]);
+  const [totalRequests, setTotalRequests] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSyncingErp, setIsSyncingErp] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function loadDashboardMetrics() {
+      try {
+        const res = await requestService.getAdminRequests({ page: 1, limit: 50 });
+        if (res?.success) {
+          setRequests(res.requests || []);
+          const total = res.pagination?.total ?? (res as any)?.total ?? res.requests?.length ?? 0;
+          setTotalRequests(total);
+        }
+      } catch (err) {
+        console.error('Gösterge paneli talepleri yüklenemedi:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadDashboardMetrics();
+  }, []);
+
+  const handleManualSyncNow = async () => {
+    setIsSyncingErp(true);
+    try {
+      const res = await apiClient.post('/erp/sync-now');
+      if (res.data?.success) {
+        toast.success(
+          'Katalog Senkronize Edildi',
+          `${res.data.report?.matchedProducts || 0} ürün ERP ile doğrulandı, ${res.data.report?.pricesUpdated || 0} fiyat güncellendi.`
+        );
+      }
+    } catch (err: unknown) {
+      console.error('Manuel senkronizasyon hatası:', err);
+      toast.error('Hata', 'Katalog senkronizasyonu tetiklenemedi.');
+    } finally {
+      setIsSyncingErp(false);
+    }
+  };
+
+  const newRequestsCount = requests.filter((r) => r.status === 'NEW').length;
+  const whatsappRequestsCount = requests.filter((r) => r.preference === 'WHATSAPP').length;
+  const storeVisitRequestsCount = requests.filter((r) => r.preference === 'STORE_VISIT').length;
+  const totalDemandVolume = requests.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
+  const publishedProducts = products.filter((p) => p.isPublished);
 
   return (
     <div className="space-y-8 animate-fade-in">
-      
-      {/* ============================================================ */}
-      {/* 1. TOP ENTERPRISE KPI METRIC CARDS                           */}
-      {/* ============================================================ */}
+      {/* 1. TOP ENTERPRISE KPI METRIC CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        {/* Total Revenue */}
+        {/* Total Demand Volume */}
         <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-[#C5A880] transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-              Toplam Satış Hacmi
+              Toplam Talep Hacmi
             </span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-full">
+            <div className="p-2 bg-amber-50 text-[#B4966E] rounded-full">
               <TrendingUp className="h-4 w-4" />
             </div>
           </div>
           <span className="text-2xl font-black text-neutral-900 block font-mono">
-            {formatPrice(totalRevenue)}
+            {formatPrice(totalDemandVolume)}
           </span>
-          <span className="text-xs text-emerald-700 font-semibold block">
-            {orders.length} işlemden elde edilen toplam ciro
+          <span className="text-xs text-neutral-500 font-medium block">
+            {totalRequests} sipariş talebi toplam portföyü
           </span>
         </div>
 
-        {/* Average Order Value (AOV) */}
-        <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-[#C5A880] transition-colors">
+        {/* New / Action Required Requests */}
+        <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-blue-400 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-              Ortalama Sepet Tutarı (AOV)
+              Yeni Bekleyen Talepler
             </span>
             <div className="p-2 bg-blue-50 text-blue-600 rounded-full">
-              <ShoppingCart className="h-4 w-4" />
-            </div>
-          </div>
-          <span className="text-2xl font-black text-neutral-900 block font-mono">
-            {formatPrice(averageOrderValue)}
-          </span>
-          <span className="text-xs text-neutral-500 block">
-            Sipariş başına ortalama harcama
-          </span>
-        </div>
-
-        {/* Pending Orders */}
-        <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-amber-400 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-              İşlem / Ödeme Bekleyenler
-            </span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-full">
               <Clock className="h-4 w-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-amber-700 block font-mono">
-            {pendingOrders.length} Sipariş
+          <span className="text-2xl font-black text-blue-700 block font-mono">
+            {newRequestsCount} Talep
           </span>
-          <span className="text-xs text-amber-800 font-medium block">
-            Havale dekontu veya onay bekliyor
+          <span className="text-xs text-blue-800 font-medium block">
+            İletişim ve teklif bekliyor
           </span>
         </div>
 
-        {/* Active Products Count */}
+        {/* WhatsApp Channel Leads */}
+        <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-emerald-400 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+              WhatsApp Müşteri Kanalı
+            </span>
+            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-full">
+              <MessageSquare className="h-4 w-4" />
+            </div>
+          </div>
+          <span className="text-2xl font-black text-emerald-700 block font-mono">
+            {whatsappRequestsCount} Müşteri
+          </span>
+          <span className="text-xs text-emerald-800 font-medium block">
+            Doğrudan temsilci sohbeti tercih edenler
+          </span>
+        </div>
+
+        {/* Showroom Visit Appointments */}
         <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-2 hover:border-[#C5A880] transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-              Aktif Ürün Envanteri
+              Showroom Randevuları
             </span>
             <div className="p-2 bg-[#C5A880]/15 text-[#9A7B54] rounded-full">
-              <Box className="h-4 w-4" />
+              <Building2 className="h-4 w-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-neutral-900 block">
-            {products.length} Model
+          <span className="text-2xl font-black text-neutral-900 block font-mono">
+            {storeVisitRequestsCount} Ziyaret
           </span>
           <span className="text-xs text-neutral-500 block">
-            {categoriesCount} kategoride yayında
+            Modoko mağazasında inceleme talebi
           </span>
         </div>
-
       </div>
 
-      {/* ============================================================ */}
-      {/* 2. ORDER PIPELINE STATUS SUMMARY BAR                         */}
-      {/* ============================================================ */}
-      <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <Truck className="h-4 w-4 text-[#C5A880]" />
-            <span>Sevkiyat & Sipariş Durumu Dağılımı</span>
-          </h3>
-          <button
-            onClick={() => setActiveTab('orders')}
-            className="text-xs text-[#C5A880] hover:text-[#9A7B54] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
-          >
-            <span>Tüm Siparişleri Aç</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-amber-50/70 border border-amber-200 rounded-xs p-4 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-amber-700 block">Ödeme & Dekont Bekleyen</span>
-              <span className="text-xl font-extrabold text-amber-900">{pendingOrders.length}</span>
-            </div>
-            <Clock className="h-6 w-6 text-amber-500" />
-          </div>
-
-          <div className="bg-blue-50/70 border border-blue-200 rounded-xs p-4 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-blue-700 block">Hazırlanan & Kargoda</span>
-              <span className="text-xl font-extrabold text-blue-900">{preparingOrders.length}</span>
-            </div>
-            <Truck className="h-6 w-6 text-blue-500" />
-          </div>
-
-          <div className="bg-emerald-50/70 border border-emerald-200 rounded-xs p-4 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-emerald-700 block">Teslim Edilen / Tamamlanan</span>
-              <span className="text-xl font-extrabold text-emerald-900">{completedOrders.length}</span>
-            </div>
-            <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-          </div>
-        </div>
-      </div>
-
-      {/* ============================================================ */}
-      {/* 3. CRITICAL LOW STOCK ALERT SYSTEM                           */}
-      {/* ============================================================ */}
-      {lowStockProducts.length > 0 && (
-        <div className="bg-rose-50 border border-rose-200 p-6 rounded-sm shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-rose-800">
-              <AlertTriangle className="h-5 w-5 text-rose-600 flex-shrink-0" />
+      {/* 2. CATALOG & ERP STATUS SUMMARY */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Catalog Sync Health Card */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-[#FBF9F5] border border-[#E5DEC9] text-[#7A6140] rounded-xs">
+                <RefreshCw className="h-4 w-4" />
+              </div>
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider">
-                  Kritik Stok Uyarısı ({lowStockProducts.length} Ürünün Stoku Azaldı / Tükendi)
-                </h4>
-                <p className="text-[11px] text-rose-700 font-light">
-                  Aşağıdaki ürünlerin stoku 3 adet veya daha az kalmıştır. Lütfen atölye üretimini planlayın veya stoku güncelleyin.
+                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+                  ERP & Web Kataloğu Durumu
+                </h3>
+                <p className="text-[11px] text-neutral-500 font-light">
+                  Her 15 dakikada bir arka planda otomatik fiyat ve stok senkronizasyonu yapılır.
                 </p>
               </div>
             </div>
 
             <button
-              onClick={() => setActiveTab('products')}
-              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase px-4 py-2 rounded-xs transition-colors cursor-pointer shadow-xs whitespace-nowrap"
+              onClick={handleManualSyncNow}
+              disabled={isSyncingErp}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer disabled:opacity-50"
             >
-              Stokları Yönet
+              <RefreshCw className={`h-3.5 w-3.5 ${isSyncingErp ? 'animate-spin' : ''}`} />
+              <span>{isSyncingErp ? 'Senkronize Ediliyor...' : 'Şimdi Senkronize Et'}</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {lowStockProducts.slice(0, 6).map((item) => (
-              <div
-                key={item.id}
-                className="bg-white p-3 rounded-xs border border-rose-200 flex items-center justify-between shadow-2xs text-xs"
-              >
-                <div className="flex items-center gap-2.5">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-10 h-10 object-cover rounded-2xs border border-neutral-200"
-                  />
-                  <div>
-                    <p className="font-bold text-neutral-900 line-clamp-1">{item.name}</p>
-                    <p className="text-[10px] text-neutral-500 font-mono">{formatPrice(item.price)}</p>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div className="p-4 bg-neutral-50 rounded-xs border border-neutral-200/70">
+              <span className="text-[10px] font-bold text-neutral-500 uppercase block tracking-wider">
+                Yayındaki Modeller
+              </span>
+              <span className="text-xl font-extrabold text-neutral-900 block mt-1">
+                {publishedProducts.length} Ürün
+              </span>
+              <span className="text-[11px] text-neutral-400">
+                Görsel, fiyat ve ERP ID tam
+              </span>
+            </div>
 
-                <span className="px-2 py-1 rounded-full text-[10px] font-extrabold uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                  {item.stock === 0 ? 'Tükendi' : `${item.stock} Kaldı`}
-                </span>
+            <div className="p-4 bg-neutral-50 rounded-xs border border-neutral-200/70">
+              <span className="text-[10px] font-bold text-neutral-500 uppercase block tracking-wider">
+                Toplam Katalog
+              </span>
+              <span className="text-xl font-extrabold text-neutral-900 block mt-1">
+                {products.length} Model
+              </span>
+              <span className="text-[11px] text-neutral-400">
+                {categoriesCount} kategoride tanımlı
+              </span>
+            </div>
+
+            <div className="p-4 bg-neutral-50 rounded-xs border border-neutral-200/70">
+              <span className="text-[10px] font-bold text-neutral-500 uppercase block tracking-wider">
+                ERP Koruma Garantisi
+              </span>
+              <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-sm mt-1">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>Outbox Aktif</span>
               </div>
-            ))}
+              <span className="text-[11px] text-neutral-400">
+                SKIP LOCKED & Çift Kayıt Önleme
+              </span>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* ============================================================ */}
-      {/* 4. QUICK ACTIONS & PLATFORM HEALTH                           */}
-      {/* ============================================================ */}
-      <div className="bg-white p-8 rounded-sm border border-neutral-200 shadow-xs space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">
-          Hızlı Yönetim & İşlem Kısayolları
-        </h3>
-        
-        <div className="flex flex-wrap gap-4">
-          <button
-            onClick={() => setActiveTab('orders')}
-            className="bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold tracking-wider uppercase py-3 px-6 rounded-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
-          >
-            <Truck className="h-4 w-4" />
-            <span>Siparişleri & Dekontları İncele</span>
-          </button>
+        {/* Quick Operational Navigation */}
+        <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 mb-3 flex items-center gap-2">
+              <Store className="h-4 w-4 text-[#C5A880]" />
+              <span>Hızlı İşlem Kısayolları</span>
+            </h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setActiveTab('orders')}
+                className="w-full text-left p-3 rounded-xs border border-neutral-200 hover:border-[#C5A880] hover:bg-[#FBF9F5] transition-colors flex items-center justify-between text-xs font-semibold text-neutral-800 cursor-pointer"
+              >
+                <span>Tüm Sipariş Taleplerini İncele</span>
+                <ChevronRight className="h-4 w-4 text-neutral-400" />
+              </button>
 
-          <button
-            onClick={() => setActiveTab('products')}
-            className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold tracking-wider uppercase py-3 px-6 rounded-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
-          >
-            <Box className="h-4 w-4" />
-            <span>+ Yeni Ürün Ekle</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('erpSync')}
+                className="w-full text-left p-3 rounded-xs border border-neutral-200 hover:border-[#C5A880] hover:bg-[#FBF9F5] transition-colors flex items-center justify-between text-xs font-semibold text-neutral-800 cursor-pointer"
+              >
+                <span>CRM / ERP Eşleştirme & Stok</span>
+                <ChevronRight className="h-4 w-4 text-neutral-400" />
+              </button>
 
-          <button
-            onClick={() => setActiveTab('coupons')}
-            className="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold tracking-wider uppercase py-3 px-6 rounded-xs transition-colors cursor-pointer flex items-center gap-2 border border-neutral-300"
-          >
-            <Tag className="h-4 w-4 text-[#C5A880]" />
-            <span>Kupon & İndirim Yönetimi</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className="w-full text-left p-3 rounded-xs border border-neutral-200 hover:border-[#C5A880] hover:bg-[#FBF9F5] transition-colors flex items-center justify-between text-xs font-semibold text-neutral-800 cursor-pointer"
+              >
+                <span>Web Kataloğunu Düzenle</span>
+                <ChevronRight className="h-4 w-4 text-neutral-400" />
+              </button>
 
-          <button
-            onClick={onResetDefault}
-            className="bg-neutral-50 hover:bg-rose-100 hover:text-rose-700 text-neutral-600 text-xs font-semibold tracking-wider uppercase py-3 px-6 rounded-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-neutral-200 ml-auto"
-            title="Tüm verileri orijinal fabrika ayarlarına döndür"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            <span>Varsayılana Sıfırla</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('stores')}
+                className="w-full text-left p-3 rounded-xs border border-neutral-200 hover:border-[#C5A880] hover:bg-[#FBF9F5] transition-colors flex items-center justify-between text-xs font-semibold text-neutral-800 cursor-pointer"
+              >
+                <span>Modoko Showroom & İletişim Bilgileri</span>
+                <ChevronRight className="h-4 w-4 text-neutral-400" />
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-400">
+            <span>ErmayWeb v2026</span>
+            <button
+              onClick={onResetDefault}
+              className="text-neutral-400 hover:text-rose-600 underline cursor-pointer"
+            >
+              Varsayılana Sıfırla
+            </button>
+          </div>
         </div>
       </div>
-
     </div>
   );
 };
+
+export default OverviewTab;

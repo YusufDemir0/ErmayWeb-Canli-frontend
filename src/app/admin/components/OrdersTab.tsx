@@ -1,44 +1,75 @@
 'use client';
 
-import React, { useState } from 'react';
-import { 
-  FileText, CheckCircle2, ExternalLink, ShieldCheck, 
-  Truck, Building, AlertCircle, Eye, Printer, ArrowUpRight 
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  MessageSquare,
+  Building2,
+  RefreshCw,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Send,
+  Search,
+  SlidersHorizontal,
+  History,
+  FileText,
+  User,
+  Phone,
+  MapPin,
+  Package,
 } from 'lucide-react';
-import type { Order, OrderStatus, OrderItem } from '../../../stores/useOrderStore';
-import { InvoiceModal } from '../../../components/InvoiceModal';
-import { Pagination } from '../../../components/Pagination';
+import {
+  requestService,
+  AdminOrderRequest,
+} from '../../../services/requestService';
 import { toast } from '../../../stores/useToastStore';
+import { Pagination } from '../../../components/Pagination';
 
 interface OrdersTabProps {
-  orders: Order[];
-  onUpdateOrderStatus: (
-    orderId: string,
-    status: OrderStatus,
-    trackingNumber?: string,
-    cargoCompany?: string
-  ) => void;
-  onShowSuccess: (msg: string) => void;
+  onShowSuccess?: (msg: string) => void;
 }
 
-export const OrdersTab: React.FC<OrdersTabProps> = ({
-  orders,
-  onUpdateOrderStatus,
-  onShowSuccess,
-}) => {
-  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<Order | null>(null);
-  const [previewReceiptUrl, setPreviewReceiptUrl] = useState<string | null>(null);
-  const [revealedDeviceOrderIds, setRevealedDeviceOrderIds] = useState<string[]>([]);
+const STATUS_LABELS: Record<AdminOrderRequest['status'], { label: string; bg: string; text: string; border: string }> = {
+  NEW: { label: 'Yeni Talep', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  CONTACTED: { label: 'İletişime Geçildi', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  OFFER_SENT: { label: 'Teklif İletildi', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  VISIT_SCHEDULED: { label: 'Showroom Randevusu', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  CONFIRMED: { label: 'Satış Teyit Edildi', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  COMPLETED: { label: 'Tamamlandı', bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-neutral-300' },
+  CANCELLED: { label: 'İptal / Vazgeçildi', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+};
 
-  // Pagination state (default 10 orders per page)
+const ERP_STATUS_LABELS: Record<AdminOrderRequest['erpStatus'], { label: string; bg: string }> = {
+  PENDING: { label: 'ERP Kuyruğunda', bg: 'bg-amber-100 text-amber-800' },
+  SYNCED: { label: 'ERP Satış Oluştu', bg: 'bg-emerald-100 text-emerald-800' },
+  FAILED: { label: 'ERP Hatası', bg: 'bg-rose-100 text-rose-800' },
+};
+
+export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
+  const [requests, setRequests] = useState<AdminOrderRequest[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Filters & Search
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [preferenceFilter, setPreferenceFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const pageSize = 15;
 
-  const toggleRevealDevice = (orderId: string) => {
-    setRevealedDeviceOrderIds(prev => 
-      prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
-    );
-  };
+  // Status Update Modal/Prompt State
+  const [selectedRequest, setSelectedRequest] = useState<AdminOrderRequest | null>(null);
+  const [targetStatus, setTargetStatus] = useState<AdminOrderRequest['status']>('CONTACTED');
+  const [staffNote, setStaffNote] = useState<string>('');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const [isRetryingErp, setIsRetryingErp] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -50,393 +81,519 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
       .replace('TRY', 'TL');
   };
 
-  const handleApproveWirePayment = (order: Order) => {
-    onUpdateOrderStatus(order.id, 'PREPARING' as OrderStatus);
-    const msg = `Sipariş #${order.orderNumber || order.id} havale ödemesi onaylandı ve Hazırlanıyor aşamasına alındı.`;
-    toast.success('Ödeme Onaylandı', msg);
-    onShowSuccess(msg);
+  const fetchRequests = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await requestService.getAdminRequests({
+        status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        preference: preferenceFilter !== 'ALL' ? preferenceFilter : undefined,
+        search: searchQuery.trim() || undefined,
+        page: currentPage,
+        limit: pageSize,
+      });
+
+      if (res?.success) {
+        setRequests(res.requests || []);
+        setTotalPages(res.pagination?.totalPages ?? (res as any)?.totalPages ?? 1);
+        setTotalCount(res.pagination?.total ?? (res as any)?.total ?? res.requests?.length ?? 0);
+      }
+    } catch (err: unknown) {
+      console.error('Talepler yüklenemedi:', err);
+      toast.error('Hata', 'Sipariş talepleri yüklenirken bir problem oluştu.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [statusFilter, preferenceFilter, searchQuery, currentPage, pageSize]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  const handleUpdateStatus = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRequest) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      const updated = await requestService.updateRequestStatus(
+        selectedRequest.id,
+        targetStatus,
+        staffNote.trim() || undefined
+      );
+
+      toast.success('Durum Güncellendi', `${updated.code} talebinin durumu güncellendi.`);
+      if (onShowSuccess) onShowSuccess(`${updated.code} güncellendi.`);
+
+      // Update in local state
+      setRequests((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
+      setSelectedRequest(null);
+      setStaffNote('');
+    } catch (err: unknown) {
+      console.error('Durum güncellenemedi:', err);
+      toast.error('Hata', 'Durum güncellenirken bir sorun oluştu.');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const handleRetryErp = async (id: string, code: string) => {
+    setIsRetryingErp(id);
+    try {
+      await requestService.retryErpSync(id);
+      toast.success('Kuyruğa Alındı', `${code} ERP aktarımı için yeniden kuyruğa alındı.`);
+      fetchRequests();
+    } catch (err: unknown) {
+      console.error('ERP tekrar denenemedi:', err);
+      toast.error('Hata', 'ERP senkronizasyonu kuyruğa alınamadı.');
+    } finally {
+      setIsRetryingErp(null);
+    }
+  };
+
+  const getWhatsAppUrl = (req: AdminOrderRequest) => {
+    const cleanPhone = req.customerPhone.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(
+      `Merhaba ${req.customerName}, Ermay Mobilya Modoko Showroom'undan iletişime geçiyorum. ${req.code} kodlu sipariş talebinizi inceledik. Size ürünlerimiz ve detaylar hakkında yardımcı olmak isteriz.`
+    );
+    return `https://wa.me/${cleanPhone}?text=${message}`;
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Top Banner Card */}
       <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs">
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-5 mb-6">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">
-              Kurumsal Sipariş Yönetimi & Sevkiyat
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#B4966E] bg-[#FBF9F5] px-2.5 py-1 rounded-xs border border-[#E5DEC9]">
+                Müşteri Talep Motoru
+              </span>
+            </div>
+            <h3 className="text-base md:text-lg font-bold tracking-tight text-neutral-900 mt-1">
+              Sipariş Talepleri Yönetimi
             </h3>
             <p className="text-xs text-neutral-500 font-light mt-0.5">
-              Havale dekontlarını doğrulayın, faturaları görüntüleyin ve kargo kodlarını atayın.
+              Müşterilerin sepetlerinden oluşturulan WhatsApp ve Mağaza randevu taleplerini yönetin, ERP durumunu takip edin.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs bg-neutral-100 px-3 py-1.5 rounded-full font-mono font-bold text-neutral-700">
-              Toplam: {orders.length} Sipariş
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => fetchRequests()}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 border border-neutral-300 hover:border-[#C5A880] text-xs font-semibold rounded-xs transition-colors cursor-pointer text-neutral-700 bg-white"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#C5A880]' : ''}`} />
+              <span>Yenile</span>
+            </button>
+            <span className="text-xs bg-[#FBF9F5] border border-[#E5DEC9] px-3.5 py-2 rounded-xs font-mono font-bold text-[#7A6140]">
+              Toplam: {totalCount} Talep
             </span>
           </div>
         </div>
 
-        <div className="space-y-6">
-          {orders.length === 0 ? (
-            <div className="text-center py-12 text-neutral-500 space-y-2">
-              <Truck className="h-10 w-10 text-neutral-300 mx-auto" />
-              <p className="text-xs">Henüz sipariş kaydı bulunmamaktadır.</p>
-            </div>
-          ) : (
-            (() => {
-              const paginatedOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-              return (
-                <>
-                  {paginatedOrders.map((order) => (
-              <div
-                key={order.id}
-                className="border border-neutral-200 rounded-sm p-6 space-y-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors"
-              >
-                {/* Top Info Bar */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-sm font-extrabold font-mono text-neutral-900">
-                        #{order.orderNumber || order.id}
-                      </span>
-                      <span className="text-xs text-neutral-500 font-mono">
-                        ({order.createdAt})
-                      </span>
-                      {order.regionCode && (
-                        <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded shadow-2xs" title="Bölgesel Lojistik & Plaka Kodu">
-                          📍 {order.regionCode}
-                        </span>
-                      )}
-                      {order.invoiceDetails?.invoiceType === 'CORPORATE' ? (
-                        <span className="text-[10px] font-bold uppercase bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <Building className="h-3 w-3" />
-                          <span>Kurumsal e-Fatura</span>
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold uppercase bg-neutral-100 text-neutral-600 border border-neutral-200 px-2 py-0.5 rounded-full">
-                          Bireysel e-Arşiv
-                        </span>
-                      )}
-                    </div>
-                    
-                    <p className="text-xs text-neutral-700 font-semibold">
-                      Müşteri: {order.customerName} ({order.customerEmail} - {order.customerPhone})
-                    </p>
-                    {order.shippingAddress && (
-                      <p className="text-[11px] text-neutral-600">
-                        Teslimat: {order.shippingAddress.addressLine}, {order.shippingAddress.district} / {order.shippingAddress.city}
-                      </p>
-                    )}
-                    {order.invoiceDetails?.companyTitle && (
-                      <p className="text-[11px] text-neutral-500 font-mono">
-                        Ünvan: {order.invoiceDetails.companyTitle} (VKN: {order.invoiceDetails.taxNo} - {order.invoiceDetails.taxOffice})
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Actions & Status Control */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Secret Device Footprint Button */}
-                    <button
-                      type="button"
-                      onClick={() => toggleRevealDevice(order.id)}
-                      className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xs border transition-all cursor-pointer shadow-2xs ${
-                        revealedDeviceOrderIds.includes(order.id)
-                          ? 'bg-neutral-900 text-amber-400 border-neutral-900'
-                          : 'bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-300'
-                      }`}
-                      title="Gizli Yönetici Erişimi: Satın Alım Cihaz İzi"
-                    >
-                      <span>🕵️ {revealedDeviceOrderIds.includes(order.id) ? 'Cihaz İzini Kapat' : 'Cihaz İzi (Gizli)'}</span>
-                    </button>
-
-                    <button
-                      onClick={() => setSelectedInvoiceOrder(order)}
-                      className="inline-flex items-center gap-1.5 bg-white hover:bg-neutral-100 text-neutral-800 text-xs font-bold uppercase px-3 py-2 rounded-xs border border-neutral-300 transition-colors cursor-pointer shadow-2xs"
-                    >
-                      <Printer className="h-3.5 w-3.5 text-[#C5A880]" />
-                      <span>Fatura Yazdır</span>
-                    </button>
-
-                    {order.receiptUrl && (
-                      <button
-                        onClick={() => setPreviewReceiptUrl(order.receiptUrl!)}
-                        className="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold uppercase px-3 py-2 rounded-xs border border-amber-300 transition-colors cursor-pointer shadow-2xs"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>Dekontu İncele</span>
-                      </button>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                      <label className="text-[10px] font-bold uppercase text-neutral-500">
-                        Durum:
-                      </label>
-                      <select
-                        onChange={(e) => {
-                          const newStatus = e.target.value as OrderStatus;
-                          onUpdateOrderStatus(order.id, newStatus);
-                          const msg = `Sipariş #${order.orderNumber || order.id} durumu güncellendi: ${newStatus}`;
-                          toast.success('Durum Güncellendi', msg);
-                          onShowSuccess(msg);
-                        }}
-                        className="text-xs font-bold bg-white border border-neutral-300 p-2 rounded-xs focus:ring-1 focus:ring-[#C5A880] cursor-pointer"
-                      >
-                        <option value="PENDING">Ödeme Bekliyor (PENDING)</option>
-                        <option value="PREPARING">Hazırlanıyor (PREPARING)</option>
-                        <option value="SHIPPED">Kargoya Verildi (SHIPPED)</option>
-                        <option value="DELIVERED">Teslim Edildi (DELIVERED)</option>
-                        <option value="CANCELLED">İptal Edildi (CANCELLED)</option>
-                        <option value="REFUNDED">İade Edildi (REFUNDED)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hidden Device & Security Footprint Panel (Admin Only) */}
-                {revealedDeviceOrderIds.includes(order.id) && (
-                  <div className="bg-neutral-900 text-neutral-100 p-4 rounded border border-neutral-800 text-xs font-mono space-y-3 animate-fade-in shadow-inner">
-                    <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                        <span className="text-amber-400 font-bold uppercase tracking-wider">
-                          🔒 Gizli Yönetici Erişimi: Müşteri Cihaz & Güvenlik İzi
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
-                        Sipariş ID: #{order.id}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
-                        <span className="text-neutral-400 block text-[10px] uppercase">Cihaz Türü</span>
-                        <span className="text-amber-300 font-bold text-sm">
-                          {order.deviceInfo?.deviceType === 'mobile' ? '📱 Akıllı Telefon (Mobil)' :
-                           order.deviceInfo?.deviceType === 'laptop' ? '💻 Dizüstü Bilgisayar (Laptop)' :
-                           order.deviceInfo?.deviceType === 'desktop' ? '🖥️ Masaüstü PC' :
-                           order.deviceInfo?.deviceType === 'tablet' ? '📱 Tablet' : '💻 Masaüstü / Web'}
-                        </span>
-                      </div>
-
-                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
-                        <span className="text-neutral-400 block text-[10px] uppercase">İşletim Sistemi</span>
-                        <span className="text-white font-semibold">
-                          {order.deviceInfo?.os || 'Bilinmiyor'}
-                        </span>
-                      </div>
-
-                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
-                        <span className="text-neutral-400 block text-[10px] uppercase">Tarayıcı & Motor</span>
-                        <span className="text-white font-semibold">
-                          {order.deviceInfo?.browser || 'Web Browser'}
-                        </span>
-                      </div>
-
-                      <div className="bg-neutral-800/60 p-2.5 rounded border border-neutral-700/50">
-                        <span className="text-neutral-400 block text-[10px] uppercase">Ekran & Çözünürlük</span>
-                        <span className="text-white font-semibold">
-                          {order.deviceInfo?.screenResolution || '1920x1080 (Standart)'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between pt-2 border-t border-neutral-800 text-[11px] text-neutral-400">
-                      <span>İstemci IP Bilgisi: <strong className="text-neutral-200">{order.deviceInfo?.ip || '127.0.0.1 (Yerel/Cloudflare)'}</strong></span>
-                      <span className={order.kvkkAccepted ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
-                        {order.kvkkAccepted ? '✓ 6698 Sayılı KVKK Onaylı Kayıt' : '⚠ KVKK Onayı Bilgisi Yok'}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Wire Payment Approval Notification Banner */}
-                {(order.paymentMethod === 'BANK_TRANSFER' || order.paymentMethod === 'bank_transfer') && 
-                 order.orderStatus === 'PENDING_PAYMENT' && (
-                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2.5 text-amber-900">
-                      <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                      <div>
-                        <strong className="block">Banka Havalesi / EFT Bekleniyor</strong>
-                        <span className="text-[11px] text-amber-800">
-                          {order.receiptUrl ? 'Müşteri dekont yükledi. Lütfen dekontu inceleyip onaylayın.' : 'Müşteri henüz dekont yüklemedi.'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleApproveWirePayment(order)}
-                      className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase text-xs px-4 py-2 rounded-xs transition-colors cursor-pointer shadow-xs"
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Ödemeyi Onayla & Hazırla</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Cargo Tracking Input Form */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xs border border-neutral-200">
-                  <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-                      Kargo / Lojistik Firması
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={order.cargoCompany || order.shippingCarrier || 'Yurtiçi Kargo'}
-                      onBlur={(e) => {
-                        const val = e.target.value;
-                        if (val !== (order.cargoCompany || order.shippingCarrier)) {
-                          onUpdateOrderStatus(
-                            order.id,
-                            order.orderStatus,
-                            order.trackingNumber,
-                            val
-                          );
-                          onShowSuccess(`Kargo firması güncellendi: ${val}`);
-                        }
-                      }}
-                      placeholder="Yurtiçi Kargo / Borusan Lojistik / Horoz Lojistik"
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-                      Kargo Takip No / İrsaliye Seri No
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={order.trackingNumber || ''}
-                      onBlur={(e) => {
-                        const val = e.target.value;
-                        if (val !== (order.trackingNumber || '')) {
-                          onUpdateOrderStatus(
-                            order.id,
-                            order.orderStatus,
-                            val,
-                            order.cargoCompany || order.shippingCarrier
-                          );
-                          onShowSuccess(`Kargo takip no güncellendi: ${val}`);
-                        }
-                      }}
-                      placeholder="YK-84910245"
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs font-mono"
-                    />
-                  </div>
-                </div>
-
-                {/* Order Items List */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                    <span>Sipariş Edilen Ürünler ({order.items.length} Kalem)</span>
-                    <span>Toplam: <strong className="text-neutral-900 text-xs">{formatPrice(order.totalAmount)}</strong></span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {order.items.map((item, idx) => {
-                      const itemUnitPrice = Number(item.unitPrice || item.price || item.product?.price || 0);
-                      const itemTotalPrice = itemUnitPrice * item.quantity;
-                      return (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between bg-white p-3 rounded-xs border border-neutral-200"
-                        >
-                          <div className="flex items-center gap-3">
-                            {item.product?.image ? (
-                              <img
-                                src={item.product.image}
-                                alt=""
-                                className="h-10 w-10 object-cover rounded-xs border border-neutral-200"
-                              />
-                            ) : (
-                              <div className="h-10 w-10 flex items-center justify-center bg-neutral-100 rounded-xs border border-neutral-200 text-[8px] font-bold text-neutral-400 text-center">
-                                Görsel Yok
-                              </div>
-                            )}
-                            <div className="text-xs">
-                              <p className="font-semibold text-neutral-800">{item.product?.name || 'Ürün'}</p>
-                              <p className="text-[10px] text-neutral-500 font-mono">
-                                {item.quantity} Adet × {formatPrice(itemUnitPrice)}
-                              </p>
-                            </div>
-                          </div>
-                          <span className="font-bold text-xs text-neutral-950 font-mono">
-                            {formatPrice(itemTotalPrice)}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-              </div>
-            ))}
-            <Pagination
-              totalItems={orders.length}
-              currentPage={currentPage}
-              pageSize={pageSize}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
+        {/* Filters and Search Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6 bg-neutral-50 p-4 rounded-xs border border-neutral-200/70">
+          {/* Search */}
+          <div className="sm:col-span-1 lg:col-span-2 relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
+            <input
+              type="text"
+              placeholder="Kod, müşteri adı veya telefon ara..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              pageSizeOptions={[5, 10, 20]}
-              itemLabel="sipariş"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
             />
-          </>
-        );
-      })()
-    )}
-  </div>
-</div>
+          </div>
 
-      {/* Invoice Modal */}
-      <InvoiceModal
-        order={selectedInvoiceOrder}
-        isOpen={!!selectedInvoiceOrder}
-        onClose={() => setSelectedInvoiceOrder(null)}
-      />
+          {/* Status Filter */}
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+            >
+              <option value="ALL">Tüm Durumlar</option>
+              <option value="NEW">Yeni Talepler</option>
+              <option value="CONTACTED">İletişime Geçildi</option>
+              <option value="OFFER_SENT">Teklif İletildi</option>
+              <option value="VISIT_SCHEDULED">Showroom Randevusu</option>
+              <option value="CONFIRMED">Satış Teyit Edildi</option>
+              <option value="COMPLETED">Tamamlandı</option>
+              <option value="CANCELLED">İptal / Vazgeçildi</option>
+            </select>
+          </div>
 
-      {/* Receipt Image/Document Preview Lightbox */}
-      {previewReceiptUrl && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white rounded-sm max-w-2xl w-full p-4 space-y-4 shadow-2xl animate-fade-in">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
-              <h4 className="text-xs font-bold uppercase text-neutral-900 flex items-center gap-2">
-                <FileText className="h-4 w-4 text-[#C5A880]" />
-                <span>Müşteri Havale / EFT Dekontu</span>
-              </h4>
+          {/* Preference Filter */}
+          <div>
+            <select
+              value={preferenceFilter}
+              onChange={(e) => {
+                setPreferenceFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+            >
+              <option value="ALL">Tüm Tercihler</option>
+              <option value="WHATSAPP">WhatsApp İletişimi</option>
+              <option value="STORE_VISIT">Showroom Ziyareti</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Requests List */}
+        <div className="space-y-4">
+          {isLoading && requests.length === 0 ? (
+            <div className="text-center py-16 text-neutral-400 space-y-3">
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-[#C5A880]" />
+              <p className="text-xs">Talepler getiriliyor...</p>
+            </div>
+          ) : requests.length === 0 ? (
+            <div className="text-center py-16 text-neutral-400 space-y-2 border border-dashed border-neutral-200 rounded-xs">
+              <Package className="h-10 w-10 text-neutral-300 mx-auto" />
+              <p className="text-xs font-semibold text-neutral-600">Aranan kriterlere uygun talep bulunamadı.</p>
+              <p className="text-[11px] text-neutral-400 font-light">Filtreleri sıfırlayarak tüm talepleri görüntüleyebilirsiniz.</p>
+            </div>
+          ) : (
+            requests.map((req) => {
+              const statusCfg = STATUS_LABELS[req.status] || STATUS_LABELS.NEW;
+              const erpCfg = ERP_STATUS_LABELS[req.erpStatus] || ERP_STATUS_LABELS.PENDING;
+              const isExpanded = expandedId === req.id;
+
+              return (
+                <div
+                  key={req.id}
+                  className="bg-white border border-neutral-200 hover:border-[#C5A880]/60 rounded-xs transition-[border-color,box-shadow] duration-200 shadow-2xs overflow-hidden"
+                >
+                  {/* Card Header Bar */}
+                  <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/50 border-b border-neutral-100">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono font-extrabold text-sm text-neutral-900 bg-white px-2.5 py-1 border border-neutral-200 rounded-xs">
+                        {req.code}
+                      </span>
+
+                      {/* Status Badge */}
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider border ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}
+                      >
+                        {statusCfg.label}
+                      </span>
+
+                      {/* Preference Badge */}
+                      {req.preference === 'WHATSAPP' ? (
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                          <MessageSquare className="h-3 w-3" />
+                          <span>WhatsApp</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          <span>Showroom Ziyareti</span>
+                        </span>
+                      )}
+
+                      {/* ERP Status Badge */}
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${erpCfg.bg}`}>
+                        {erpCfg.label}
+                        {req.erpSaleCode && ` (${req.erpSaleCode})`}
+                      </span>
+
+                      <span className="text-[11px] text-neutral-400 font-mono">
+                        {new Date(req.createdAt).toLocaleDateString('tr-TR', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* WhatsApp CTA button */}
+                      <a
+                        href={getWhatsAppUrl(req)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xs transition-colors shadow-2xs"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5 fill-current" />
+                        <span>WhatsApp&apos;ta Aç</span>
+                      </a>
+
+                      {/* Update Status button */}
+                      <button
+                        onClick={() => {
+                          setSelectedRequest(req);
+                          setTargetStatus(req.status);
+                          setStaffNote(req.staffNote || '');
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
+                      >
+                        <SlidersHorizontal className="h-3.5 w-3.5" />
+                        <span>Durum Değiştir</span>
+                      </button>
+
+                      {/* Retry ERP if failed */}
+                      {req.erpStatus === 'FAILED' && (
+                        <button
+                          onClick={() => handleRetryErp(req.id, req.code)}
+                          disabled={isRetryingErp === req.id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs font-bold rounded-xs transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className={`h-3 w-3 ${isRetryingErp === req.id ? 'animate-spin' : ''}`} />
+                          <span>ERP Tekrar Dene</span>
+                        </button>
+                      )}
+
+                      {/* Public Receipt Link */}
+                      <a
+                        href={`/talep/${req.publicToken}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-600 text-xs font-medium rounded-xs transition-colors"
+                        title="Müşteri Dijital Fişi"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span>Fiş</span>
+                      </a>
+
+                      {/* Toggle Expand Items */}
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : req.id)}
+                        className="p-1.5 hover:bg-neutral-100 rounded-xs text-neutral-500 cursor-pointer"
+                        title="Kalemleri ve Detayları Aç/Kapat"
+                      >
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Customer and Summary Quick Strip */}
+                  <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                        Müşteri
+                      </span>
+                      <div className="font-semibold text-neutral-800 flex items-center gap-1.5 mt-0.5">
+                        <User className="h-3.5 w-3.5 text-neutral-400" />
+                        <span>{req.customerName}</span>
+                      </div>
+                      <div className="font-mono text-neutral-600 flex items-center gap-1.5 mt-1">
+                        <Phone className="h-3.5 w-3.5 text-neutral-400" />
+                        <span>{req.customerPhone}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                        Bölge / Mağaza
+                      </span>
+                      <div className="font-semibold text-neutral-800 flex items-center gap-1.5 mt-0.5">
+                        <MapPin className="h-3.5 w-3.5 text-neutral-400" />
+                        <span>{req.city} {req.district ? `/ ${req.district}` : ''}</span>
+                      </div>
+                      {req.preferredStore && (
+                        <div className="text-[11px] text-[#B4966E] font-medium flex items-center gap-1.5 mt-1">
+                          <Building2 className="h-3 w-3" />
+                          <span>{req.preferredStore.name}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                        Talep Tutarı ({req.items?.length || 0} Kalem)
+                      </span>
+                      <div className="text-base font-extrabold text-[#C87A53] mt-0.5">
+                        {formatPrice(req.totalAmount)}
+                      </div>
+                      <span className="text-[10px] text-neutral-400">
+                        Liste Fiyatı Snapshot
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                        Personel Notu
+                      </span>
+                      <p className="text-[11px] text-neutral-600 italic mt-0.5 line-clamp-2">
+                        {req.staffNote ? `"${req.staffNote}"` : 'Henüz not girilmemiş.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Expanded Items & History Drawer */}
+                  {isExpanded && (
+                    <div className="border-t border-neutral-100 bg-[#FBF9F5] p-5 space-y-5 animate-fade-in">
+                      {/* Items Table */}
+                      <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-3 flex items-center gap-2">
+                          <Package className="h-4 w-4 text-[#C5A880]" />
+                          <span>Talep Edilen Ürün Kalemleri</span>
+                        </h4>
+                        <div className="bg-white border border-neutral-200 rounded-xs overflow-hidden">
+                          <table className="w-full text-left text-xs">
+                            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-500 font-bold uppercase text-[10px]">
+                              <tr>
+                                <th className="p-3">Ürün</th>
+                                <th className="p-3">Renk / Varyant</th>
+                                <th className="p-3 text-center">Adet</th>
+                                <th className="p-3 text-right">Birim Fiyat</th>
+                                <th className="p-3 text-right">Toplam</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-100">
+                              {req.items?.map((item) => (
+                                <tr key={item.id} className="hover:bg-neutral-50/50">
+                                  <td className="p-3 font-medium text-neutral-900">
+                                    {item.productName}
+                                  </td>
+                                  <td className="p-3 text-neutral-600">
+                                    {item.colorLabel || 'Standart'}
+                                  </td>
+                                  <td className="p-3 text-center font-mono font-bold">
+                                    {item.quantity}
+                                  </td>
+                                  <td className="p-3 text-right font-mono text-neutral-600">
+                                    {formatPrice(item.unitPrice)}
+                                  </td>
+                                  <td className="p-3 text-right font-mono font-bold text-neutral-900">
+                                    {formatPrice(item.lineTotal)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* Events and Audit Log */}
+                      {req.events && req.events.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-2 flex items-center gap-2">
+                            <History className="h-4 w-4 text-[#C5A880]" />
+                            <span>İşlem & Durum Geçmişi</span>
+                          </h4>
+                          <div className="bg-white border border-neutral-200 rounded-xs p-3 space-y-2">
+                            {req.events.map((evt) => (
+                              <div key={evt.id} className="text-xs flex items-start gap-2 border-b border-neutral-100 pb-2 last:border-b-0 last:pb-0">
+                                <span className="text-[10px] font-mono text-neutral-400 whitespace-nowrap pt-0.5">
+                                  {new Date(evt.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                                <span className="font-semibold text-neutral-800">{evt.eventType}:</span>
+                                <span className="text-neutral-600">{evt.note || '-'}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalCount > pageSize && (
+          <div className="mt-6 pt-4 border-t border-neutral-100 flex justify-center">
+            <Pagination
+              totalItems={totalCount}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={(page) => setCurrentPage(page)}
+              itemLabel="talep"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Status Update Modal */}
+      {selectedRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white rounded-xs border border-neutral-200 shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <div>
+                <h4 className="text-sm font-bold text-neutral-900">
+                  Talep Durumunu Güncelle
+                </h4>
+                <p className="text-xs text-neutral-500 font-mono mt-0.5">
+                  {selectedRequest.code} - {selectedRequest.customerName}
+                </p>
+              </div>
               <button
-                onClick={() => setPreviewReceiptUrl(null)}
-                className="text-neutral-500 hover:text-neutral-900 text-xs font-bold uppercase p-1 cursor-pointer"
+                onClick={() => setSelectedRequest(null)}
+                className="text-neutral-400 hover:text-neutral-600 text-sm font-bold cursor-pointer"
               >
-                Kapat (ESC)
+                ✕
               </button>
             </div>
-            
-            <div className="max-h-[70vh] overflow-y-auto flex items-center justify-center bg-neutral-100 p-2 rounded-xs">
-              <img
-                src={previewReceiptUrl}
-                alt="Havale Dekontu"
-                className="max-h-[65vh] object-contain rounded-xs shadow-xs"
-              />
-            </div>
 
-            <div className="text-right">
-              <a
-                href={previewReceiptUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-[#C5A880] font-bold hover:underline"
-              >
-                <span>Yeni Sekmede Tam Boyut Aç</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
-            </div>
+            <form onSubmit={handleUpdateStatus} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1.5">
+                  Yeni Durum
+                </label>
+                <select
+                  value={targetStatus}
+                  onChange={(e) => setTargetStatus(e.target.value as AdminOrderRequest['status'])}
+                  className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+                >
+                  <option value="NEW">Yeni Talep</option>
+                  <option value="CONTACTED">İletişime Geçildi</option>
+                  <option value="OFFER_SENT">Teklif İletildi</option>
+                  <option value="VISIT_SCHEDULED">Showroom Randevusu</option>
+                  <option value="CONFIRMED">Satış Teyit Edildi</option>
+                  <option value="COMPLETED">Tamamlandı</option>
+                  <option value="CANCELLED">İptal / Vazgeçildi</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1.5">
+                  Personel Notu / Açıklama
+                </label>
+                <textarea
+                  rows={3}
+                  value={staffNote}
+                  onChange={(e) => setStaffNote(e.target.value)}
+                  placeholder="Müşteriyle görüşüldü, Modoko showroom randevusu teyit edildi..."
+                  className="w-full p-3 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedRequest(null)}
+                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-xs hover:bg-neutral-50 cursor-pointer"
+                >
+                  Vazgeç
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingStatus}
+                  className="px-5 py-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  {isUpdatingStatus && <RefreshCw className="h-3 w-3 animate-spin" />}
+                  <span>Kaydet</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-
     </div>
   );
 };
+
+export default OrdersTab;

@@ -223,7 +223,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                       u[index] = { ...u[index], subtitle: e.target.value };
                       setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                     }}
-                    placeholder="Makam takımları, çalışma grupları ve lüks dinlenme alanları için özel üretim çözümler."
+                    placeholder="Makam takımları, çalışma grupları ve kurumsal çalışma alanları için standart seri fabrika çözümleri."
                     className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white leading-relaxed"
                   />
                 </div>

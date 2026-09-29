@@ -15,6 +15,8 @@ export type AdminTabId =
   | 'deliveryZones'
   | 'categories' 
   | 'coupons'
+  | 'landingPage'
+  | 'blog'
   | 'homeCMS' 
   | 'corporateCMS' 
   | 'ticker' 
@@ -30,9 +32,10 @@ interface AdminTabsNavProps {
     orders: number;
     categories: number;
     products: number;
-    coupons: number;
+    coupons?: number;
     tickerItems: number;
     stores?: number;
+    blogs?: number;
   };
 }
 
@@ -44,16 +47,17 @@ export const AdminTabsNav: React.FC<AdminTabsNavProps> = ({
 }) => {
   const ecommerceTabs = [
     { id: 'overview', label: 'Genel Bakış', icon: LayoutGrid },
-    { id: 'orders', label: 'Siparişler', count: counts.orders, icon: Truck },
+    { id: 'orders', label: 'Sipariş Talepleri', count: counts.orders, icon: Truck },
     { id: 'products', label: 'Web Kataloğu', count: counts.products, icon: Package },
     { id: 'erpSync', label: 'CRM / ERP Senkronizasyonu', icon: RefreshCw },
     { id: 'deliveryZones', label: 'Teslimat & Şehirler', icon: MapPin },
     { id: 'categories', label: 'Kategoriler', count: counts.categories, icon: FolderTree },
-    { id: 'coupons', label: 'Kuponlar', count: counts.coupons, icon: Tag },
   ];
 
   const cmsTabs = [
-    { id: 'homeCMS', label: 'Ana Sayfa Tasarımı', icon: Sliders },
+    { id: 'landingPage', label: 'Açılış Sayfası Tercihi', icon: Sliders },
+    { id: 'blog', label: 'Blog & SEO Makaleleri', count: counts.blogs, icon: FileText },
+    { id: 'homeCMS', label: 'Vitrin / Ana Sayfa Tasarımı', icon: LayoutGrid },
     { id: 'corporateCMS', label: 'Kurumsal Sayfalar', icon: FileText },
     { id: 'stores', label: 'Mağazalar & Bayiler', count: counts.stores, icon: Building2 },
     { id: 'ticker', label: 'Duyuru Bandı', count: counts.tickerItems, icon: Megaphone },

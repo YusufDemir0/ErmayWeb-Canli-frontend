@@ -63,10 +63,17 @@ export interface CorporateConfig {
   qualityText: string;
 }
 
+export interface LandingPageConfig {
+  type: 'home' | 'category' | 'catalog';
+  targetSlug?: string;
+  targetTitle?: string;
+}
+
 interface CMSState {
   tickerItems: string[];
   campaignPopup: CampaignPopupConfig;
   contactInfo: ContactInfoConfig;
+  landingPageConfig: LandingPageConfig;
   products: Product[];
   categories: Category[];
   stores: StoreItem[];
@@ -77,6 +84,7 @@ interface CMSState {
   // Actions
   fetchCmsBlocks: () => Promise<void>;
   fetchProductsAndCategories: () => Promise<void>;
+  updateLandingPageConfig: (config: LandingPageConfig) => Promise<void>;
 
   setTickerItems: (items: string[]) => void;
   addTickerItem: (item: string) => void;
@@ -121,19 +129,20 @@ export const DEFAULT_SOCIAL_LINKS: SocialLinksConfig = {
 };
 
 const DEFAULT_TICKER = [
-  '• ÜCRETSİZ KARGO & MONTAJ',
-  '• 12 TAKSİT İMKANI',
-  '• 5 YIL İSKELET GARANTİSİ',
-  '• DOĞRUDAN ÜRETİCİDEN SATIŞ'
+  '• DOĞRUDAN FABRİKADAN ARACISIZ SATIŞ',
+  '• İSTANBUL İÇİ KENDİ ARACIMIZLA TESLİMAT & MONTAJ',
+  '• ÇOKLU ALIMLARDA FABRİKA İSKONTOSU',
+  '• 1. SINIF E1 MELAMİN & DAYANIKLI METAL İSKELET',
+  '• 2 YIL RESMİ ÜRETİCİ GARANTİSİ'
 ];
 
 const DEFAULT_POPUP: CampaignPopupConfig = {
   enabled: true,
   popupType: 'coupon',
-  title: 'YENİ SEZON KOLEKSİYONU',
-  subtitle: 'Özel tasarım ürünlerimizde sepette ekstra %15 indirim fırsatı!',
-  discountCode: 'YENISEZON15',
-  badgeText: 'FIRSAT',
+  title: 'FABRİKA SATIŞ & TOPTAN İSKONTO',
+  subtitle: 'Standart seri ofis mobilyalarımızda doğrudan üretici fiyatı ve toptan avantajı!',
+  discountCode: 'FABRIKA10',
+  badgeText: 'ÜRETİCİDEN',
   image: '/default-furniture.webp',
   buttonText: 'Koleksiyonu İncele',
   buttonLink: '/katalog'
@@ -188,71 +197,50 @@ const DEFAULT_HOME_CONFIG: HomeConfig = {
   heroSlides: [
     {
       id: 'slide-1',
-      title: 'Zamansız Tasarım & Lüks Konfor',
-      subtitle: 'Ermay Mobilya ile yaşam alanlarınıza İtalyan zarafeti katın.',
-      badge: '2026 ÖZEL KOLEKSİYON',
+      title: 'Doğrudan Fabrikadan Aracısız Ofis Mobilyaları',
+      subtitle: 'Kendi üretim tesislerimizde standart seri imalat; aracı komisyonu olmadan net fabrika fiyatıyla.',
+      badge: 'FABRİKA SATIŞ GÜVENCESİ',
       image: '/default-furniture.webp',
       buttonText: 'Koleksiyonu Keşfet',
       buttonLink: '/katalog'
     }
   ],
-  featuredTitle: 'Öne Çıkan Ürünler',
-  featuredSubtitle: 'En çok tercih edilen lüks mobilya tasarımlarımız',
+  featuredTitle: 'Öne Çıkan Ofis Takımları',
+  featuredSubtitle: 'En çok tercih edilen standart seri fabrika ofis mobilyalarımız',
   categoriesTitle: 'Kategoriler',
-  categoriesSubtitle: 'Evinizin her köşesi için özel tasarımlar'
+  categoriesSubtitle: 'Çalışma alanlarınız ve ofisiniz için standart seri fabrika imalatı çözümler'
 };
 
 const DEFAULT_CORPORATE_CONFIG: CorporateConfig = {
-  heroBadge: '40 YILLIK TECRÜBE',
-  heroTitle: 'Geleneksel Ahşap Ustalığı,',
-  heroHighlight: 'Modern İtalyan Çizgisi.',
-  heroSubtitle: '1986 yılından bu yana Modoko merkezli atölyelerimizde üretilen lüks mobilyalar.',
+  heroBadge: 'DOĞRUDAN ÜRETİCİDEN',
+  heroTitle: 'Fabrikadan Aracısız,',
+  heroHighlight: 'Standart Seri Güvencesi.',
+  heroSubtitle: 'Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı ofis mobilyaları.',
   heroImage: '/default-furniture.webp',
-  storyTitle: 'Zanaat ve Estetiğin Buluşması',
-  storyContent: `Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün modern üretim tesisleri ve geniş satış ağı ile sürdürmektedir.\n\nHer bir parçada kullanılan %100 fırınlanmış gürgen ağacı, birinci sınıf çelik konstrüksiyon ve hakiki döşemelik kumaşlar, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.`,
-  storyParagraph1: 'Ermay Mobilya, kurucumuzun ahşaba olan tutkusuyla küçük bir atölyede başlayan yolculuğunu bugün geniş satış ağı ile sürdürmektedir.',
-  storyParagraph2: 'Her bir parçada kullanılan %100 fırınlanmış gürgen ağacı ve hakiki döşemeler, usta zanaatkarlarımızın elinde zamansız mobilyalara dönüşür.',
+  storyTitle: 'İmalat Felsefemiz ve Üretim Standartlarımız',
+  storyContent: `Ermay Mobilya, modern üretim tesislerinde standart seri ofis mobilyası imalatı yaparak doğrudan kurumsal firmalara ve son kullanıcıya aracısız ulaştırmaktadır.\n\nÜrünlerimizde 1. sınıf E1 melamin paneller, darbe emici 2mm PVC kenar bantları ve elektrostatik fırın boyalı DKP çelik profil ayaklar kullanılarak sağlamlık ve uzun ömür güvence altına alınır. Aracı ve mağaza komisyonlarını ortadan kaldırarak en rekabetçi fabrika fiyatlarını sunuyoruz.`,
+  storyParagraph1: 'Ermay Mobilya, modern tesislerinde standart seri ofis mobilyaları üreterek aracısız doğrudan satış gerçekleştirmektedir.',
+  storyParagraph2: '1. Sınıf E1 melamin paneller, 2mm PVC kenar koruması ve dayanıklı çelik profil ayaklar ile uzun ömürlü kullanım sunar.',
   experienceYears: '40+',
-  experienceSubtitle: 'Yıllık İmalat Tecrübesi',
+  experienceSubtitle: 'Yıllık İmalat Güvencesi',
   storyImage: '/default-furniture.webp',
   visionTitle: 'Vizyonumuz',
-  visionText: 'Türk mobilya zanaatını dünya ölçeğinde lüks ve kalite standartlarıyla temsil eden öncü marka olmak.',
+  visionText: 'Ofis ve çalışma alanlarında uzun ömürlü, dayanıklı ve ergonomik standart seri mobilyaları en uygun fabrika fiyatıyla müşterilerimize ulaştırmak.',
   missionTitle: 'Misyonumuz',
-  missionText: 'Yaşam alanlarına değer katan, ergonomik, estetik ve nesiller boyu kullanılan kaliteli mobilyalar üretmek.',
+  missionText: '1. Sınıf E1 melamin, darbe emici PVC ve elektrostatik boyalı çelik konstrüksiyon ile yüksek kalite standartlarında seri üretim.',
   qualityTitle: 'Kalite Politikamız',
-  qualityText: 'Kullandığımız tüm hammaddelerde uluslararası sertifikalı masif ahşap ve E1 normunda çevreci malzemeler tercih ediyoruz.'
+  qualityText: 'Tüm ürünlerimizde E1 normunda insan sağlığına uygun antibakteriyel melamin ve yüksek mukavemetli metal profiller kullanıyoruz.'
 };
 
-export const DEFAULT_CATEGORIES: Category[] = [
-  {
-    id: 'f2143ac4-7df4-4dc3-8cb3-fef2fccfee72',
-    name: 'Oturma Odası',
-    slug: 'oturma-odasi',
-    description: 'Masif iskeletli lüks koltuk takımları ve berjerler',
-    image: '/default-furniture.webp',
-  },
-  {
-    id: 'b4a01ede-5120-4c19-ad0a-292d4918922a',
-    name: 'Yemek Odası',
-    slug: 'yemek-odasi',
-    description: 'Masif ahşap yemek masaları, sandalyeler ve konsollar',
-    image: '/default-furniture.webp',
-  },
-  {
-    id: '1db98bad-99c0-44ac-8737-91d3457a0d5a',
-    name: 'Yatak Odası',
-    slug: 'yatak-odasi',
-    description: 'Özel tasarım karyolalar, komodinler ve gardıroplar',
-    image: '/default-furniture.webp',
-  },
-];
+export const DEFAULT_CATEGORIES: Category[] = [];
 
 export const useCMSStore = create<CMSState>()((set, get) => ({
       tickerItems: DEFAULT_TICKER,
       campaignPopup: DEFAULT_POPUP,
       contactInfo: DEFAULT_CONTACT,
+      landingPageConfig: { type: 'home' } as LandingPageConfig,
       products: [],
-      categories: DEFAULT_CATEGORIES,
+      categories: [],
       stores: DEFAULT_STORES,
       homeConfig: DEFAULT_HOME_CONFIG,
       corporateConfig: DEFAULT_CORPORATE_CONFIG,
@@ -269,6 +257,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
               tickerItems: cms.ticker_items || get().tickerItems,
               campaignPopup: cms.campaign_popup || get().campaignPopup,
               contactInfo: cms.contact_info || get().contactInfo,
+              landingPageConfig: (cms.landing_page_config as LandingPageConfig) || get().landingPageConfig,
               socialLinks: cms.social_links
                 ? { ...DEFAULT_SOCIAL_LINKS, ...(cms.social_links as SocialLinksConfig) }
                 : get().socialLinks,
@@ -292,6 +281,15 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         }
       },
 
+      updateLandingPageConfig: async (config) => {
+        set({ landingPageConfig: config });
+        try {
+          await apiClient.put('/cms/landing_page_config', { content: config });
+        } catch (e) {
+          console.warn('Açılış sayfası ayarı API kayıt hatası:', e);
+        }
+      },
+
       updateSocialLinks: (config) => {
         set((state) => {
           const updated = { ...state.socialLinks, ...config };
@@ -307,14 +305,12 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
             apiClient.get('/categories').catch(() => ({ data: { success: false, categories: [] } })),
           ]);
 
-          if (prodRes.data?.success && Array.isArray(prodRes.data.products) && prodRes.data.products.length > 0) {
+          if (prodRes.data?.success && Array.isArray(prodRes.data.products)) {
             set({ products: prodRes.data.products });
           }
 
-          if (catRes.data?.success && Array.isArray(catRes.data.categories) && catRes.data.categories.length > 0) {
+          if (catRes.data?.success && Array.isArray(catRes.data.categories)) {
             set({ categories: catRes.data.categories });
-          } else if (!get().categories || get().categories.length === 0) {
-            set({ categories: DEFAULT_CATEGORIES });
           }
         } catch (err) {
           console.warn('REST API ürün/kategori çekme uyarısı:', err);

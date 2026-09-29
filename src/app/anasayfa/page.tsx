@@ -1,16 +1,12 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Hero from '../components/Hero';
-import CategoryList from '../components/CategoryList';
-import CuratedSets from '../components/CuratedSets';
-import ProductGridClient from './ProductGridClient';
-import { productService } from '../services/productService';
-import { CategoryPage } from '../components/CategoryPage';
-import apiClient from '../services/api';
-import type { Product } from '../types';
+import Hero from '../../components/Hero';
+import CategoryList from '../../components/CategoryList';
+import CuratedSets from '../../components/CuratedSets';
+import ProductGridClient from '../ProductGridClient';
+import { productService } from '../../services/productService';
+import type { Product } from '../../types';
 import Link from 'next/link';
-
-import { redirect } from 'next/navigation';
 
 export const revalidate = 60; // Incremental Static Regeneration (ISR) every 60s
 
@@ -21,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ERMAY Mobilya | Doğrudan Fabrika Satış',
     description: 'Kendi üretim tesislerimizde imal edilen standart seri ofis mobilyaları.',
-    url: 'https://ermaymobilya.com',
+    url: 'https://ermaymobilya.com/anasayfa',
     siteName: 'Ermay Mobilya',
     images: [
       {
@@ -35,23 +31,11 @@ export const metadata: Metadata = {
     type: 'website',
   },
   alternates: {
-    canonical: 'https://ermaymobilya.com',
+    canonical: 'https://ermaymobilya.com/anasayfa',
   },
 };
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const sp = searchParams ? await searchParams : {};
-  const isDirectHome = sp?.home === 'true' || sp?.view === 'home';
-
-  // Default behavior on root URL ("/"): redirect to Aksesuar ve Diğer URL
-  if (!isDirectHome) {
-    redirect('/kategori/aksesuar-ve-diger');
-  }
-
+export default async function AnasayfaPage() {
   let products: Product[] = [];
   try {
     const fetched = await productService.getProducts({ limit: 24 });
@@ -59,10 +43,9 @@ export default async function HomePage({
       products = fetched;
     }
   } catch (e) {
-    console.warn('HomePage SSR ürün çekme uyarısı:', e);
+    console.warn('AnasayfaPage SSR ürün çekme uyarısı:', e);
   }
 
-  // Schema.org Structured Data (JSON-LD) for Rich Google Search Results
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FurnitureStore',
@@ -97,6 +80,7 @@ export default async function HomePage({
 
   return (
     <div className="w-full bg-[#FCFAF6] text-neutral-800">
+      {/* Schema.org Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -108,7 +92,7 @@ export default async function HomePage({
       {/* 2. COLLECTION CATEGORIES QUICK SELECTOR */}
       <CategoryList />
 
-      {/* 3. CURATED FACTORY SETS (Fabrikadan Takım Kombinasyonları) */}
+      {/* 3. CURATED FACTORY SETS */}
       <CuratedSets />
 
       {/* 4. TABBED COLLECTION SHOWCASE */}
@@ -135,17 +119,23 @@ export default async function HomePage({
               <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EAE3D2]/70 space-y-1.5">
                 <span className="text-base block">🏭</span>
                 <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wide">Doğrudan İmalatçı</h4>
-                <p className="text-[11px] text-neutral-500 font-light leading-snug">Aracı komisyonu yok, net fabrika liste fiyatıyla dürüst maliyet avantajı.</p>
+                <p className="text-[11px] text-neutral-500 font-light leading-snug">
+                  Aracı komisyonu yok, net fabrika liste fiyatıyla dürüst maliyet avantajı.
+                </p>
               </div>
               <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EAE3D2]/70 space-y-1.5">
                 <span className="text-base block">🚚</span>
                 <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wide">Kendi Fabrika Ekibimiz</h4>
-                <p className="text-[11px] text-neutral-500 font-light leading-snug">İstanbul içi kendi araç ve personelimizle kata teslimat ve eksiksiz montaj.</p>
+                <p className="text-[11px] text-neutral-500 font-light leading-snug">
+                  İstanbul içi kendi araç ve personelimizle kata teslimat ve eksiksiz montaj.
+                </p>
               </div>
               <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EAE3D2]/70 space-y-1.5">
                 <span className="text-base block">🏢</span>
                 <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wide">Çoklu Alım İskontosu</h4>
-                <p className="text-[11px] text-neutral-500 font-light leading-snug">Şirket ve ofis kurulumlarında adetli siparişler için anında fabrika iskontosu.</p>
+                <p className="text-[11px] text-neutral-500 font-light leading-snug">
+                  Şirket ve ofis kurulumlarında adetli siparişler için anında fabrika iskontosu.
+                </p>
               </div>
             </div>
 
