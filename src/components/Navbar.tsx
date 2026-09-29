@@ -80,6 +80,7 @@ export const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'ANASAYFA', href: '/anasayfa' },
+    { name: 'ÜRÜNLER', href: '/kategori' },
     { name: 'KATALOG', href: '/katalog' },
     { name: 'BAYİLER', href: '/bayiler' },
     { name: 'BLOG', href: '/blog' },
@@ -91,14 +92,8 @@ export const Navbar: React.FC = () => {
     <>
       <header className="w-full z-40 bg-white sticky top-0 shadow-xs border-b border-neutral-200/70 transition-all duration-300">
         
-        {/* 1. CONTINUOUS TICKER MARQUEE (Hidden at top, smoothly expands into view on scroll down) */}
-        <div 
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            isScrolled 
-              ? 'max-h-12 opacity-100' 
-              : 'max-h-0 opacity-0 pointer-events-none'
-          }`}
-        >
+        {/* 1. CONTINUOUS TICKER MARQUEE (Always Visible) */}
+        <div className="w-full overflow-hidden bg-neutral-900 border-b border-neutral-800">
           <UpperNavbar />
         </div>
 
@@ -115,7 +110,7 @@ export const Navbar: React.FC = () => {
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link href="/kategori/aksesuar-ve-diger" className="flex items-center gap-2 group cursor-pointer" title="Ermay Mobilya - Aksesuar ve Diğer">
+            <Link href="/" className="flex items-center gap-2 group cursor-pointer" title="Ermay Mobilya - Doğrudan Fabrika Satış">
               <span className="font-serif font-black text-xl md:text-2xl tracking-tighter text-neutral-900 group-hover:text-[#C5A880] transition-colors">
                 ERMAY
               </span>
@@ -128,7 +123,11 @@ export const Navbar: React.FC = () => {
           {/* Center Main Nav Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-7">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/anasayfa' && link.href !== '/' && pathname.startsWith(link.href)) || (link.href === '/anasayfa' && (pathname === '/anasayfa' || pathname === '/vitrin'));
+              const isActive = 
+                pathname === link.href || 
+                (link.href === '/kategori' && (pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/'))) ||
+                (link.href !== '/anasayfa' && link.href !== '/kategori' && link.href !== '/' && pathname.startsWith(link.href)) || 
+                (link.href === '/anasayfa' && (pathname === '/anasayfa' || pathname === '/vitrin'));
               return (
                 <Link
                   key={link.name}
@@ -221,29 +220,31 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. SECONDARY CATEGORY SUB-BAR (Refined Clean Luxury) */}
-        <div className="bg-[#FAF8F5] border-t border-neutral-200/60 py-2 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar text-[10.5px] font-bold uppercase tracking-wider text-neutral-600">
-            {categories.map((cat, idx) => {
-              const isActive = pathname === `/kategori/${cat.slug}`;
-              return (
-                <React.Fragment key={cat.id}>
-                  <Link
-                    href={`/kategori/${cat.slug}`}
-                    className={`transition-colors whitespace-nowrap cursor-pointer ${
-                      isActive ? 'text-[#C5A880] font-extrabold' : 'hover:text-[#C5A880]'
-                    }`}
-                  >
-                    {cat.name}
-                  </Link>
-                  {idx < categories.length - 1 && (
-                    <span className="text-neutral-300 text-[8px]">/</span>
-                  )}
-                </React.Fragment>
-              );
-            })}
+        {/* 4. SECONDARY CATEGORY SUB-BAR (Only on product/category pages) */}
+        {(pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/')) && (
+          <div className="bg-[#FAF8F5] border-t border-neutral-200/60 py-2 px-4 animate-fade-in">
+            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar text-[10.5px] font-bold uppercase tracking-wider text-neutral-600">
+              {categories.map((cat, idx) => {
+                const isActive = pathname === `/kategori/${cat.slug}`;
+                return (
+                  <React.Fragment key={cat.id}>
+                    <Link
+                      href={`/kategori/${cat.slug}`}
+                      className={`transition-colors whitespace-nowrap cursor-pointer ${
+                        isActive ? 'text-[#C5A880] font-extrabold' : 'hover:text-[#C5A880]'
+                      }`}
+                    >
+                      {cat.name}
+                    </Link>
+                    {idx < categories.length - 1 && (
+                      <span className="text-neutral-300 text-[8px]">/</span>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* ============================================================ */}
@@ -262,7 +263,7 @@ export const Navbar: React.FC = () => {
             {/* Header */}
             <div>
               <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-[#FAF8F5]">
-                <Link href="/kategori/aksesuar-ve-diger" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="font-serif font-black text-xl tracking-tight text-neutral-900">
                     ERMAY MOBİLYA
                   </span>
@@ -284,7 +285,11 @@ export const Navbar: React.FC = () => {
                   Menü
                 </span>
                 {navLinks.map((link) => {
-                  const isActive = pathname === link.href;
+                  const isActive = 
+                    pathname === link.href || 
+                    (link.href === '/kategori' && (pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/'))) ||
+                    (link.href !== '/anasayfa' && link.href !== '/kategori' && link.href !== '/' && pathname.startsWith(link.href)) || 
+                    (link.href === '/anasayfa' && (pathname === '/anasayfa' || pathname === '/vitrin'));
                   return (
                     <Link
                       key={link.name}

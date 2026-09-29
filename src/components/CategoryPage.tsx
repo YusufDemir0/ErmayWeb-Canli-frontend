@@ -102,7 +102,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     });
 
     const queryString = params.toString();
-    const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+    const basePath = pathname === '/' ? `/kategori/${categorySlug}` : pathname;
+    const targetUrl = queryString ? `${basePath}?${queryString}` : basePath;
     router.push(targetUrl, { scroll: false });
   };
 
@@ -304,7 +305,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   const handleResetFilters = () => {
     setMinPriceInput('');
     setMaxPriceInput('');
-    router.push(pathname, { scroll: false });
+    const basePath = pathname === '/' ? `/kategori/${categorySlug}` : pathname;
+    router.push(basePath, { scroll: false });
   };
 
   const getProductImage = (product: Product): string => {
@@ -378,7 +380,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
             </h3>
             <div className="space-y-1.5 text-xs">
               <Link
-                href="/katalog"
+                href="/kategori"
                 className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
                   categorySlug === 'hepsi' || categorySlug === 'all'
                     ? 'bg-[#C5A880] text-white font-bold'

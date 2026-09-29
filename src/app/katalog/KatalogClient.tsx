@@ -61,7 +61,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
   return (
     <div className="w-full bg-[#FCFAF6] text-neutral-900 min-h-screen print:bg-white print:p-0 print:m-0">
       {/* 1. TOP CONTROL BAR (Screen Only - PDF Print & Filter) */}
-      <nav className="print:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-2xs py-3 px-4 sm:px-6 lg:px-8">
+      <nav className="print:hidden relative z-10 bg-white border-b border-neutral-200 shadow-2xs py-3.5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="font-serif font-black tracking-wider text-sm sm:text-base text-neutral-900 uppercase">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CategoryPage } from '../../../components/CategoryPage';
@@ -62,5 +62,9 @@ export default async function CategoryRoute({ params }: Props) {
     console.warn('CategoryRoute SSR error:', err);
   }
 
-  return <CategoryPage categorySlug={slug} initialProducts={initialProducts} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center text-xs text-neutral-400">Yükleniyor...</div>}>
+      <CategoryPage categorySlug={slug} initialProducts={initialProducts} />
+    </Suspense>
+  );
 }
