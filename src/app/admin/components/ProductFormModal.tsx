@@ -44,10 +44,14 @@ const DIMENSION_PRESETS = [
   { label: 'Yönetici Masası', w: 200, d: 90, h: 75 },
   { label: 'Çalışma Masası', w: 160, d: 80, h: 75 },
   { label: 'Operasyonel Masa', w: 140, d: 70, h: 75 },
-  { label: 'Toplantı Masası', w: 240, d: 120, h: 75 },
-  { label: 'Ofis Koltuğu', w: 65, d: 65, h: 115 },
-  { label: 'Dosya Dolabı', w: 160, d: 45, h: 120 },
-  { label: 'Sehpa', w: 60, d: 50, h: 45 },
+  { label: 'Toplantı Masası (K)', w: 200, d: 100, h: 75 },
+  { label: 'Toplantı Masası (B)', w: 280, d: 120, h: 75 },
+  { label: 'Ofis Bankosu', w: 200, d: 75, h: 110 },
+  { label: 'Dosya Dolabı (Orta)', w: 160, d: 45, h: 120 },
+  { label: 'Yüksek Dosya Dolabı', w: 80, d: 40, h: 198 },
+  { label: 'Müdür Koltuğu', w: 68, d: 68, h: 120 },
+  { label: 'Personel Koltuğu', w: 60, d: 60, h: 100 },
+  { label: 'Ofis Sehpası', w: 100, d: 60, h: 45 },
 ];
 
 // Preset material chips (Factory Standard Substrates)
@@ -114,6 +118,9 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const [leadTimeDays, setLeadTimeDays] = useState(
     editingProduct?.leadTimeDays !== undefined ? String(editingProduct.leadTimeDays) : '15'
   );
+  const [vatRate, setVatRate] = useState(
+    editingProduct?.vatRate !== undefined ? String(editingProduct.vatRate) : '0.20'
+  );
 
   // 5. Parçalı Boyut / Ölçü Girişi (Dimensions Chunk)
   const [width, setWidth] = useState(editingProduct?.widthCm ? String(editingProduct.widthCm) : '220');
@@ -162,6 +169,185 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   const [activeFormTab, setActiveFormTab] = useState<'general' | 'specs' | 'features' | 'preview'>('general');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Synchronize form fields whenever modal opens or editingProduct changes
+  React.useEffect(() => {
+    if (isOpen) {
+      if (editingProduct) {
+        setName(editingProduct.name || '');
+        setCategory(
+          typeof editingProduct.category === 'object' && editingProduct.category !== null
+            ? (editingProduct.category as any).slug || (editingProduct.category as any).id
+            : (editingProduct.category as string) || (categories[0]?.slug || '')
+        );
+        const pImages = Array.isArray(editingProduct.images) ? editingProduct.images : [];
+        setImage1(editingProduct.image || pImages[0] || '');
+        setImage2(pImages[1] || editingProduct.image2 || '');
+        setImage3(pImages[2] || editingProduct.image3 || '');
+        setErpItemId(editingProduct.erpItemId ? String(editingProduct.erpItemId) : '');
+        setErpItemCode(editingProduct.erpItemCode || '');
+        setPrice(editingProduct.price ? String(editingProduct.price) : '');
+        setOriginalPrice(editingProduct.originalPrice ? String(editingProduct.originalPrice) : '');
+        setInStock(editingProduct.inStock !== false);
+        setLeadTimeDays(editingProduct.leadTimeDays !== undefined ? String(editingProduct.leadTimeDays) : '15');
+        setVatRate(editingProduct.vatRate !== undefined ? String(editingProduct.vatRate) : '0.20');
+        setWidth(editingProduct.widthCm ? String(editingProduct.widthCm) : '220');
+        setDepth(editingProduct.depthCm ? String(editingProduct.depthCm) : '95');
+        setHeight(editingProduct.heightCm ? String(editingProduct.heightCm) : '75');
+        setMaterial(editingProduct.material || 'E1 Kalite Çizilmez Melamin & DKP Çelik Profil');
+        setDrawerCount(editingProduct.drawerCount !== undefined ? String(editingProduct.drawerCount) : '3');
+        setFeatures(
+          editingProduct.features && editingProduct.features.length > 0
+            ? editingProduct.features
+            : [
+                'Doğrudan İmalatçı Fabrika Satış Fiyatı',
+                'E1 Normlarında Dayanıklı Çizilmez Yüzey',
+                '2 Yıl Resmi Üretici Garantisi',
+              ]
+        );
+        setColors(
+          editingProduct.colors && editingProduct.colors.length > 0
+            ? editingProduct.colors
+            : [
+                { id: 'c-1', name: 'Krem Keten', hex: '#E4DAC6', tag: 'Döşeme' },
+                { id: 'c-2', name: 'Antrasit Nubuk', hex: '#2C323B', tag: 'Nubuk' },
+                { id: 'c-3', name: 'İtalyan Taba', hex: '#8A4B20', tag: 'Hakiki Deri' },
+              ]
+        );
+        setDescription(editingProduct.description || '');
+        setBadge(editingProduct.badge || '2026 Standart Seri');
+      } else {
+        setName('');
+        setCategory(categories[0]?.slug || categories[0]?.id || '');
+        setImage1('');
+        setImage2('');
+        setImage3('');
+        setErpItemId('');
+        setErpItemCode('');
+        setPrice('');
+        setOriginalPrice('');
+        setInStock(true);
+        setLeadTimeDays('15');
+        setVatRate('0.20');
+        setWidth('220');
+        setDepth('95');
+        setHeight('75');
+        setMaterial('E1 Kalite Çizilmez Melamin & DKP Çelik Profil');
+        setDrawerCount('3');
+        setFeatures([
+          'Doğrudan İmalatçı Fabrika Satış Fiyatı',
+          'E1 Normlarında Dayanıklı Çizilmez Yüzey',
+          '2 Yıl Resmi Üretici Garantisi',
+        ]);
+        setDescription('');
+        setBadge('2026 Standart Seri');
+      }
+      setActiveFormTab('general');
+    }
+  }, [isOpen, editingProduct, categories]);
+
+  // LocalStorage Auto-Drafting (ERP Caching Paradigm)
+  const DRAFT_KEY = 'ermay_admin_product_form_draft';
+  const [hasDraft, setHasDraft] = useState(false);
+
+  React.useEffect(() => {
+    if (!editingProduct && typeof window !== 'undefined') {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.name && !name) {
+            setHasDraft(true);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+  }, [editingProduct]);
+
+  React.useEffect(() => {
+    if (!editingProduct && name.trim() && typeof window !== 'undefined') {
+      const draft = {
+        name,
+        category,
+        price,
+        originalPrice,
+        width,
+        depth,
+        height,
+        material,
+        drawerCount,
+        leadTimeDays,
+        vatRate,
+        features,
+        description,
+        badge,
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }
+  }, [
+    editingProduct,
+    name,
+    category,
+    price,
+    originalPrice,
+    width,
+    depth,
+    height,
+    material,
+    drawerCount,
+    leadTimeDays,
+    vatRate,
+    features,
+    description,
+    badge,
+  ]);
+
+  const handleRestoreDraft = () => {
+    if (typeof window === 'undefined') return;
+    const saved = localStorage.getItem(DRAFT_KEY);
+    if (saved) {
+      try {
+        const p = JSON.parse(saved);
+        if (p.name) setName(p.name);
+        if (p.category) setCategory(p.category);
+        if (p.price) setPrice(p.price);
+        if (p.originalPrice) setOriginalPrice(p.originalPrice);
+        if (p.width) setWidth(p.width);
+        if (p.depth) setDepth(p.depth);
+        if (p.height) setHeight(p.height);
+        if (p.material) setMaterial(p.material);
+        if (p.drawerCount) setDrawerCount(p.drawerCount);
+        if (p.leadTimeDays) setLeadTimeDays(p.leadTimeDays);
+        if (p.vatRate) setVatRate(p.vatRate);
+        if (p.features) setFeatures(p.features);
+        if (p.description) setDescription(p.description);
+        if (p.badge) setBadge(p.badge);
+        setHasDraft(false);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const handleClearDraft = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+    setHasDraft(false);
+  };
+
+  const handleUppercaseName = () => {
+    if (name) {
+      setName(name.toLocaleUpperCase('tr-TR'));
+    }
+  };
+
+  const numericPrice = parseFloat(price) || 0;
+  const numericVat = parseFloat(vatRate) || 0.20;
+  const netPrice = numericPrice > 0 ? numericPrice / (1 + numericVat) : 0;
+  const vatAmount = numericPrice > 0 ? numericPrice - netPrice : 0;
 
   if (!isOpen) return null;
 
@@ -250,7 +436,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         image3: image3 || undefined,
         inStock,
         leadTimeDays: parseInt(leadTimeDays, 10) || 15,
-        vatRate: 0.20,
+        vatRate: parseFloat(vatRate) || 0.20,
         erpItemId: erpItemId ? erpItemId : undefined,
         erpItemCode: erpItemCode ? erpItemCode : undefined,
         colors,
@@ -266,6 +452,10 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       };
 
       await onSave(payload);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(DRAFT_KEY);
+      }
+      setHasDraft(false);
       onClose();
     } finally {
       setIsSubmitting(false);
@@ -359,6 +549,32 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-xs">
           
+          {/* DRAFT RESTORATION BANNER */}
+          {hasDraft && !editingProduct && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-900 animate-fade-in shadow-2xs">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <span>Kaydedilmemiş bir önceki ürün taslağınız bulundu.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRestoreDraft}
+                  className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-md text-[11px] cursor-pointer"
+                >
+                  Taslağı Yükle
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearDraft}
+                  className="px-2 py-1 text-amber-700 hover:text-amber-900 text-[11px] cursor-pointer"
+                >
+                  Temizle
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: GENEL BİLGİLER, ERP, RESİMLER & FİYAT */}
           {activeFormTab === 'general' && (
             <div className="space-y-5 animate-fade-in">
@@ -371,9 +587,19 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
-                      Ürün Adı *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[10px] font-bold text-neutral-600 uppercase">
+                        Ürün Adı *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleUppercaseName}
+                        className="text-[10px] text-[#C5A880] hover:text-[#8A4B20] font-bold flex items-center gap-0.5 cursor-pointer"
+                        title="Tüm harfleri Türkçe büyük harfe çevir"
+                      >
+                        <span>[Aa → BÜYÜK HARF]</span>
+                      </button>
+                    </div>
                     <input
                       type="text"
                       required
@@ -583,6 +809,51 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
                     />
                   </div>
+                </div>
+
+                {/* KDV Selection & Dynamic Breakdown */}
+                <div className="pt-2 border-t border-neutral-200/60 space-y-2">
+                  <label className="block text-[10px] font-bold text-neutral-600 uppercase">
+                    KDV Oranı Seçimi
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { label: '%20 (Standart KDV)', val: '0.20' },
+                      { label: '%10 (İndirimli KDV)', val: '0.10' },
+                      { label: '%1 (Özel KDV)', val: '0.01' },
+                      { label: '%0 (KDV Muaf)', val: '0' },
+                    ].map((v) => (
+                      <button
+                        key={v.val}
+                        type="button"
+                        onClick={() => setVatRate(v.val)}
+                        className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          vatRate === v.val
+                            ? 'bg-[#C5A880] text-white shadow-xs'
+                            : 'bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-100'
+                        }`}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {numericPrice > 0 && (
+                    <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#EAE3D2] flex flex-wrap items-center justify-between text-[11px] text-neutral-700 gap-2">
+                      <div>
+                        <span className="text-neutral-500 block text-[9.5px] uppercase font-bold">KDV Hariç Net:</span>
+                        <strong className="font-mono text-neutral-900 text-xs">{Math.round(netPrice).toLocaleString('tr-TR')} TL</strong>
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block text-[9.5px] uppercase font-bold">KDV Tutarı ({Number(vatRate) * 100}%):</span>
+                        <strong className="font-mono text-neutral-900 text-xs">{Math.round(vatAmount).toLocaleString('tr-TR')} TL</strong>
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block text-[9.5px] uppercase font-bold">KDV Dahil Satış:</span>
+                        <strong className="font-mono text-[#8A4B20] text-sm font-black">{Math.round(numericPrice).toLocaleString('tr-TR')} TL</strong>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">

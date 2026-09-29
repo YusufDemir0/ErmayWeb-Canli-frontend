@@ -784,7 +784,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   return (
                     <a
                       href={`https://wa.me/${contactInfo.whatsapp || '905324194151'}?text=${encodeURIComponent(
-                        `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}${setPiecesSummaryText}\n• Ölçüler: ${product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : 'Standart')}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
+                        `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}${setPiecesSummaryText}\n• Ölçüler: ${product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : 'Standart Seri')}\n• Malzeme: ${product.material || '1. Sınıf E1 Melamin & Metal İskelet'}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
                       )}`}
                       target="_blank"
                       rel="noreferrer"
@@ -1028,16 +1028,23 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                               <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[0] || '220 cm'}</td>
                               <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[1] || '95 cm'}</td>
                               <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[2] || '75 cm'}</td>
-                              <td className="py-3 px-4 text-neutral-600">{product.material}</td>
+                              <td className="py-3 px-4 text-neutral-600">{product.material || 'E1 Melamin & Metal İskelet'}</td>
                             </tr>
                           ))
                         ) : (
                           <tr className="hover:bg-neutral-50">
                             <td className="py-3 px-4 font-bold text-neutral-900">{product.name}</td>
-                            <td className="py-3 px-4 font-mono">{product.dimensionSpec?.width || '220'} cm</td>
-                            <td className="py-3 px-4 font-mono">{product.dimensionSpec?.depth || '95'} cm</td>
-                            <td className="py-3 px-4 font-mono">{product.dimensionSpec?.height || '75'} cm</td>
-                            <td className="py-3 px-4 text-neutral-600">{product.material}</td>
+                            <td className="py-3 px-4 font-mono">{product.widthCm || product.dimensionSpec?.width || '220'} cm</td>
+                            <td className="py-3 px-4 font-mono">{product.depthCm || product.dimensionSpec?.depth || '95'} cm</td>
+                            <td className="py-3 px-4 font-mono">{product.heightCm || product.dimensionSpec?.height || '75'} cm</td>
+                            <td className="py-3 px-4 text-neutral-600">
+                              <div>{product.material || '1. Sınıf E1 Melamin & Elektrostatik Metal İskelet'}</div>
+                              {product.drawerCount !== undefined && product.drawerCount > 0 && (
+                                <div className="text-[10px] text-neutral-500 font-mono mt-0.5">
+                                  {product.drawerCount} Çekmeceli (Teleskopik Ray)
+                                </div>
+                              )}
+                            </td>
                           </tr>
                         )}
                       </tbody>
