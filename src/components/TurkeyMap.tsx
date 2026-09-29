@@ -112,15 +112,15 @@ export const REGION_NAMES: Record<string, string> = {
   doguanadolu: 'Doğu Anadolu',
 };
 
-// Smooth zoomed viewBoxes for each region
-export const REGION_VIEWBOXES: Record<string, string> = {
-  marmara: '30 4 282 221',
-  ege: '57 141 291 250',
-  icanadolu: '242 67 440 315',
-  akdeniz: '201 220 435 198',
-  karadeniz: '264 4 598 170',
-  guneydogu: '542 213 361 158',
-  doguanadolu: '579 36 391 314',
+// Smooth GPU-accelerated transforms for each region (translate & scale on 1000x422 canvas)
+export const REGION_TRANSFORMS: Record<string, { scale: number; x: number; y: number }> = {
+  marmara: { scale: 2.3, x: 100, y: -50 },
+  ege: { scale: 2.2, x: 140, y: -350 },
+  icanadolu: { scale: 1.9, x: -300, y: -180 },
+  akdeniz: { scale: 2.0, x: -260, y: -400 },
+  karadeniz: { scale: 1.8, x: -430, y: 30 },
+  guneydogu: { scale: 2.2, x: -990, y: -400 },
+  doguanadolu: { scale: 1.9, x: -920, y: -130 },
 };
 
 // Memoized province path for maximum 60fps rendering without re-parsing paths
@@ -208,12 +208,12 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
   const activeCityNorm = (selectedCityName || activeBubbleCity || '').trim().toLowerCase();
 
-  // Dynamic viewBox: when activeRegionId is null -> full Turkey '0 0 1000 422'
-  const currentViewBox = useMemo(() => {
-    if (activeRegionId && REGION_VIEWBOXES[activeRegionId]) {
-      return REGION_VIEWBOXES[activeRegionId];
+  // Dynamic smooth GPU transform (translate & scale on fixed 1000x422 canvas)
+  const currentTransform = useMemo(() => {
+    if (activeRegionId && REGION_TRANSFORMS[activeRegionId]) {
+      return REGION_TRANSFORMS[activeRegionId];
     }
-    return '0 0 1000 422';
+    return { scale: 1, x: 0, y: 0 };
   }, [activeRegionId]);
 
   // Click on province or pin: open city bubble
@@ -319,18 +319,23 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <svg
-          viewBox={currentViewBox}
-          className="w-full h-full"
-          style={{
-            willChange: 'transform',
-            transform: 'translateZ(0)',
-            transition: 'all 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
+          viewBox="0 0 1000 422"
+          className="w-full h-full overflow-hidden"
           xmlns="http://www.w3.org/2000/svg"
           shapeRendering="geometricPrecision"
         >
-          {/* 81 PROVINCES */}
-          <g id="turkey-provinces">
+          {/* HARDWARE GPU ACCELERATED SMOOTH ZOOM & PAN GROUP */}
+          <g
+            id="map-zoom-transform-group"
+            style={{
+              transform: `translate(${currentTransform.x}px, ${currentTransform.y}px) scale(${currentTransform.scale})`,
+              transformOrigin: '0 0',
+              transition: 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
+              willChange: 'transform',
+            }}
+          >
+            {/* 81 PROVINCES */}
+            <g id="turkey-provinces">
             {TURKEY_PROVINCES.map((prov) => {
               const provNorm = prov.name.toLowerCase();
               const hasStores = cityStoresMap.has(provNorm);
@@ -422,6 +427,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               </g>
             );
           })}
+          </g>
         </svg>
 
         {/* Hovered city tooltip (lightweight) */}

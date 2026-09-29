@@ -1,7 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Image as ImageIcon, Upload, Search, Check, Trash2 } from 'lucide-react';
+import {
+  X,
+  Image as ImageIcon,
+  Search,
+  Check,
+  Plus,
+  Trash2,
+  Ruler,
+  Layers,
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  Box,
+  Eye,
+} from 'lucide-react';
 import type { Product, Category, ProductColorVariant } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 
@@ -24,6 +38,41 @@ interface ProductFormModalProps {
   onSave: (productData: any) => Promise<void> | void;
 }
 
+// Preset furniture dimension templates (ERP/B2B Industry Standards)
+const DIMENSION_PRESETS = [
+  { label: 'Makam Masası', w: 220, d: 95, h: 75 },
+  { label: 'Yönetici Masası', w: 200, d: 90, h: 75 },
+  { label: 'Çalışma Masası', w: 160, d: 80, h: 75 },
+  { label: 'Operasyonel Masa', w: 140, d: 70, h: 75 },
+  { label: 'Toplantı Masası', w: 240, d: 120, h: 75 },
+  { label: 'Ofis Koltuğu', w: 65, d: 65, h: 115 },
+  { label: 'Dosya Dolabı', w: 160, d: 45, h: 120 },
+  { label: 'Sehpa', w: 60, d: 50, h: 45 },
+];
+
+// Preset material chips (Factory Standard Substrates)
+const MATERIAL_PRESETS = [
+  'E1 Kalite Çizilmez Melamin',
+  '1. Sınıf Fırınlanmış Masif Gürgen',
+  'DKP Çelik Profil & Elektrostatik Fırın Boya',
+  'Ergonomik Nefes Alan File & HR Sünger',
+  'Hakiki İtalyan Taba Deri',
+  'Lüks Silinebilir Dokuma Kumaş',
+  'Doğal Ceviz Kaplama & Masif Kenar Bandı',
+];
+
+// Preset technical feature bullet templates (High-conversion B2B selling points)
+const FEATURE_PRESETS = [
+  'Alüminyum bas-aç kablo kanalı & priz yuvası',
+  'Frenli teleskopik çekmece rayları (sessiz kapanma)',
+  '32 DNS yüksek dansite dökme sünger dolgu',
+  'Çift kollu senkron yatarlı ergonomik mekanizma',
+  'Yükseklik ayarlı zemin dengeleme pabuçları',
+  '2 mm darbe emici elastik PVC kenar bantları',
+  'Çizilme ve sıvı temasına dayanıklı E1 melamin yüzey',
+  'Gizli taşıyıcı çelik elektrifikasyon omurgası',
+];
+
 export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   isOpen,
   onClose,
@@ -32,6 +81,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   editingProduct,
   onSave,
 }) => {
+  // 1. Basic Definitions
   const [name, setName] = useState(editingProduct?.name || '');
   const [category, setCategory] = useState<string>(
     typeof editingProduct?.category === 'object' && editingProduct.category !== null
@@ -39,7 +89,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       : (editingProduct?.category as string) || (categories[0]?.slug || '')
   );
 
-  // Images
+  // 2. Images
   const initialImg = editingProduct?.image || (editingProduct?.images && (editingProduct.images as string[])[0]) || '';
   const initialImg2 = (editingProduct?.images && (editingProduct.images as string[])[1]) || editingProduct?.image2 || '';
   const initialImg3 = (editingProduct?.images && (editingProduct.images as string[])[2]) || editingProduct?.image3 || '';
@@ -49,17 +99,53 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const [image3, setImage3] = useState(initialImg3);
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
 
-  // ERP Matching
+  // 3. ERP Matching
   const [erpItemId, setErpItemId] = useState(editingProduct?.erpItemId ? String(editingProduct.erpItemId) : '');
   const [erpItemCode, setErpItemCode] = useState(editingProduct?.erpItemCode || '');
   const [erpSearch, setErpSearch] = useState('');
   const [showErpList, setShowErpList] = useState(false);
 
-  // Pricing & Stock
+  // 4. Pricing & Stock
   const [price, setPrice] = useState(editingProduct?.price ? String(editingProduct.price) : '');
+  const [originalPrice, setOriginalPrice] = useState(
+    editingProduct?.originalPrice ? String(editingProduct.originalPrice) : ''
+  );
   const [inStock, setInStock] = useState(editingProduct?.inStock !== false);
+  const [leadTimeDays, setLeadTimeDays] = useState(
+    editingProduct?.leadTimeDays !== undefined ? String(editingProduct.leadTimeDays) : '15'
+  );
 
-  // Colors
+  // 5. Parçalı Boyut / Ölçü Girişi (Dimensions Chunk)
+  const [width, setWidth] = useState(editingProduct?.widthCm ? String(editingProduct.widthCm) : '220');
+  const [depth, setDepth] = useState(editingProduct?.depthCm ? String(editingProduct.depthCm) : '95');
+  const [height, setHeight] = useState(editingProduct?.heightCm ? String(editingProduct.heightCm) : '75');
+
+  // 6. Malzeme & İskelet Girişi (Material Chunk)
+  const [material, setMaterial] = useState(
+    editingProduct?.material || 'E1 Kalite Çizilmez Melamin & DKP Çelik Profil'
+  );
+
+  // 7. Standart Teknik Donanım (Technical Specs Chunk)
+  const [topThickness, setTopThickness] = useState('30 mm');
+  const [drawerCount, setDrawerCount] = useState(
+    editingProduct?.drawerCount !== undefined ? String(editingProduct.drawerCount) : '3'
+  );
+  const [assemblyType, setAssemblyType] = useState('Demonte - Kolay Kurulum Şemalı');
+  const [warrantyYears, setWarrantyYears] = useState('2 Yıl Fabrika Garantisi');
+
+  // 8. Parçalı Madde İmleri / Dinamik Özellikler (Features Chunk)
+  const [features, setFeatures] = useState<string[]>(
+    editingProduct?.features && editingProduct.features.length > 0
+      ? editingProduct.features
+      : [
+          'Doğrudan İmalatçı Fabrika Satış Fiyatı',
+          'E1 Normlarında Dayanıklı Çizilmez Yüzey',
+          '2 Yıl Resmi Üretici Garantisi',
+        ]
+  );
+  const [customFeatureInput, setCustomFeatureInput] = useState('');
+
+  // 9. Renkler
   const [colors, setColors] = useState<ProductColorVariant[]>(
     editingProduct?.colors && editingProduct.colors.length > 0
       ? editingProduct.colors
@@ -70,17 +156,41 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         ]
   );
 
-  // Optional Details
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [width, setWidth] = useState(editingProduct?.widthCm ? String(editingProduct.widthCm) : '220');
-  const [depth, setDepth] = useState(editingProduct?.depthCm ? String(editingProduct.depthCm) : '95');
-  const [height, setHeight] = useState(editingProduct?.heightCm ? String(editingProduct.heightCm) : '75');
+  // 10. Açıklama & Rozet
   const [description, setDescription] = useState(editingProduct?.description || '');
-  const [badge, setBadge] = useState(editingProduct?.badge || '2026 Özel Koleksiyon');
+  const [badge, setBadge] = useState(editingProduct?.badge || '2026 Standart Seri');
 
+  const [activeFormTab, setActiveFormTab] = useState<'general' | 'specs' | 'features' | 'preview'>('general');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
+
+  // Auto-calculated dimension summary string
+  const dimensionsSummary = `G: ${width || '220'}cm × D: ${depth || '95'}cm × Y: ${height || '75'}cm`;
+
+  const handleApplyDimensionPreset = (p: { w: number; d: number; h: number }) => {
+    setWidth(String(p.w));
+    setDepth(String(p.d));
+    setHeight(String(p.h));
+  };
+
+  const handleAddFeature = () => {
+    const trimmed = customFeatureInput.trim();
+    if (trimmed && !features.includes(trimmed)) {
+      setFeatures([...features, trimmed]);
+      setCustomFeatureInput('');
+    }
+  };
+
+  const handleRemoveFeature = (idx: number) => {
+    setFeatures(features.filter((_, i) => i !== idx));
+  };
+
+  const handleAddPresetFeature = (f: string) => {
+    if (!features.includes(f)) {
+      setFeatures([...features, f]);
+    }
+  };
 
   const handleImageUpload = async (slot: number, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -127,28 +237,32 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     setIsSubmitting(true);
     try {
       const allImages = [image1, image2, image3].filter(Boolean);
-      const dimsString = `G: ${width || '220'}cm × D: ${depth || '95'}cm × Y: ${height || '75'}cm`;
 
       const payload = {
         name: name.trim(),
         category,
         price: parseFloat(price) || 0,
+        originalPrice: originalPrice ? parseFloat(originalPrice) : undefined,
         image: image1 || '/default-furniture.webp',
         images: allImages.length > 0 ? allImages : ['/default-furniture.webp'],
         image1: image1 || undefined,
         image2: image2 || undefined,
         image3: image3 || undefined,
         inStock,
+        leadTimeDays: parseInt(leadTimeDays, 10) || 15,
+        vatRate: 0.20,
         erpItemId: erpItemId ? erpItemId : undefined,
         erpItemCode: erpItemCode ? erpItemCode : undefined,
         colors,
-        dimensions: dimsString,
+        dimensions: dimensionsSummary,
         widthCm: parseInt(width, 10) || 220,
         depthCm: parseInt(depth, 10) || 95,
         heightCm: parseInt(height, 10) || 75,
+        drawerCount: parseInt(drawerCount, 10) || 0,
+        material: material.trim(),
+        features,
         description: description.trim() || undefined,
         badge: badge.trim() || undefined,
-        material: '1. Sınıf Masif Gürgen & İtalyan Döşeme',
       };
 
       await onSave(payload);
@@ -159,19 +273,25 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
-      <div className="relative w-full max-w-2xl bg-white rounded-sm shadow-2xl border border-neutral-200 flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-xs animate-fade-in">
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-neutral-200 flex flex-col max-h-[94vh] overflow-hidden">
         
         {/* Header */}
-        <div className="bg-[#FAF8F5] px-6 py-4 border-b border-[#EAE3D2] flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880] block">
-              {editingProduct ? 'Düzenleme Ekranı' : 'Sade & Kolay Form'}
-            </span>
-            <h3 className="text-base font-bold text-neutral-900">
-              {editingProduct ? `Ürünü Düzenle: ${editingProduct.name}` : 'Yeni Ürün Ekle'}
-            </h3>
+        <div className="bg-[#FAF8F5] px-6 py-3.5 border-b border-[#EAE3D2] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#C5A880]/20 flex items-center justify-center text-[#8A4B20]">
+              <Box className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880] block">
+                {editingProduct ? 'Ürün Düzenleme Paneli' : 'Parçalı & Modüler Ürün Formu'}
+              </span>
+              <h3 className="text-base font-bold text-neutral-900 leading-tight">
+                {editingProduct ? editingProduct.name : 'Yeni Ürün Ekle'}
+              </h3>
+            </div>
           </div>
+
           <button
             type="button"
             onClick={onClose}
@@ -181,388 +301,783 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+        {/* Tab Navigation Bar (ERP Style Ergonomics) */}
+        <div className="flex border-b border-neutral-200 bg-neutral-50 px-4 text-xs font-semibold overflow-x-auto no-scrollbar">
+          <button
+            type="button"
+            onClick={() => setActiveFormTab('general')}
+            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeFormTab === 'general'
+                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                : 'border-transparent text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <Box className="w-3.5 h-3.5" />
+            <span>1. Genel & Fiyat</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveFormTab('specs')}
+            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeFormTab === 'specs'
+                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                : 'border-transparent text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <Ruler className="w-3.5 h-3.5" />
+            <span>2. Ölçü & Malzeme (Parçalı)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveFormTab('features')}
+            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeFormTab === 'features'
+                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                : 'border-transparent text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>3. Donanım & Madde İmleri</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveFormTab('preview')}
+            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeFormTab === 'preview'
+                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                : 'border-transparent text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>4. Canlı Müşteri Önizlemesi</span>
+          </button>
+        </div>
+
+        {/* Scrollable Form Body */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-xs">
           
-          {/* ADIM 1: ÜRÜN ADI & KATEGORİ */}
-          <div className="bg-neutral-50/70 p-4 rounded-xs border border-neutral-200/80 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-xs font-bold">1</span>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                Ürün Adı ve Kategori
-              </h4>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-bold text-neutral-700 uppercase mb-1">
-                  Ürün Adı *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Örn: Milano Chester Koltuk"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full text-sm font-semibold px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-neutral-700 uppercase mb-1">
-                  Kategori *
-                </label>
-                <select
-                  required
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden bg-white"
-                >
-                  <option value="" disabled>-- Kategori Seçin --</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.slug || c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* ADIM 2: ÜRÜN RESMİ */}
-          <div className="bg-neutral-50/70 p-4 rounded-xs border border-neutral-200/80 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-xs font-bold">2</span>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                Ürün Resmi
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Slot 1: Ana Kapak */}
-              <div className="relative aspect-square bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xs flex flex-col items-center justify-center overflow-hidden transition-colors">
-                {image1 ? (
-                  <>
-                    <img src={image1} alt="Kapak" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setImage1('')}
-                      className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full hover:bg-black"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </>
-                ) : (
-                  <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
-                    <ImageIcon className="h-7 w-7 text-neutral-400 mb-1" />
-                    <span className="text-xs font-bold text-neutral-800">Ana Resim Seç</span>
-                    <span className="text-[10px] text-neutral-400 mt-0.5">
-                      {uploadingSlot === 1 ? 'Yükleniyor...' : 'Tıkla ve Yükle'}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      disabled={uploadingSlot === 1}
-                      onChange={(e) => handleImageUpload(1, e)}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-
-              {/* Slot 2: Ek Resim */}
-              <div className="relative aspect-square bg-white border border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xs flex flex-col items-center justify-center overflow-hidden transition-colors">
-                {image2 ? (
-                  <>
-                    <img src={image2} alt="Detay" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setImage2('')}
-                      className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full hover:bg-black"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </>
-                ) : (
-                  <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
-                    <Upload className="h-5 w-5 text-neutral-400 mb-1" />
-                    <span className="text-[11px] font-semibold text-neutral-600">2. Resim</span>
-                    <span className="text-[9px] text-neutral-400">İsteğe Bağlı</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      disabled={uploadingSlot === 2}
-                      onChange={(e) => handleImageUpload(2, e)}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-
-              {/* Slot 3: Ek Resim */}
-              <div className="relative aspect-square bg-white border border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xs flex flex-col items-center justify-center overflow-hidden transition-colors">
-                {image3 ? (
-                  <>
-                    <img src={image3} alt="Detay" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setImage3('')}
-                      className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full hover:bg-black"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </>
-                ) : (
-                  <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
-                    <Upload className="h-5 w-5 text-neutral-400 mb-1" />
-                    <span className="text-[11px] font-semibold text-neutral-600">3. Resim</span>
-                    <span className="text-[9px] text-neutral-400">İsteğe Bağlı</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      disabled={uploadingSlot === 3}
-                      onChange={(e) => handleImageUpload(3, e)}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ADIM 3: CRM / ERP EŞLEŞTİRME */}
-          <div className="bg-neutral-50/70 p-4 rounded-xs border border-neutral-200/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-xs font-bold">3</span>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                  CRM / ERP Ürün Eşleştirmesi
+          {/* TAB 1: GENEL BİLGİLER, ERP, RESİMLER & FİYAT */}
+          {activeFormTab === 'general' && (
+            <div className="space-y-5 animate-fade-in">
+              {/* Product Name & Category */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                  <span>Temel Ürün Bilgileri</span>
                 </h4>
-              </div>
-              {erpItemId && (
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  ✓ Eşleşti: {erpItemCode}
-                </span>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-neutral-400" />
-                <input
-                  type="text"
-                  placeholder="ERP'deki ürünün adını veya kodunu arayın..."
-                  value={erpSearch}
-                  onChange={(e) => {
-                    setErpSearch(e.target.value);
-                    setShowErpList(true);
-                  }}
-                  onFocus={() => setShowErpList(true)}
-                  className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden bg-white"
-                />
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Ürün Adı *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Örn: Viyana Yönetici Makam Masası"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
+                    />
+                  </div>
 
-              {showErpList && (
-                <div className="border border-neutral-200 rounded-xs max-h-40 overflow-y-auto divide-y divide-neutral-100 bg-white shadow-md">
-                  {filteredErp.slice(0, 25).map((erp) => (
-                    <div
-                      key={erp.erpId}
-                      onClick={() => handleSelectErp(erp)}
-                      className="p-2.5 text-xs hover:bg-[#FAF8F5] cursor-pointer flex items-center justify-between"
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Kategori *
+                    </label>
+                    <select
+                      required
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
                     >
-                      <div className="space-x-2">
-                        <span className="font-mono text-[10px] bg-neutral-100 px-1 py-0.5 rounded font-bold text-neutral-700">
-                          {erp.erpCode}
+                      <option value="" disabled>-- Kategori Seçin --</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.slug || c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* ERP Matching */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold">ERP</span>
+                    <span>ERP Ürün Eşleştirmesi</span>
+                  </h4>
+                  {erpItemId && (
+                    <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Eşleşti: {erpItemCode || erpItemId}
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-neutral-400" />
+                  <input
+                    type="text"
+                    placeholder="ERP'deki ürün kodunu veya adını arayın..."
+                    value={erpSearch}
+                    onChange={(e) => {
+                      setErpSearch(e.target.value);
+                      setShowErpList(true);
+                    }}
+                    onFocus={() => setShowErpList(true)}
+                    className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
+                  />
+                </div>
+
+                {showErpList && (
+                  <div className="border border-neutral-200 rounded-lg max-h-36 overflow-y-auto divide-y divide-neutral-100 bg-white shadow-md">
+                    {filteredErp.slice(0, 20).map((erp) => (
+                      <div
+                        key={erp.erpId}
+                        onClick={() => handleSelectErp(erp)}
+                        className="p-2 text-xs hover:bg-[#FAF8F5] cursor-pointer flex items-center justify-between"
+                      >
+                        <div className="space-x-2">
+                          <span className="font-mono text-[10px] bg-neutral-100 px-1.5 py-0.5 rounded font-bold text-neutral-700">
+                            {erp.erpCode}
+                          </span>
+                          <span className="text-neutral-900 font-medium">{erp.erpName}</span>
+                        </div>
+                        <span className="text-neutral-500 font-mono text-[11px]">
+                          {erp.erpSalePrice ? `${Number(erp.erpSalePrice).toLocaleString('tr-TR')} TL` : '0 TL'}
                         </span>
-                        <span className="text-neutral-900 font-medium">{erp.erpName}</span>
                       </div>
-                      <span className="text-neutral-500 font-mono text-[11px]">
-                        {erp.erpSalePrice ? `${Number(erp.erpSalePrice).toLocaleString('tr-TR')} TL` : '0 TL'}
-                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Images Grid */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                  <span>Ürün Görselleri (Kapak & Galeri)</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Image 1 */}
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                    {image1 ? (
+                      <>
+                        <img src={image1} alt="Kapak" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImage1('')}
+                          className="absolute top-1.5 right-1.5 p-1 bg-black/60 text-white rounded-full hover:bg-black"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
+                        <ImageIcon className="h-6 w-6 text-neutral-400 mb-1" />
+                        <span className="text-[11px] font-bold text-neutral-800">Ana Resim Seç</span>
+                        <span className="text-[9px] text-neutral-400">{uploadingSlot === 1 ? 'Yükleniyor...' : 'Tıkla ve Yükle'}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(1, e)} />
+                      </label>
+                    )}
+                  </div>
+
+                  {/* Image 2 */}
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                    {image2 ? (
+                      <>
+                        <img src={image2} alt="Görsel 2" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImage2('')}
+                          className="absolute top-1.5 right-1.5 p-1 bg-black/60 text-white rounded-full hover:bg-black"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
+                        <ImageIcon className="h-6 w-6 text-neutral-400 mb-1" />
+                        <span className="text-[11px] font-bold text-neutral-800">2. Görsel Ekle</span>
+                        <span className="text-[9px] text-neutral-400">{uploadingSlot === 2 ? 'Yükleniyor...' : 'Tıkla ve Yükle'}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(2, e)} />
+                      </label>
+                    )}
+                  </div>
+
+                  {/* Image 3 */}
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                    {image3 ? (
+                      <>
+                        <img src={image3} alt="Görsel 3" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImage3('')}
+                          className="absolute top-1.5 right-1.5 p-1 bg-black/60 text-white rounded-full hover:bg-black"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer">
+                        <ImageIcon className="h-6 w-6 text-neutral-400 mb-1" />
+                        <span className="text-[11px] font-bold text-neutral-800">3. Görsel Ekle</span>
+                        <span className="text-[9px] text-neutral-400">{uploadingSlot === 3 ? 'Yükleniyor...' : 'Tıkla ve Yükle'}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(3, e)} />
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing & Stock Parameters */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                  <span>Fiyat, KDV ve Stok Koşulları</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Fabrika Net Satış Fiyatı (TL) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="Örn: 24500"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      className="w-full text-sm font-bold text-[#8A4B20] px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Üstü Çizili Liste Fiyatı (TL)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Örn: 29000"
+                      value={originalPrice}
+                      onChange={(e) => setOriginalPrice(e.target.value)}
+                      className="w-full text-xs font-medium text-neutral-500 px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Termin / Teslimat Süresi (Gün)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="15"
+                      value={leadTimeDays}
+                      onChange={(e) => setLeadTimeDays(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="stockCheck"
+                    checked={inStock}
+                    onChange={(e) => setInStock(e.target.checked)}
+                    className="h-4 w-4 text-[#C5A880] border-neutral-300 rounded"
+                  />
+                  <label htmlFor="stockCheck" className="text-xs font-semibold text-neutral-800 cursor-pointer">
+                    Stokta Var (Katalogda Hemen Teslim Rozeti Göster)
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: PARÇALI ÖLÇÜ & MALZEME GİRİŞİ (CHUNKS 1 & 2) */}
+          {activeFormTab === 'specs' && (
+            <div className="space-y-5 animate-fade-in">
+              {/* CHUNK 1: BOYUT & ÖLÇÜ GİRİŞİ */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                    <Ruler className="w-4 h-4 text-[#C5A880]" />
+                    <span>Ölçü & Ebat Parçaları</span>
+                  </h4>
+                  <span className="font-mono text-[11px] font-bold text-neutral-700 bg-white px-2.5 py-0.5 rounded border border-neutral-200 shadow-2xs">
+                    {dimensionsSummary}
+                  </span>
+                </div>
+
+                {/* Preset Chips */}
+                <div>
+                  <span className="text-[10px] text-neutral-400 font-medium block mb-1.5">
+                    Hızlı Standart Mobilya Şablonları:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {DIMENSION_PRESETS.map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => handleApplyDimensionPreset(p)}
+                        className="px-2.5 py-1 bg-white hover:bg-[#FAF8F5] border border-neutral-200 hover:border-[#C5A880] text-neutral-700 rounded-lg text-[10px] font-medium transition-colors cursor-pointer"
+                      >
+                        {p.label} ({p.w}×{p.d}×{p.h})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Width, Depth, Height Inputs with Step Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  {/* Width */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Genişlik (cm)
+                    </label>
+                    <div className="flex items-center border border-neutral-300 rounded-lg bg-white overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setWidth(String(Math.max(10, (parseInt(width, 10) || 0) - 10)))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        -10
+                      </button>
+                      <input
+                        type="number"
+                        value={width}
+                        onChange={(e) => setWidth(e.target.value)}
+                        className="flex-1 text-center font-bold text-neutral-900 py-1.5 focus:outline-hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setWidth(String((parseInt(width, 10) || 0) + 10))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        +10
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Depth */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Derinlik (cm)
+                    </label>
+                    <div className="flex items-center border border-neutral-300 rounded-lg bg-white overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setDepth(String(Math.max(10, (parseInt(depth, 10) || 0) - 5)))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        -5
+                      </button>
+                      <input
+                        type="number"
+                        value={depth}
+                        onChange={(e) => setDepth(e.target.value)}
+                        className="flex-1 text-center font-bold text-neutral-900 py-1.5 focus:outline-hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setDepth(String((parseInt(depth, 10) || 0) + 5))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        +5
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Height */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Yükseklik (cm)
+                    </label>
+                    <div className="flex items-center border border-neutral-300 rounded-lg bg-white overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setHeight(String(Math.max(10, (parseInt(height, 10) || 0) - 5)))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        -5
+                      </button>
+                      <input
+                        type="number"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        className="flex-1 text-center font-bold text-neutral-900 py-1.5 focus:outline-hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setHeight(String((parseInt(height, 10) || 0) + 5))}
+                        className="px-2.5 py-2 text-neutral-500 hover:bg-neutral-100 font-bold"
+                      >
+                        +5
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CHUNK 2: MALZEME & İSKELET YAPISI */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-[#C5A880]" />
+                  <span>Malzeme & İskelet Yapısı</span>
+                </h4>
+
+                {/* Preset Material Chips */}
+                <div>
+                  <span className="text-[10px] text-neutral-400 font-medium block mb-1.5">
+                    Hazır Üretim Hammadde Seçicileri (Tıkla ve Uygula):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {MATERIAL_PRESETS.map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMaterial(m)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors border cursor-pointer ${
+                          material === m
+                            ? 'bg-[#8A4B20] text-white border-[#8A4B20]'
+                            : 'bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-200'
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                    Malzeme Tanım Metni (Katalogda Görünecek İfade)
+                  </label>
+                  <input
+                    type="text"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
+                    placeholder="Örn: E1 Melamin Tabla & Masif Gürgen İskelet"
+                    className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg bg-white focus:ring-1 focus:ring-[#C5A880]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: DONANIM, MADDELER & TEKNİK ÖZELLİKLER (CHUNKS 3 & 4) */}
+          {activeFormTab === 'features' && (
+            <div className="space-y-5 animate-fade-in">
+              {/* CHUNK 3: STANDART TEKNİK DONANIMLAR */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#C5A880]" />
+                  <span>Standart Teknik Parametreler</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Tabla Kalınlığı
+                    </label>
+                    <select
+                      value={topThickness}
+                      onChange={(e) => setTopThickness(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    >
+                      <option value="18 mm">18 mm Standart Melamin</option>
+                      <option value="30 mm">30 mm Kalınlaştırılmış Tabla</option>
+                      <option value="48 mm">48 mm Duble Makam Tablası</option>
+                      <option value="54 mm">54 mm Ağır Hizmet Masif Tabla</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Çekmece / Keson Sayısı
+                    </label>
+                    <select
+                      value={drawerCount}
+                      onChange={(e) => setDrawerCount(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    >
+                      <option value="0">0 (Çekmecesiz Ünite)</option>
+                      <option value="2">2 Çekmeceli Etejer</option>
+                      <option value="3">3 Çekmeceli Merkezi Kilitli Keson</option>
+                      <option value="4">4 Çekmeceli Geniş Depolama</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Montaj & Sevk Şekli
+                    </label>
+                    <select
+                      value={assemblyType}
+                      onChange={(e) => setAssemblyType(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    >
+                      <option value="Demonte - Kolay Kurulum Şemalı">Demonte (Numaralı Kolay Kurulum Şemalı)</option>
+                      <option value="Fabrika Montajlı Hazır Teslimat">Fabrika Montajlı (Kullanıma Hazır Tek Parça)</option>
+                      <option value="İstanbul İçi Personelimizle Montaj">İstanbul İçi Kendi Personelimizle Montaj</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Garanti Koşulları
+                    </label>
+                    <select
+                      value={warrantyYears}
+                      onChange={(e) => setWarrantyYears(e.target.value)}
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    >
+                      <option value="2 Yıl Fabrika Garantisi">2 Yıl Doğrudan Üretici Garantisi</option>
+                      <option value="3 Yıl Fabrika Garantisi">3 Yıl Ağır Hizmet Garantisi</option>
+                      <option value="5 Yıl Kurumsal B2B Garantisi">5 Yıl Kurumsal Proje Garantisi</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* CHUNK 4: DİNAMİK MADDE İMLERİ / SPESİFİKASYON LİSTESİ */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#C5A880]" />
+                    <span>Dinamik Özellik Maddeleri (Bullet Points)</span>
+                  </h4>
+                  <span className="text-[10px] text-neutral-400 font-medium">
+                    {features.length} Madde Tanımlı
+                  </span>
+                </div>
+
+                {/* Preset feature chips */}
+                <div>
+                  <span className="text-[10px] text-neutral-400 font-medium block mb-1.5">
+                    Hızlı Madde Şablonları (+ Tıkla ve Ekle):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FEATURE_PRESETS.map((fp) => (
+                      <button
+                        key={fp}
+                        type="button"
+                        onClick={() => handleAddPresetFeature(fp)}
+                        className="px-2 py-0.5 bg-white hover:bg-emerald-50 hover:text-emerald-800 border border-neutral-200 hover:border-emerald-300 rounded text-[10px] text-neutral-600 transition-colors cursor-pointer"
+                      >
+                        + {fp}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Add Input */}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={customFeatureInput}
+                    onChange={(e) => setCustomFeatureInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddFeature();
+                      }
+                    }}
+                    placeholder="Örn: Elektrostatik fırın boyalı metal konik ayaklar..."
+                    className="flex-1 text-xs px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddFeature}
+                    className="px-4 py-2 bg-neutral-900 hover:bg-[#8A4B20] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    + Madde Ekle
+                  </button>
+                </div>
+
+                {/* Current Active Features List */}
+                <div className="space-y-1.5 pt-2">
+                  {features.map((feat, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-lg bg-white border border-neutral-200 text-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span className="text-neutral-800 font-medium">{feat}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFeature(idx)}
+                        className="text-neutral-400 hover:text-rose-600 p-1 cursor-pointer"
+                        title="Maddeyi Sil"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* ADIM 4: FİYAT VE RENK BİLGİLERİ */}
-          <div className="bg-neutral-50/70 p-4 rounded-xs border border-neutral-200/80 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-xs font-bold">4</span>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                Fiyat ve Renk Seçenekleri
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold text-neutral-700 uppercase mb-1">
-                  Satış Fiyatı (TL) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  placeholder="Örn: 48000"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className="w-full text-base font-bold text-[#C87A53] px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden bg-white"
-                />
               </div>
 
-              <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
-                  id="inStockForm"
-                  checked={inStock}
-                  onChange={(e) => setInStock(e.target.checked)}
-                  className="h-4 w-4 text-[#C5A880] border-neutral-300 rounded-xs focus:ring-[#C5A880]"
-                />
-                <label htmlFor="inStockForm" className="text-xs font-bold text-neutral-800 cursor-pointer">
-                  Stokta Var (Sipariş Talebine Açık)
-                </label>
+              {/* Description & Badge */}
+              <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Koleksiyon / Seri Rozeti
+                    </label>
+                    <input
+                      type="text"
+                      value={badge}
+                      onChange={(e) => setBadge(e.target.value)}
+                      placeholder="Örn: 2026 Standart Seri"
+                      className="w-full text-xs px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-neutral-600 uppercase mb-1">
+                      Detaylı İmalat Açıklaması
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Masif gürgen iskelet, leke tutmaz silinebilir kumaş..."
+                      className="w-full text-xs px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Colors list */}
-            <div className="space-y-2 pt-1">
-              <label className="block text-[11px] font-bold text-neutral-700 uppercase">
-                Seçilen Renkler:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((c, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white text-neutral-800 text-xs rounded-xs border border-neutral-200"
-                  >
-                    <span className="w-3 h-3 rounded-full border border-black/20" style={{ backgroundColor: c.hex }} />
-                    <span>{c.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => setColors(colors.filter((_, i) => i !== idx))}
-                      className="text-neutral-400 hover:text-rose-600 ml-1 cursor-pointer"
-                    >
-                      ×
-                    </button>
+          {/* TAB 4: CANLI MÜŞTERİ ÖNİZLEMESİ (LIVE PREVIEW) */}
+          {activeFormTab === 'preview' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="p-4 bg-amber-50/60 border border-amber-200/80 rounded-xl text-[11px] text-amber-900 leading-relaxed">
+                Aşağıdaki kart, girdiğiniz parçalı özelliklerin ürün detay sayfasında ve sipariş teklif fişinde müşteriye nasıl gösterileceğinin canlı simülasyonudur.
+              </div>
+
+              {/* Product Spec Card Preview */}
+              <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-5 space-y-4">
+                <div className="flex items-start justify-between border-b border-neutral-100 pb-3">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A4B20] bg-[#C5A880]/20 px-2 py-0.5 rounded">
+                      {badge || 'Standart Seri'}
+                    </span>
+                    <h3 className="text-base font-bold text-neutral-900 mt-1">
+                      {name || 'Ürün Adı Belirtilmedi'}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-base font-bold text-[#8A4B20]">
+                      {price ? `${Number(price).toLocaleString('tr-TR')} TL` : '0 TL'}
+                    </span>
+                    <span className="text-[10px] text-neutral-400 block">%20 KDV Dahil Fabrika Satışı</span>
+                  </div>
+                </div>
+
+                {/* Structured Specs Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded-xl border border-neutral-100 text-xs">
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase font-bold block">Ölçüler</span>
+                    <span className="font-semibold text-neutral-800">{dimensionsSummary}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase font-bold block">Malzeme</span>
+                    <span className="font-semibold text-neutral-800 line-clamp-1">{material}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase font-bold block">Tabla / Kalınlık</span>
+                    <span className="font-semibold text-neutral-800">{topThickness}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase font-bold block">Garanti / Termin</span>
+                    <span className="font-semibold text-neutral-800">{warrantyYears} • {leadTimeDays} Gün</span>
+                  </div>
+                </div>
+
+                {/* Bullet Features */}
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-2">
+                    Teknik Özellikler:
                   </span>
-                ))}
-              </div>
-
-              {/* Quick Add Color Pills */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
-                <span className="text-neutral-400">Hızlı Ekle:</span>
-                {[
-                  { name: 'Krem Keten', hex: '#E4DAC6' },
-                  { name: 'Antrasit Nubuk', hex: '#2C323B' },
-                  { name: 'İtalyan Taba', hex: '#8A4B20' },
-                  { name: 'Siyah Deri', hex: '#1A1A1A' },
-                  { name: 'Doğal Ceviz', hex: '#5A3825' },
-                ].map((rc, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      if (!colors.some((c) => c.name === rc.name)) {
-                        setColors([...colors, { id: `c-${Date.now()}-${idx}`, name: rc.name, hex: rc.hex, tag: 'Döşeme' }]);
-                      }
-                    }}
-                    className="px-2 py-0.5 bg-white hover:bg-neutral-100 border border-neutral-200 rounded-xs text-neutral-700 cursor-pointer text-[10px]"
-                  >
-                    + {rc.name}
-                  </button>
-                ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {features.map((feat, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs text-neutral-700 bg-neutral-50/70 p-2 rounded-lg border border-neutral-100">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* İSTEĞE BAĞLI EKSTRA BİLGİLER AKORDEONU */}
-          <div className="border border-neutral-200 rounded-xs overflow-hidden bg-white">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="w-full p-3.5 text-left text-xs font-bold text-neutral-700 hover:bg-neutral-50 flex items-center justify-between cursor-pointer"
-            >
-              <span>+ İsteğe Bağlı Ek Detaylar (Ölçü, Açıklama, Etiket)</span>
-              <span className="text-neutral-400 text-xs">{showAdvanced ? 'Gizle ▲' : 'Göster ▼'}</span>
-            </button>
-
-            {showAdvanced && (
-              <div className="p-4 border-t border-neutral-100 space-y-4 animate-fade-in bg-neutral-50/50">
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Genişlik (cm)</label>
-                    <input
-                      type="number"
-                      value={width}
-                      onChange={(e) => setWidth(e.target.value)}
-                      placeholder="220"
-                      className="w-full text-xs px-2.5 py-1.5 border border-neutral-300 rounded-xs bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Derinlik (cm)</label>
-                    <input
-                      type="number"
-                      value={depth}
-                      onChange={(e) => setDepth(e.target.value)}
-                      placeholder="95"
-                      className="w-full text-xs px-2.5 py-1.5 border border-neutral-300 rounded-xs bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Yükseklik (cm)</label>
-                    <input
-                      type="number"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                      placeholder="75"
-                      className="w-full text-xs px-2.5 py-1.5 border border-neutral-300 rounded-xs bg-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Koleksiyon Rozeti</label>
-                  <input
-                    type="text"
-                    value={badge}
-                    onChange={(e) => setBadge(e.target.value)}
-                    placeholder="Örn: 2026 Özel Koleksiyon"
-                    className="w-full text-xs px-2.5 py-1.5 border border-neutral-300 rounded-xs bg-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Açıklama</label>
-                  <textarea
-                    rows={2}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Masif gürgen iskelet, leke tutmaz kumaş..."
-                    className="w-full text-xs px-2.5 py-1.5 border border-neutral-300 rounded-xs bg-white"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Footer Actions */}
           <div className="pt-4 border-t border-neutral-200 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-neutral-800 py-2.5 px-4 rounded-xs cursor-pointer"
-            >
-              Vazgeç
-            </button>
+            <div className="flex items-center gap-2">
+              {activeFormTab !== 'general' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeFormTab === 'specs') setActiveFormTab('general');
+                    if (activeFormTab === 'features') setActiveFormTab('specs');
+                    if (activeFormTab === 'preview') setActiveFormTab('features');
+                  }}
+                  className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-medium cursor-pointer"
+                >
+                  &larr; Önceki Adım
+                </button>
+              )}
+              {activeFormTab !== 'preview' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeFormTab === 'general') setActiveFormTab('specs');
+                    if (activeFormTab === 'specs') setActiveFormTab('features');
+                    if (activeFormTab === 'features') setActiveFormTab('preview');
+                  }}
+                  className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-medium cursor-pointer"
+                >
+                  Sonraki Adım &rarr;
+                </button>
+              )}
+            </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-8 py-3 bg-[#C5A880] hover:bg-[#B4966E] text-white font-bold text-xs uppercase tracking-wider rounded-xs transition-colors shadow-xs cursor-pointer disabled:opacity-50"
-            >
-              {isSubmitting ? 'Kaydediliyor...' : editingProduct ? 'Değişiklikleri Kaydet' : 'Ürünü Kaydet & Kataloğa Ekle'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold rounded-lg hover:bg-neutral-50 cursor-pointer"
+              >
+                İptal
+              </button>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2 bg-[#8A4B20] hover:bg-[#723c17] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span>Kaydediliyor...</span>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>{editingProduct ? 'Değişiklikleri Kaydet' : 'Ürünü Sisteme Ekle'}</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
         </form>

@@ -130,21 +130,26 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
     };
   }, [regionStats]);
 
-  // 2. HARDWARE-OPTIMIZED RAF SCROLL LISTENER
+  // Lock timestamp when user explicitly clicks on a region or bubble
+  const manualLockUntilRef = useRef<number>(0);
+
+  // 2. HARDWARE-OPTIMIZED RAF SCROLL LISTENER WITH HYSTERESIS
   // - Starts full view (activeRegionId = null)
-  // - When scroll begins (scrollY > 40): zooms into targetPrimaryRegion (IP region or highest density region)
+  // - When scroll begins (scrollY > 90): zooms smoothly into targetPrimaryRegion (IP region or highest density region)
   // - As scroll continues: focuses on subsequent active store regions
   // - When scrolled back to top (< 30px): resets to full Turkey view
+  // - Deadzone (30px-90px) prevents threshold flipping and jitter!
   useEffect(() => {
     let ticking = false;
 
     const handleScroll = () => {
       if (isAutoScrollingRef.current) return;
+      if (Date.now() < manualLockUntilRef.current) return;
 
       const scrollY = window.scrollY;
 
-      // Top of page: Full Turkey Map
-      if (scrollY < 40) {
+      // Top of page: Reset to Full Turkey Map
+      if (scrollY < 35) {
         setActiveRegionId(null);
         return;
       }
@@ -156,7 +161,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         if (el) {
           const rect = el.getBoundingClientRect();
           // Region section is currently being viewed
-          if (rect.top <= 380 && rect.bottom >= 140) {
+          if (rect.top <= 360 && rect.bottom >= 140) {
             matchedRegion = reg.regionId;
             break;
           }
@@ -165,9 +170,9 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
       if (matchedRegion) {
         setActiveRegionId(matchedRegion);
-      } else if (scrollY >= 40) {
-        // Scroll is active but before subsequent region sections: target primary region!
-        setActiveRegionId(targetPrimaryRegion);
+      } else if (scrollY >= 90) {
+        // Only zoom in after passing 90px threshold (prevents jitter)
+        setActiveRegionId((prev) => prev || targetPrimaryRegion);
       }
 
       // Store card active border tracking
@@ -199,6 +204,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
   // Click handler on map city / province
   const handleSelectCity = useCallback((cityName: string) => {
+    manualLockUntilRef.current = Date.now() + 3000;
     setSelectedCityName(cityName);
     setActiveBubbleCity(cityName);
 
@@ -214,6 +220,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
   // Scroll to store card smoothly
   const handleScrollToStore = useCallback((storeId: string) => {
+    manualLockUntilRef.current = Date.now() + 3000;
     const cardEl = storeCardRefs.current[storeId];
     if (cardEl) {
       isAutoScrollingRef.current = true;
@@ -274,6 +281,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           <button
             type="button"
             onClick={() => {
+              manualLockUntilRef.current = Date.now() + 3000;
               setActiveRegionId(null);
               setSelectedCityName(null);
               setActiveBubbleCity(null);
@@ -293,6 +301,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
               key={reg.regionId}
               type="button"
               onClick={() => {
+                manualLockUntilRef.current = Date.now() + 3000;
                 setActiveRegionId(reg.regionId);
                 const firstStoreInReg = reg.stores[0];
                 if (firstStoreInReg) {

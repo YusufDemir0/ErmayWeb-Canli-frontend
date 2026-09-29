@@ -91,12 +91,12 @@ export const Navbar: React.FC = () => {
     <>
       <header className="w-full z-40 bg-white sticky top-0 shadow-xs border-b border-neutral-200/70 transition-all duration-300">
         
-        {/* 1. CONTINUOUS TICKER MARQUEE (Gradual Smooth Collapse with Zero Glitch) */}
+        {/* 1. CONTINUOUS TICKER MARQUEE (Hidden at top, smoothly expands into view on scroll down) */}
         <div 
           className={`overflow-hidden transition-all duration-500 ease-in-out ${
             isScrolled 
-              ? 'max-h-0 opacity-0 pointer-events-none' 
-              : 'max-h-12 opacity-100'
+              ? 'max-h-12 opacity-100' 
+              : 'max-h-0 opacity-0 pointer-events-none'
           }`}
         >
           <UpperNavbar />
