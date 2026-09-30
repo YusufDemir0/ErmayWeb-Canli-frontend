@@ -107,12 +107,31 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     router.push(targetUrl, { scroll: false });
   };
 
-  // Resolve Category Name & Category List
+  // Resolve Category Name & Category List (sortOrder bazlı, alfabetik değil)
   const categoryList = firebaseCategories.length > 0 ? firebaseCategories : [];
-  const currentCategory = categoryList.find(c => c.slug === categorySlug || c.id === categorySlug);
+  const sortedCategoryList = useMemo(() => {
+    return [...categoryList].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  }, [categoryList]);
+
+  const rootCategories = useMemo(() => {
+    return sortedCategoryList.filter((c) => !c.parentId);
+  }, [sortedCategoryList]);
+
+  const currentCategory = sortedCategoryList.find(c => c.slug === categorySlug || c.id === categorySlug);
   const categoryName = currentCategory 
     ? currentCategory.name 
     : (categorySlug === 'hepsi' || categorySlug === 'all' ? 'Tüm Ürünler' : 'Koleksiyonlar');
+
+  // Geçerli kategorinin alt kategorileri veya kardeş alt kategorileri
+  const currentSubcategories = useMemo(() => {
+    if (!currentCategory) return [];
+    const directChildren = sortedCategoryList.filter((c) => c.parentId === currentCategory.id);
+    if (directChildren.length > 0) return directChildren;
+    if (currentCategory.parentId) {
+      return sortedCategoryList.filter((c) => c.parentId === currentCategory.parentId);
+    }
+    return [];
+  }, [currentCategory, sortedCategoryList]);
 
   // Materials List
   const MATERIALS_LIST = [
@@ -348,6 +367,31 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
               <p className="text-xs text-neutral-500 mt-0.5">Doğrudan Fabrika Satış • Kendi Üretimimiz Standart Seri Ofis Mobilyaları</p>
             </div>
           </div>
+
+          {/* Hiyerarşik Alt Kategori Çipleri (Varsa) */}
+          {currentSubcategories.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-neutral-100 mt-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mr-1">
+                Alt Kategoriler:
+              </span>
+              {currentSubcategories.map((sub) => {
+                const isSubActive = categorySlug === sub.slug || categorySlug === sub.id;
+                return (
+                  <Link
+                    key={sub.id}
+                    href={`/kategori/${sub.slug}`}
+                    className={`px-3 py-1 text-xs rounded-full font-semibold transition-all ${
+                      isSubActive
+                        ? 'bg-[#C5A880] text-white shadow-2xs'
+                        : 'bg-neutral-100 hover:bg-[#FAF8F5] text-neutral-700 hover:text-[#C5A880] border border-neutral-200/80'
+                    }`}
+                  >
+                    ↳ {sub.name}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -390,21 +434,49 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                 <span>Tüm Kategoriler</span>
                 <ChevronRight className="h-3.5 w-3.5" />
               </Link>
-              {categoryList.map((cat) => {
-                const isSelected = categorySlug === cat.slug || categorySlug === cat.id;
+              {rootCategories.map((rootCat) => {
+                const isSelected = categorySlug === rootCat.slug || categorySlug === rootCat.id;
+                const children = sortedCategoryList.filter((c) => c.parentId === rootCat.id);
+                const hasSelectedChild = children.some((c) => categorySlug === c.slug || categorySlug === c.id);
+
                 return (
-                  <Link
-                    key={cat.id}
-                    href={`/kategori/${cat.slug}`}
-                    className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#C5A880] text-white font-bold'
-                        : 'text-neutral-700 hover:bg-[#FBF9F5]'
-                    }`}
-                  >
-                    <span>{cat.name}</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
+                  <div key={rootCat.id} className="space-y-0.5">
+                    <Link
+                      href={`/kategori/${rootCat.slug}`}
+                      className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#C5A880] text-white font-bold'
+                          : hasSelectedChild
+                          ? 'text-[#C5A880] font-semibold bg-[#FAF8F5]'
+                          : 'text-neutral-700 hover:bg-[#FBF9F5]'
+                      }`}
+                    >
+                      <span>{rootCat.name}</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+
+                    {children.length > 0 && (
+                      <div className="pl-4 space-y-0.5 border-l border-[#E5DEC9] ml-2 py-0.5">
+                        {children.map((subCat) => {
+                          const isSubSelected = categorySlug === subCat.slug || categorySlug === subCat.id;
+                          return (
+                            <Link
+                              key={subCat.id}
+                              href={`/kategori/${subCat.slug}`}
+                              className={`w-full text-left py-1 px-2 rounded-xs transition-colors flex items-center justify-between text-[11px] cursor-pointer ${
+                                isSubSelected
+                                  ? 'bg-[#C5A880] text-white font-bold'
+                                  : 'text-neutral-600 hover:text-[#C5A880] hover:bg-[#FAF8F5]'
+                              }`}
+                            >
+                              <span>↳ {subCat.name}</span>
+                              <ChevronRight className="h-3 w-3" />
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -652,31 +724,63 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
                   {/* Category Navigation (URL Based) */}
                   <div className="border-b border-[#E5DEC9] pb-4">
                     <h3 className="font-bold uppercase tracking-wider text-neutral-900 mb-2">Kategoriler</h3>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Link
-                        href="/katalog"
+                        href="/kategori"
                         onClick={() => setIsMobileFilterOpen(false)}
-                        className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between ${
+                        className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
                           categorySlug === 'hepsi' || categorySlug === 'all' ? 'bg-[#C5A880] text-white font-bold' : 'text-neutral-700'
                         }`}
                       >
                         <span>Tüm Kategoriler</span>
                         <ChevronRight className="h-3.5 w-3.5" />
                       </Link>
-                      {categoryList.map((cat) => {
-                        const isSelected = categorySlug === cat.slug || categorySlug === cat.id;
+                      {rootCategories.map((rootCat) => {
+                        const isSelected = categorySlug === rootCat.slug || categorySlug === rootCat.id;
+                        const children = sortedCategoryList.filter((c) => c.parentId === rootCat.id);
+                        const hasSelectedChild = children.some((c) => categorySlug === c.slug || categorySlug === c.id);
+
                         return (
-                          <Link
-                            key={cat.id}
-                            href={`/kategori/${cat.slug}`}
-                            onClick={() => setIsMobileFilterOpen(false)}
-                            className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between ${
-                              isSelected ? 'bg-[#C5A880] text-white font-bold' : 'text-neutral-700'
-                            }`}
-                          >
-                            <span>{cat.name}</span>
-                            <ChevronRight className="h-3.5 w-3.5" />
-                          </Link>
+                          <div key={rootCat.id} className="space-y-0.5">
+                            <Link
+                              key={rootCat.id}
+                              href={`/kategori/${rootCat.slug}`}
+                              onClick={() => setIsMobileFilterOpen(false)}
+                              className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
+                                isSelected 
+                                  ? 'bg-[#C5A880] text-white font-bold' 
+                                  : hasSelectedChild
+                                  ? 'text-[#C5A880] font-semibold bg-[#FAF8F5]'
+                                  : 'text-neutral-700'
+                              }`}
+                            >
+                              <span>{rootCat.name}</span>
+                              <ChevronRight className="h-3.5 w-3.5" />
+                            </Link>
+
+                            {children.length > 0 && (
+                              <div className="pl-4 space-y-0.5 border-l border-[#E5DEC9] ml-2 py-0.5">
+                                {children.map((subCat) => {
+                                  const isSubSelected = categorySlug === subCat.slug || categorySlug === subCat.id;
+                                  return (
+                                    <Link
+                                      key={subCat.id}
+                                      href={`/kategori/${subCat.slug}`}
+                                      onClick={() => setIsMobileFilterOpen(false)}
+                                      className={`w-full text-left py-1 px-2 rounded transition-colors flex items-center justify-between text-[11px] ${
+                                        isSubSelected
+                                          ? 'bg-[#C5A880] text-white font-bold'
+                                          : 'text-neutral-600 hover:text-[#C5A880]'
+                                      }`}
+                                    >
+                                      <span>↳ {subCat.name}</span>
+                                      <ChevronRight className="h-3 w-3" />
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

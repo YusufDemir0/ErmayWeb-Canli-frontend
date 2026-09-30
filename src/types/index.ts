@@ -94,6 +94,10 @@ export interface Category {
   image: string;
   slug: string;
   description?: string;
+  parentId?: string | null;
+  parent?: Category | null;
+  children?: Category[];
+  sortOrder?: number;
 }
 
 export interface StoreItem {

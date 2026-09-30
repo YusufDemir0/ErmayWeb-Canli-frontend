@@ -75,6 +75,7 @@ export default function AdminPage() {
   const addCategory = useCMSStore((state) => state.addCategory);
   const updateCategory = useCMSStore((state) => state.updateCategory);
   const deleteCategory = useCMSStore((state) => state.deleteCategory);
+  const reorderCategories = useCMSStore((state) => state.reorderCategories);
 
   const homeConfig = useCMSStore((state) => state.homeConfig);
   const updateHomeConfig = useCMSStore((state) => state.updateHomeConfig);
@@ -337,6 +338,7 @@ export default function AdminPage() {
                 onAddCategory={addCategory}
                 onUpdateCategory={updateCategory}
                 onDeleteCategory={deleteCategory}
+                onReorderCategories={reorderCategories}
                 onShowSuccess={showSaveSuccess}
                 onShowError={showError}
               />

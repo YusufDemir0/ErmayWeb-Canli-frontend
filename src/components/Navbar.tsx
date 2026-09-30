@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   Search, Heart, ShoppingBag, Phone, Mail,
-  MessageSquare, Menu, X, ChevronRight 
+  MessageSquare, Menu, X, ChevronRight, ChevronDown 
 } from 'lucide-react';
 import UpperNavbar from './UpperNavbar';
 import { useUIStore } from '../stores/useUIStore';
@@ -33,6 +33,16 @@ export const Navbar: React.FC = () => {
   const categories = useCMSStore((state) => state.categories);
   const cartCount = useCartStore((state) => state.getTotalCount());
   const favoritesCount = useFavoritesStore((state) => state.favorites.length);
+
+  // Sıralama: Alfabetik DEĞİL, sortOrder bazlı
+  const sortedCategories = React.useMemo(() => {
+    return [...categories].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  }, [categories]);
+
+  // Ana Kategoriler (Kök Seviye)
+  const rootCategories = React.useMemo(() => {
+    return sortedCategories.filter((c) => !c.parentId);
+  }, [sortedCategories]);
 
   // Mount & Scroll Listener with Hysteresis for Smooth Sticky Header (60-120 FPS RAF throttled)
   useEffect(() => {
@@ -223,21 +233,55 @@ export const Navbar: React.FC = () => {
         {/* 4. SECONDARY CATEGORY SUB-BAR (Only on product/category pages) */}
         {(pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/')) && (
           <div className="bg-[#FAF8F5] border-t border-neutral-200/60 py-2 px-4 animate-fade-in">
-            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-8 overflow-x-auto no-scrollbar text-[10.5px] font-bold uppercase tracking-wider text-neutral-600">
-              {categories.map((cat, idx) => {
+            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-7 overflow-x-visible no-scrollbar text-[10.5px] font-bold uppercase tracking-wider text-neutral-600">
+              {rootCategories.map((cat, idx) => {
                 const isActive = pathname === `/kategori/${cat.slug}`;
+                const children = sortedCategories.filter((c) => c.parentId === cat.id);
+                const hasChildren = children.length > 0;
+
                 return (
                   <React.Fragment key={cat.id}>
-                    <Link
-                      href={`/kategori/${cat.slug}`}
-                      className={`transition-colors whitespace-nowrap cursor-pointer ${
-                        isActive ? 'text-[#C5A880] font-extrabold' : 'hover:text-[#C5A880]'
-                      }`}
-                    >
-                      {cat.name}
-                    </Link>
-                    {idx < categories.length - 1 && (
-                      <span className="text-neutral-300 text-[8px]">/</span>
+                    <div className="relative group py-1">
+                      <Link
+                        href={`/kategori/${cat.slug}`}
+                        className={`transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                          isActive ? 'text-[#C5A880] font-extrabold' : 'hover:text-[#C5A880]'
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        {hasChildren && (
+                          <ChevronDown className="h-3 w-3 text-neutral-400 group-hover:text-[#C5A880] transition-transform group-hover:rotate-180" />
+                        )}
+                      </Link>
+
+                      {/* Dropdown for Subcategories */}
+                      {hasChildren && (
+                        <div className="absolute top-full left-0 mt-0.5 min-w-[200px] bg-white border border-neutral-200/90 shadow-xl rounded-xs py-2 hidden group-hover:block z-50 animate-fade-in">
+                          <div className="px-3 py-1 text-[9px] font-mono text-neutral-400 uppercase tracking-widest border-b border-neutral-100 mb-1">
+                            {cat.name} Alt Kategorileri
+                          </div>
+                          {children.map((subCat) => {
+                            const isSubActive = pathname === `/kategori/${subCat.slug}`;
+                            return (
+                              <Link
+                                key={subCat.id}
+                                href={`/kategori/${subCat.slug}`}
+                                className={`block px-3 py-1.5 text-[10px] uppercase font-semibold transition-colors ${
+                                  isSubActive
+                                    ? 'bg-[#FAF8F5] text-[#C5A880] font-bold'
+                                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-[#C5A880]'
+                                }`}
+                              >
+                                ↳ {subCat.name}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {idx < rootCategories.length - 1 && (
+                      <span className="text-neutral-300 text-[8px] select-none">/</span>
                     )}
                   </React.Fragment>
                 );
@@ -308,18 +352,51 @@ export const Navbar: React.FC = () => {
               {/* Categories Section */}
               <div className="p-4 border-t border-neutral-100 space-y-1">
                 <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-3 block mb-2">
-                  Koleksiyonlar
+                  Koleksiyonlar & Kategoriler
                 </span>
-                {categories.map((cat) => (
-                  <Link
-                    key={cat.id}
-                    href={`/kategori/${cat.slug}`}
-                    className="flex items-center justify-between px-3 py-2 text-xs text-neutral-700 hover:text-[#C5A880] transition-colors"
-                  >
-                    <span>{cat.name}</span>
-                    <ChevronRight className="h-3 w-3 text-neutral-300" />
-                  </Link>
-                ))}
+                {rootCategories.map((cat) => {
+                  const children = sortedCategories.filter((c) => c.parentId === cat.id);
+                  const isCatActive = pathname === `/kategori/${cat.slug}`;
+
+                  return (
+                    <div key={cat.id} className="space-y-0.5">
+                      <Link
+                        href={`/kategori/${cat.slug}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center justify-between px-3 py-2 text-xs transition-colors rounded-xs ${
+                          isCatActive
+                            ? 'bg-[#FAF8F5] text-[#C5A880] font-bold'
+                            : 'text-neutral-800 hover:text-[#C5A880] hover:bg-neutral-50'
+                        }`}
+                      >
+                        <span className="font-semibold">{cat.name}</span>
+                        <ChevronRight className="h-3 w-3 text-neutral-300" />
+                      </Link>
+
+                      {children.length > 0 && (
+                        <div className="pl-5 space-y-0.5 border-l-2 border-neutral-100 ml-3 py-1">
+                          {children.map((subCat) => {
+                            const isSubActive = pathname === `/kategori/${subCat.slug}`;
+                            return (
+                              <Link
+                                key={subCat.id}
+                                href={`/kategori/${subCat.slug}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`flex items-center justify-between px-2 py-1.5 text-[11px] rounded-xs transition-colors ${
+                                  isSubActive
+                                    ? 'text-[#C5A880] font-bold bg-[#FAF8F5]'
+                                    : 'text-neutral-600 hover:text-[#C5A880]'
+                                }`}
+                              >
+                                <span>↳ {subCat.name}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

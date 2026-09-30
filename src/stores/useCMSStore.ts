@@ -97,6 +97,7 @@ interface CMSState {
   addCategory: (category: Category) => Promise<void>;
   updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<{ success: boolean; message: string }>;
+  reorderCategories: (items: { id: string; parentId?: string | null; sortOrder: number }[]) => Promise<{ success: boolean; message: string }>;
 
   // Product CRUD
   addProduct: (product: Product) => Promise<void>;
@@ -385,6 +386,22 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
             ? ((e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Kategori silinemedi.')
             : (e instanceof Error ? e.message : 'Kategori silinirken bir hata oluştu.');
           console.warn('Kategori silme hatası:', msg);
+          return { success: false, message: msg };
+        }
+      },
+
+      reorderCategories: async (items) => {
+        try {
+          const res = await apiClient.put('/categories/reorder', { items });
+          if (res.data?.success && Array.isArray(res.data.categories)) {
+            set({ categories: res.data.categories });
+            return { success: true, message: res.data.message || 'Sıralama güncellendi.' };
+          }
+          return { success: false, message: res.data?.message || 'Sıralama kaydedilemedi.' };
+        } catch (e: unknown) {
+          const msg = e && typeof e === 'object' && 'response' in e
+            ? ((e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Sıralama güncellenemedi.')
+            : (e instanceof Error ? e.message : 'Sıralama kaydedilemedi.');
           return { success: false, message: msg };
         }
       },
