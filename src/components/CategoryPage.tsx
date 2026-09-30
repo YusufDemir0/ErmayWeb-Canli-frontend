@@ -133,14 +133,23 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     return [];
   }, [currentCategory, sortedCategoryList]);
 
-  // Materials List
-  const MATERIALS_LIST = [
-    'E1 Kalite Melamin',
-    'DKP Çelik Profil',
-    'Ergonomik File / Kumaş',
-    'Deri / Nubuk',
-    'Ahşap & Metal Kombin',
-  ];
+  // Materials List - Dynamic from Products with fallback
+  const MATERIALS_LIST = useMemo(() => {
+    const set = new Set<string>();
+    allProducts.forEach((p) => {
+      if (p.material && typeof p.material === 'string' && p.material.trim().length > 0) {
+        set.add(p.material.trim());
+      }
+    });
+    if (set.size > 0) return Array.from(set);
+    return [
+      'E1 Kalite Melamin',
+      'DKP Çelik Profil',
+      'Ergonomik File / Kumaş',
+      'Deri / Nubuk',
+      'Ahşap & Metal Kombin',
+    ];
+  }, [allProducts]);
 
   // Colors List - Dynamic from Products + Defaults
   const COLORS_LIST = useMemo(() => {

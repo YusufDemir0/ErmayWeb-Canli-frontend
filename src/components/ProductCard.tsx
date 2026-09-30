@@ -100,7 +100,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
       className="group relative flex flex-col bg-white border border-[#EAE3D2]/80 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-[#C5A880]/60"
     >
       {/* Image and Badges/Actions */}
-      <Link href={`/urun/${product.id}`} className="relative aspect-[4/5] bg-neutral-100/60 overflow-hidden block">
+      <Link href={`/urun/${product.slug || product.id}`} className="relative aspect-[4/5] bg-neutral-100/60 overflow-hidden block">
         {/* Primary Angle Image */}
         <OptimizedImage
           src={mainImage}
@@ -124,19 +124,22 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
         )}
 
         {/* Brand/Promo Badge */}
-        {product.badge && (
-          <div className="absolute top-3 left-3 z-10 pointer-events-none">
+        <div className="absolute top-3 left-3 z-10 pointer-events-none flex flex-col gap-1">
+          {product.badge && (
             <span 
-              className={`text-[9px] tracking-[0.15em] font-semibold uppercase py-1 px-3 shadow-sm rounded-sm border ${
+              className={`text-[9px] tracking-[0.15em] font-semibold uppercase py-1 px-2.5 shadow-sm rounded-xs border ${
                 product.badge.includes('İndirim') || product.badge.includes('%')
                   ? 'bg-brand-terracotta text-white border-brand-terracotta-dark'
-                  : 'bg-white text-brand-dark border-neutral-100'
+                  : 'bg-white text-neutral-900 border-neutral-200'
               }`}
             >
               {product.badge}
             </span>
-          </div>
-        )}
+          )}
+          <span className="text-[8px] font-bold uppercase tracking-wider bg-neutral-900/80 backdrop-blur-xs text-white px-2 py-0.5 rounded-xs w-fit">
+            Fabrika Satış
+          </span>
+        </div>
 
         {/* Favorite Heart Button */}
         <button
@@ -164,7 +167,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
           </span>
           {/* Name */}
           <Link 
-            href={`/urun/${product.id}`}
+            href={`/urun/${product.slug || product.id}`}
             className="text-neutral-800 text-sm md:text-base font-normal tracking-wide hover:text-brand-camel transition-colors duration-200 line-clamp-1 block mb-2"
           >
             {product.name}

@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
 import AppInitializer from '../providers/AppInitializer';
 import Navbar from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -8,21 +7,6 @@ import ClientModals from '../components/ClientModals';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import ToastContainer from '../components/ToastContainer';
 import '../index.css';
-
-// Optimize Inter (Modern Sans for UI & body)
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-// Optimize Playfair Display (Italian Editorial Serif for Headlines & Brand Identity)
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-playfair',
-  weight: ['400', '500', '600', '700', '800'],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ermaymobilya.com'),
@@ -37,8 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
-      <body className={`${inter.className} font-sans flex flex-col min-h-screen bg-white text-neutral-800 antialiased selection:bg-[#C5A880] selection:text-white`}>
+    <html lang="tr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans flex flex-col min-h-screen bg-white text-neutral-800 antialiased selection:bg-[#C5A880] selection:text-white">
         <AppInitializer>
           <Navbar />
           <main className="flex-1">{children}</main>

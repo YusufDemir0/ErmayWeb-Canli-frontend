@@ -162,26 +162,37 @@ export const CuratedSets: React.FC = () => {
               </div>
 
               {/* Price & Actions Footer */}
-              <div className="p-6 pt-0 border-t border-[#EAE3D2]/60 mt-4 flex items-center justify-between gap-4">
-                <div>
-                  <span className="text-[10px] text-neutral-400 line-through block">
-                    {formatPrice(setObj.originalPrice)}
-                  </span>
-                  <span className="text-base md:text-lg font-extrabold text-neutral-900">
-                    {formatPrice(setObj.price)}
-                  </span>
-                </div>
+              {(() => {
+                const displayPrice = setObj.matchedProduct ? Number(setObj.matchedProduct.price) : setObj.price;
+                const displayOriginalPrice = setObj.matchedProduct?.originalPrice 
+                  ? Number(setObj.matchedProduct.originalPrice) 
+                  : (setObj.originalPrice || Math.round(displayPrice * 1.2));
 
-                <div className="w-full">
-                  <Link
-                    href={setObj.matchedProduct ? `/urun/${setObj.matchedProduct.id}` : '/katalog'}
-                    className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Takımı İncele</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </div>
+                return (
+                  <div className="p-6 pt-0 border-t border-[#EAE3D2]/60 mt-4 flex items-center justify-between gap-4">
+                    <div className="min-w-fit">
+                      {displayOriginalPrice > displayPrice && (
+                        <span className="text-[10px] text-neutral-400 line-through block">
+                          {formatPrice(displayOriginalPrice)}
+                        </span>
+                      )}
+                      <span className="text-base md:text-lg font-extrabold text-neutral-900">
+                        {formatPrice(displayPrice)}
+                      </span>
+                    </div>
+
+                    <div className="w-full">
+                      <Link
+                        href={setObj.matchedProduct ? `/urun/${setObj.matchedProduct.slug || setObj.matchedProduct.id}` : '/kategori'}
+                        className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <span>Takımı İncele</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
           ))}
