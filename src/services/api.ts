@@ -11,6 +11,7 @@ export const getApiBaseUrl = (): string => {
 export const apiClient: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 45000, // 45s for serverless & cold-start resilience
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

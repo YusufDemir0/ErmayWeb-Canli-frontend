@@ -94,28 +94,17 @@ export default function AdminPage() {
 
   const stores = useCMSStore((state) => state.stores);
 
-  // Check login session on mount via Backend JWT Verification
+  // Check login session on mount via Backend JWT Verification (HttpOnly cookie via withCredentials)
   useEffect(() => {
     async function verifyAdminJWT() {
-      const token = localStorage.getItem('admin_jwt_token') || localStorage.getItem('auth_token');
-      if (!token) {
-        setIsVerifying(false);
-        return;
-      }
-
       try {
-        const res = await apiClient.get('/auth/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const res = await apiClient.get('/auth/profile');
         if (res.data?.success && res.data?.user?.role === 'ADMIN') {
           setIsAuthenticated(true);
         } else {
-          localStorage.removeItem('admin_jwt_token');
           setIsAuthenticated(false);
         }
       } catch (err) {
-        localStorage.removeItem('admin_jwt_token');
         setIsAuthenticated(false);
       } finally {
         setIsVerifying(false);
@@ -142,7 +131,7 @@ export default function AdminPage() {
     const cleanPass = loginPass.trim();
 
     try {
-      // Direct REST API Admin Authentication
+      // Direct REST API Admin Authentication (Cookie is set as HttpOnly by server)
       const res = await apiClient.post(
         '/auth/login',
         {
@@ -151,11 +140,9 @@ export default function AdminPage() {
         }
       );
 
-      if (res.data?.success && res.data.token) {
+      if (res.data?.success) {
         const userRole = res.data.user?.role;
         if (userRole === 'ADMIN') {
-          localStorage.setItem('admin_jwt_token', res.data.token);
-          document.cookie = `admin_jwt_token=${res.data.token}; path=/; max-age=604800; SameSite=Lax`;
           setIsAuthenticated(true);
           setAuthError('');
           return;
@@ -172,7 +159,12 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch {
+      // Ignore network errors on logout
+    }
     setIsAuthenticated(false);
     localStorage.removeItem('admin_jwt_token');
     document.cookie = 'admin_jwt_token=; path=/; max-age=0; SameSite=Lax';

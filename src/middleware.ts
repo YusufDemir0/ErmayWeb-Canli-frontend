@@ -32,6 +32,7 @@ export async function middleware(request: NextRequest) {
   // Protect Admin Portal (/admin and sub-routes)
   if (pathname.startsWith('/admin')) {
     const token =
+      request.cookies.get('ermay_admin')?.value ||
       request.cookies.get('admin_jwt_token')?.value ||
       request.cookies.get('auth_token')?.value ||
       request.headers.get('authorization')?.replace('Bearer ', '');
