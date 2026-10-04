@@ -8,6 +8,11 @@ import { useCartStore } from '../stores/useCartStore';
 import { useUIStore } from '../stores/useUIStore';
 
 export const FavoritesPage: React.FC = () => {
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const favorites = useFavoritesStore((state) => state.favorites);
   const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
 
@@ -37,7 +42,12 @@ export const FavoritesPage: React.FC = () => {
           Beğendiğim Tasarımlar
         </h2>
 
-        {favorites.length === 0 ? (
+        {!isMounted ? (
+          <div className="py-24 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-camel mb-3"></div>
+            <p className="text-xs text-neutral-400 font-light">Favorileriniz yükleniyor...</p>
+          </div>
+        ) : favorites.length === 0 ? (
           /* --- EMPTY STATE --- */
           <div className="text-center py-20 bg-white border border-neutral-200/60 rounded-sm shadow-sm max-w-xl mx-auto">
             <Heart className="h-16 w-16 text-neutral-300 stroke-[1.5] mx-auto mb-6" />

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import type { CorporateConfig } from '../../../stores/useCMSStore';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 import { Building2, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { toast } from '../../../stores/useToastStore';
 
 interface CorporateCMSTabProps {
   corporateConfig: CorporateConfig;
@@ -45,7 +46,8 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
         setLocalCorpConfig({ ...localCorpConfig, heroImage: url });
         onShowSuccess('Kurumsal hero görseli yüklendi!');
       } catch (err) {
-        console.error('Yükleme hatası:', err);
+        console.error('Görsel yükleme hatası:', err);
+        toast.error('Yükleme Hatası', err instanceof Error ? err.message : 'Görsel yüklenemedi.');
       } finally {
         setUploadingHero(false);
       }
@@ -60,7 +62,8 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
         setLocalCorpConfig({ ...localCorpConfig, storyImage: url });
         onShowSuccess('İmalat hikaye görseli yüklendi!');
       } catch (err) {
-        console.error('Yükleme hatası:', err);
+        console.error('Görsel yükleme hatası:', err);
+        toast.error('Yükleme Hatası', err instanceof Error ? err.message : 'Görsel yüklenemedi.');
       } finally {
         setUploadingStory(false);
       }

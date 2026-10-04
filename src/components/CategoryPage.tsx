@@ -13,6 +13,7 @@ import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { OptimizedImage } from './OptimizedImage';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 // Module-level cached price formatter
 const categoryCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
@@ -28,12 +29,16 @@ const formatPrice = (price: number): string => {
 interface CategoryPageProps {
   categorySlug: string;
   initialProducts?: Product[];
+  /** Sunucunun bildiği kategori adı: store henüz dolmadan (SSR / ilk render) başlık "Koleksiyonlar" görünmesin */
+  initialCategoryName?: string;
 }
 
 export const CategoryPage: React.FC<CategoryPageProps> = ({
   categorySlug,
   initialProducts = [],
+  initialCategoryName,
 }) => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -104,7 +109,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     const queryString = params.toString();
     const basePath = pathname === '/' ? `/kategori/${categorySlug}` : pathname;
     const targetUrl = queryString ? `${basePath}?${queryString}` : basePath;
-    router.push(targetUrl, { scroll: false });
+    router.push(targetUrl, { scroll: false }); // push: geri tuşu son filtre değişikliğini geri alabilsin
   };
 
   // Resolve Category Name & Category List (sortOrder bazlı, alfabetik değil)
@@ -120,7 +125,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   const currentCategory = sortedCategoryList.find(c => c.slug === categorySlug || c.id === categorySlug);
   const categoryName = currentCategory 
     ? currentCategory.name 
-    : (categorySlug === 'hepsi' || categorySlug === 'all' ? 'Tüm Ürünler' : 'Koleksiyonlar');
+    : (categorySlug === 'hepsi' || categorySlug === 'all' ? 'Tüm Ürünler' : initialCategoryName || 'Koleksiyonlar');
 
   // Geçerli kategorinin alt kategorileri veya kardeş alt kategorileri
   const currentSubcategories = useMemo(() => {
@@ -133,28 +138,27 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
     return [];
   }, [currentCategory, sortedCategoryList]);
 
-  // Materials List - Dynamic from Products with fallback
+const MATERIAL_GROUPS = [
+  { id: 'melamin', label: 'E1 Kalite Melamin', keywords: ['melamin', 'mdf'] },
+  { id: 'metal', label: 'DKP Çelik / Metal', keywords: ['çelik', 'celik', 'metal', 'profil', 'dkp'] },
+  { id: 'deri', label: 'Deri / Nubuk', keywords: ['deri', 'nubuk', 'sümen', 'sumen'] },
+  { id: 'kumas', label: 'Ergonomik File / Kumaş', keywords: ['file', 'kumaş', 'kumas', 'sünger', 'sunger'] },
+  { id: 'ahsap', label: 'Doğal Ahşap / Masif', keywords: ['ahşap', 'ahsap', 'masif', 'kaplama'] },
+];
+
+  // Materials List - Grouped & strictly dynamic from products in this view (F-18)
   const MATERIALS_LIST = useMemo(() => {
-    const set = new Set<string>();
-    allProducts.forEach((p) => {
-      if (p.material && typeof p.material === 'string' && p.material.trim().length > 0) {
-        set.add(p.material.trim());
-      }
-    });
-    if (set.size > 0) return Array.from(set);
-    return [
-      'E1 Kalite Melamin',
-      'DKP Çelik Profil',
-      'Ergonomik File / Kumaş',
-      'Deri / Nubuk',
-      'Ahşap & Metal Kombin',
-    ];
+    return MATERIAL_GROUPS.filter((group) =>
+      allProducts.some((p) => {
+        const mat = (p.material || '').toLowerCase();
+        return group.keywords.some((kw) => mat.includes(kw));
+      })
+    ).map((g) => g.label);
   }, [allProducts]);
 
-  // Colors List - Dynamic from Products + Defaults
+  // Colors List - Strictly dynamic from products in this view to prevent zero-result blind filters (F-17)
   const COLORS_LIST = useMemo(() => {
-    const defaultColors = ['Ceviz', 'Antrasit', 'Siyah', 'Beyaz', 'Meşe', 'Gri', 'Haki Yeşil'];
-    const dynamicSet = new Set<string>(defaultColors);
+    const dynamicSet = new Set<string>();
     allProducts.forEach((p) => {
       const rawColors = [
         ...(Array.isArray(p.colors) ? p.colors : []),
@@ -204,12 +208,14 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
       const matchesMin = appliedMinPrice === '' || pPriceNum >= Number(appliedMinPrice);
       const matchesMax = appliedMaxPrice === '' || pPriceNum <= Number(appliedMaxPrice);
 
-      // 4. Material filter
+      // 4. Material filter (Keyword group matching)
       const matchesMaterial =
         selectedMaterials.length === 0 ||
-        selectedMaterials.some(
-          (m) => typeof m === 'string' && pMat.includes(m.toLowerCase())
-        );
+        selectedMaterials.some((sel) => {
+          const group = MATERIAL_GROUPS.find((g) => g.label === sel);
+          if (!group) return pMat.includes(sel.toLowerCase());
+          return group.keywords.some((kw) => pMat.includes(kw));
+        });
 
       // 5. Color filter safely extracted
       const rawColorList = [
@@ -1084,7 +1090,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
 
                         {/* WhatsApp quick contact */}
                         <a
-                          href={`https://wa.me/905324194151?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında doğrudan fabrika fiyatı ve teslimat bilgisi almak istiyorum.`)}`}
+                          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında doğrudan fabrika fiyatı ve teslimat bilgisi almak istiyorum.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-full text-center py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded flex items-center justify-center gap-1.5 transition-colors"

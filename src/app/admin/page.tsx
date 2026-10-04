@@ -12,6 +12,7 @@ import { AdminHeader, type AdminModuleMode } from './components/AdminHeader';
 import { AdminTabsNav, type AdminTabId } from './components/AdminTabsNav';
 import { OverviewTab } from './components/OverviewTab';
 import { OrdersTab } from './components/OrdersTab';
+import { ContactMessagesTab } from './components/ContactMessagesTab';
 import { CategoriesTab } from './components/CategoriesTab';
 import { ProductsTab } from './components/ProductsTab';
 import { ErpSyncTab } from './components/ErpSyncTab';
@@ -29,6 +30,9 @@ import { toast } from '../../stores/useToastStore';
 export default function AdminPage() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // STAFF (satış personeli) yalnızca talepleri ve gelen mesajları yönetir; katalog/CMS ADMIN'e özeldir.
+  const [userRole, setUserRole] = useState<'ADMIN' | 'STAFF' | null>(null);
+  const isStaffOnly = userRole === 'STAFF';
   const [isVerifying, setIsVerifying] = useState<boolean>(true);
   const [loginUser, setLoginUser] = useState('');
   const [loginPass, setLoginPass] = useState('');
@@ -37,6 +41,7 @@ export default function AdminPage() {
   // Active Panel Mode & Active Tab State
   const [activeModule, setActiveModule] = useState<AdminModuleMode>('ecommerce');
   const [activeTab, setActiveTab] = useState<AdminTabId>('overview');
+  const [openMessageCount, setOpenMessageCount] = useState<number | undefined>(undefined);
 
   const handleModuleChange = (mode: AdminModuleMode) => {
     setActiveModule(mode);
@@ -100,7 +105,10 @@ export default function AdminPage() {
     async function verifyAdminJWT() {
       try {
         const res = await apiClient.get('/auth/profile');
-        if (res.data?.success && res.data?.user?.role === 'ADMIN') {
+        const role = res.data?.user?.role;
+        if (res.data?.success && (role === 'ADMIN' || role === 'STAFF')) {
+          setUserRole(role);
+          if (role === 'STAFF') setActiveTab('orders');
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
@@ -117,12 +125,18 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const store = useCMSStore.getState();
-      store.fetchProductsAndCategories();
-      store.fetchStores();
-      store.fetchCmsBlocks();
+      if (userRole === 'ADMIN') {
+        const store = useCMSStore.getState();
+        store.fetchProductsAndCategories({ includeDrafts: true });
+        store.fetchStores({ includeInactive: true });
+        store.fetchCmsBlocks();
+      }
+      apiClient
+        .get('/contact', { params: { status: 'open', limit: 1 } })
+        .then((res) => setOpenMessageCount(res.data?.openCount ?? 0))
+        .catch(() => {});
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userRole]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,13 +156,18 @@ export default function AdminPage() {
       );
 
       if (res.data?.success) {
-        const userRole = res.data.user?.role;
-        if (userRole === 'ADMIN') {
+        const loginRole = res.data.user?.role;
+        if (loginRole === 'ADMIN' || loginRole === 'STAFF') {
+          setUserRole(loginRole);
+          if (loginRole === 'STAFF') {
+            setActiveModule('ecommerce');
+            setActiveTab('orders');
+          }
           setIsAuthenticated(true);
           setAuthError('');
           return;
         } else {
-          setAuthError('Yetkisiz Giriş: Bu hesaba Yönetici (Admin) erişim yetkisi tanımlanmamıştır.');
+          setAuthError('Yetkisiz Giriş: Bu hesaba panel erişim yetkisi tanımlanmamıştır.');
           return;
         }
       } else {
@@ -167,7 +186,7 @@ export default function AdminPage() {
       // Ignore network errors on logout
     }
     setIsAuthenticated(false);
-    localStorage.removeItem('admin_jwt_token');
+    setUserRole(null);
     document.cookie = 'admin_jwt_token=; path=/; max-age=0; SameSite=Lax';
     setLoginUser('');
     setLoginPass('');
@@ -271,6 +290,7 @@ export default function AdminPage() {
           activeModule={activeModule}
           setActiveModule={handleModuleChange}
           onLogout={handleLogout}
+          isStaffOnly={isStaffOnly}
         />
 
         {savedSuccessMsg && (
@@ -301,8 +321,10 @@ export default function AdminPage() {
           activeModule={activeModule}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          isStaffOnly={isStaffOnly}
           counts={{
             orders: 0,
+            messages: openMessageCount,
             categories: categories.length,
             products: products.length,
             tickerItems: tickerItems.length,
@@ -310,7 +332,11 @@ export default function AdminPage() {
           }}
         />
 
-        {activeModule === 'ecommerce' && (
+        {isStaffOnly && activeTab !== 'orders' && activeTab !== 'messages' && (
+          <OrdersTab onShowSuccess={showSaveSuccess} />
+        )}
+
+        {activeModule === 'ecommerce' && (!isStaffOnly || activeTab === 'orders' || activeTab === 'messages') && (
           <>
             {activeTab === 'overview' && (
               <OverviewTab
@@ -329,6 +355,10 @@ export default function AdminPage() {
 
             {activeTab === 'orders' && (
               <OrdersTab onShowSuccess={showSaveSuccess} />
+            )}
+
+            {activeTab === 'messages' && (
+              <ContactMessagesTab onOpenCountChange={setOpenMessageCount} />
             )}
 
             {activeTab === 'categories' && (
@@ -374,7 +404,7 @@ export default function AdminPage() {
           </>
         )}
 
-        {activeModule === 'cms' && (
+        {activeModule === 'cms' && !isStaffOnly && (
           <>
             {activeTab === 'landingPage' && (
               <LandingPageTab

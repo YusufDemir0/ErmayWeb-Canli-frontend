@@ -11,7 +11,9 @@ export const CuratedSets: React.FC = () => {
   const addToCart = useCartStore((state) => state.addToCart);
   const products = useCMSStore((state) => state.products);
 
-  // Curated package definitions with set items
+  // Curated package definitions with set items.
+  // matchedProduct için rastgele ürüne (products[0..2]) düşülmez: eşleşme yoksa set kendi fiyatıyla katalog sayfasına gider;
+  // aksi halde "Yemek Odası Takımı" ceket askısının fiyatıyla gösterilip sepete askı ekleniyordu.
   const SETS = [
     {
       id: 'set-milano-makam',
@@ -29,7 +31,7 @@ export const CuratedSets: React.FC = () => {
       ],
       originalPrice: 84000,
       price: 69900,
-      matchedProduct: products.find((p) => p.slug?.includes('makam') || p.name.includes('Makam')) || products[0],
+      matchedProduct: products.find((p) => p.slug?.includes('makam') || p.name.includes('Makam')),
     },
     {
       id: 'set-floransa-salon',
@@ -46,7 +48,7 @@ export const CuratedSets: React.FC = () => {
       ],
       originalPrice: 78500,
       price: 64500,
-      matchedProduct: products.find((p) => p.slug?.includes('koltuk') || p.name.includes('Koltuk')) || products[1] || products[0],
+      matchedProduct: products.find((p) => p.slug?.includes('koltuk') || p.name.includes('Koltuk')),
     },
     {
       id: 'set-roma-yemek',
@@ -62,7 +64,7 @@ export const CuratedSets: React.FC = () => {
       ],
       originalPrice: 62000,
       price: 52900,
-      matchedProduct: products.find((p) => p.slug?.includes('yemek') || p.name.includes('Yemek')) || products[2] || products[0],
+      matchedProduct: products.find((p) => p.slug?.includes('yemek') || p.name.includes('Yemek')),
     },
   ];
 
@@ -122,9 +124,9 @@ export const CuratedSets: React.FC = () => {
                     src={setObj.image}
                     alt={setObj.title}
                     fill
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                   />
-                  <div className="absolute top-3 left-3 bg-neutral-900/90 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-2xs border border-white/20">
+                  <div className="absolute top-3 left-3 bg-neutral-900/90 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-xs border border-white/20">
                     {setObj.tag}
                   </div>
                 </div>
@@ -166,16 +168,16 @@ export const CuratedSets: React.FC = () => {
                 const displayPrice = setObj.matchedProduct ? Number(setObj.matchedProduct.price) : setObj.price;
                 const displayOriginalPrice = setObj.matchedProduct?.originalPrice 
                   ? Number(setObj.matchedProduct.originalPrice) 
-                  : (setObj.originalPrice || Math.round(displayPrice * 1.2));
+                  : (setObj.originalPrice || null);
 
                 return (
                   <div className="p-6 pt-0 border-t border-[#EAE3D2]/60 mt-4 flex items-center justify-between gap-4">
                     <div className="min-w-fit">
-                      {displayOriginalPrice > displayPrice && (
+                      {displayOriginalPrice && displayOriginalPrice > displayPrice ? (
                         <span className="text-[10px] text-neutral-400 line-through block">
                           {formatPrice(displayOriginalPrice)}
                         </span>
-                      )}
+                      ) : null}
                       <span className="text-base md:text-lg font-extrabold text-neutral-900">
                         {formatPrice(displayPrice)}
                       </span>

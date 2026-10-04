@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { DEFAULT_STORES } from '../../stores/useCMSStore';
 import { cmsService } from '../../services/cmsService';
 import type { StoreItem } from '../../types';
 import { BayilerContent } from './BayilerContent';
@@ -33,7 +32,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BayilerPage() {
-  let allStores: StoreItem[] = DEFAULT_STORES;
+  // API'ye ulaşılamazsa uydurma adres göstermek yerine boş liste (sayfa kullanıcıyı WhatsApp'a yönlendirir)
+  let allStores: StoreItem[] = [];
   try {
     const remoteStores = await cmsService.getStores();
     if (remoteStores && remoteStores.length > 0) {

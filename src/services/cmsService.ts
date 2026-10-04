@@ -142,9 +142,10 @@ export const cmsService = {
 
   async getContactConfig(): Promise<{ phone?: string; whatsapp?: string; email?: string; address?: string }> {
     try {
-      const response = await apiClient.get('/cms/blocks/contact');
-      if (response.data && typeof response.data === 'object') {
-        return response.data;
+      const response = await apiClient.get('/cms/contact');
+      const data = response.data?.content || response.data;
+      if (data && typeof data === 'object') {
+        return data as { phone?: string; whatsapp?: string; email?: string; address?: string };
       }
     } catch {
       // Fallback

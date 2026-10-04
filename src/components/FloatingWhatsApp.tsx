@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useCMSStore } from '../stores/useCMSStore';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 export const FloatingWhatsApp: React.FC = () => {
-  const socialLinks = useCMSStore((state) => state.socialLinks);
-  const rawNumber = socialLinks?.whatsapp || '0532 000 00 00';
-  const cleanNumber = rawNumber.replace(/\D/g, '') || '905320000000';
-  const formattedNumber = cleanNumber.startsWith('90') ? cleanNumber : `90${cleanNumber.replace(/^0/, '')}`;
+  // Önceden CMS boşsa sahte "0532 000 00 00" numarasına düşüyordu
+  const formattedNumber = useWhatsappNumber();
 
   const message = encodeURIComponent(
     'Selamlar Ermay Mobilya, web sitenizdeki modeller ve atölye teslimatınız hakkında bilgi almak istiyorum.'

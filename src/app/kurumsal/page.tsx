@@ -138,7 +138,7 @@ export default async function KurumsalPage() {
         </div>
 
         {/* Corporate Value Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <div className="bg-white p-8 rounded-sm border border-[#EAE3D2] shadow-2xs text-center">
             <Building2 className="h-10 w-10 text-[#C5A880] mx-auto mb-4 stroke-[1.5]" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-2">
@@ -165,8 +165,37 @@ export default async function KurumsalPage() {
               Müşteri Memnuniyeti
             </h3>
             <p className="text-xs text-neutral-500 font-light leading-relaxed">
-              14 gün içinde değişim/iade garantisi, 5 yıl iskelet garantisi ve hızlı teslimat ağıyla güven veren satış sonrası hizmet.
+              Uzaktan satışlarda 14 gün yasal cayma hakkı, 2 yıl resmi üretici garantisi ve hızlı teslimat ağıyla güven veren satış sonrası hizmet.
             </p>
+          </div>
+        </div>
+
+        {/* KVKK Aydınlatma Metni & Veri Güvenliği Bölümü (#kvkk) */}
+        <div id="kvkk" className="scroll-mt-24 bg-white rounded-sm border border-[#EAE3D2] p-8 md:p-12 shadow-2xs">
+          <div className="max-w-4xl">
+            <span className="inline-block bg-[#FAF8F5] text-[#8A4B20] font-bold text-[10px] uppercase tracking-[0.25em] px-3 py-1 rounded-xs mb-3 border border-[#EAE3D2]">
+              6698 Sayılı Kanun Kapsamında
+            </span>
+            <h2 className="text-2xl font-serif font-bold text-neutral-900 uppercase tracking-wide mb-4">
+              Kişisel Verilerin Korunması (KVKK) Aydınlatma Metni
+            </h2>
+            <div className="space-y-4 text-neutral-600 font-light text-xs md:text-sm leading-relaxed">
+              <p>
+                <strong>Veri Sorumlusu:</strong> Ermay Mobilya San. ve Tic. Ltd. Şti. olarak 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca, müşterilerimizin ve web sitemizi ziyaret eden kullanıcılarımızın kişisel verilerinin gizliliğine ve güvenliğine en üst düzeyde önem vermekteyiz.
+              </p>
+              <p>
+                <strong>İşlenen Kişisel Veriler ve Veri Minimizasyonu İlkesi:</strong> Sitemiz üzerinden sipariş talebi oluşturduğunuzda yalnızca talebinizin teyit edilmesi, lojistik süreçlerin planlanması ve mağaza randevunuzun koordine edilmesi amacıyla asgari düzeyde kişisel veri (Ad-Soyad, Telefon Numarası, İl/İlçe ve varsa teslimat notunuz) işlenmektedir. Platformumuzda müşteri üyeliği, kredi kartı, banka kartı veya sanal POS ödeme bilgileri kesinlikle toplanmaz ve saklanmaz.
+              </p>
+              <p>
+                <strong>Kişisel Verilerin İşlenme Amacı ve Hukuki Sebebi:</strong> Kişisel verileriniz, KVKK’nın 5. maddesinde yer alan “bir sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması” ve “ilgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla veri sorumlusunun meşru menfaatleri için veri işlenmesinin zorunlu olması” hukuki sebeplerine dayalı olarak; talep ettiğiniz standart seri ürünlerin imalatı, sevk edilmesi ve müşteri hizmetleri desteğinin verilmesi amacıyla işlenmektedir.
+              </p>
+              <p>
+                <strong>Kişisel Verilerin Aktarımı:</strong> Toplanan kişisel veriler, üçüncü şahıslara veya reklam/pazarlama ajanslarına asla satılmaz veya aktarılmaz. Yalnızca siparişinizin sevkiyatı ve montajı için zorunlu olan yetkili nakliye birimlerimiz ile kanunen yetkili kamu kurum ve kuruluşları dışında hiçbir kurumla paylaşılmamaktadır.
+              </p>
+              <p>
+                <strong>İlgili Kişi Olarak Haklarınız:</strong> KVKK’nın 11. maddesi uyarınca; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, amaca uygun kullanılıp kullanılmadığını sorgulama, düzeltilmesini veya silinmesini isteme haklarına sahipsiniz. Başvurularınızı <em>bilgi@ermaymobilya.com</em> e-posta adresimize iletebilirsiniz.
+              </p>
+            </div>
           </div>
         </div>
       </div>

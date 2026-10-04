@@ -49,7 +49,7 @@ export function getRegionalLogistics(city?: string): RegionalLogisticsInfo {
       regionCode: '34-MAR',
       regionName: 'Marmara',
       deliveryTime: '1-3 İş Günü',
-      assemblyBadge: 'Kendi Aracımızla Ücretsiz Teslimat & Montaj',
+      assemblyBadge: 'Kendi Aracımızla Teslimat & Montaj',
       esnafCommitment: 'Modoko atölyemizden kendi araçlarımızla adrese teslim ve profesyonel usta montajı.',
     };
   }
@@ -65,7 +65,7 @@ export function getRegionalLogistics(city?: string): RegionalLogisticsInfo {
       regionName: found.regionName,
       deliveryTime: isMarmaraLocal ? '1-3 İş Günü' : '3-5 İş Günü',
       assemblyBadge: isMarmaraLocal
-        ? 'Kendi Aracımızla Ücretsiz Teslimat & Montaj'
+        ? 'Kendi Aracımızla Teslimat & Montaj'
         : 'Özel Mobilya Nakliyesi & Güvenli Sandık Teslimi',
       esnafCommitment: isMarmaraLocal
         ? 'Atölyemizden kendi araçlarımız ve ustalarımızla kapınıza teslim, sıfır hasar güvencesi.'

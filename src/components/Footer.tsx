@@ -4,8 +4,16 @@ import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, Truck, Sparkles, MessageSquare, Phone, MapPin } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
+import { useWhatsappNumber } from '../lib/whatsapp';
+
+/** "905324194151" -> "+90 532 419 41 51" (tanınmayan biçimler olduğu gibi döner) */
+function formatTrPhone(digits: string): string {
+  const m = digits.match(/^90(\d{3})(\d{3})(\d{2})(\d{2})$/);
+  return m ? `+90 ${m[1]} ${m[2]} ${m[3]} ${m[4]}` : digits;
+}
 
 export const Footer: React.FC = () => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const currentYear = new Date().getFullYear();
   const contactInfo = useCMSStore((state) => state.contactInfo);
   const socialLinks = useCMSStore((state) => state.socialLinks);
@@ -75,7 +83,12 @@ export const Footer: React.FC = () => {
           </p>
           <div className="space-y-1.5 text-xs text-neutral-300">
             <p><strong>Merkez Showroom:</strong> {contactInfo?.address || 'Modoko Mobilyacılar Sitesi 3. Cadde No: 126, Ümraniye / İstanbul'}</p>
-            <p><strong>Danışma / WhatsApp:</strong> {socialLinks?.whatsapp || contactInfo?.phone || '+90 532 419 41 51'}</p>
+            <p>
+              <strong>Danışma / WhatsApp:</strong>{' '}
+              <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-2 hover:underline">
+                {formatTrPhone(waNumber)}
+              </a>
+            </p>
             <p><strong>E-Posta:</strong> {contactInfo?.email || 'bilgi@ermaymobilya.com'}</p>
           </div>
         </div>
@@ -122,7 +135,7 @@ export const Footer: React.FC = () => {
             Toplu alım teklifleri, fabrika teslimatı veya sipariş talepleriniz için temsilcimizle WhatsApp üzerinden doğrudan iletişime geçebilirsiniz.
           </p>
           <a
-            href={`https://wa.me/${(socialLinks?.whatsapp || '+905324194151').replace(/[^0-9]/g, '')}?text=Merhaba%2C%20Ermay%20Mobilya%20koleksiyonlar%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
+            href={`https://wa.me/${waNumber}?text=Merhaba%2C%20Ermay%20Mobilya%20koleksiyonlar%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-3 rounded-xs uppercase tracking-wider transition-colors shadow-xs"

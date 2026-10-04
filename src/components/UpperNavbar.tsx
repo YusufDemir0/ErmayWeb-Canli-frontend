@@ -8,8 +8,14 @@ export const UpperNavbar: React.FC = () => {
 
   if (!tickerItems || tickerItems.length === 0) return null;
 
+  // CMS metinleri bazen kendi madde işaretiyle ("• ...") girilmiş; bileşen zaten nokta çizdiği için çift görünüyordu
+  const cleanItems = tickerItems
+    .map((item) => String(item).replace(/^[\s•·●▪\-–—]+/, '').trim())
+    .filter(Boolean);
+  if (cleanItems.length === 0) return null;
+
   // Duplicate items array for smooth infinite marquee effect
-  const repeatedItems = [...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems];
+  const repeatedItems = [...cleanItems, ...cleanItems, ...cleanItems, ...cleanItems];
 
   return (
     <div className="bg-gradient-to-r from-brand-camel via-brand-camel-dark to-brand-camel text-white text-xs font-semibold py-2 overflow-hidden shadow-xs select-none">

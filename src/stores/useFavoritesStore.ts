@@ -47,6 +47,7 @@ export const useFavoritesStore = create<FavoritesState>()(
         setItem: () => {},
         removeItem: () => {},
       })),
+      skipHydration: true,
     }
   )
 );

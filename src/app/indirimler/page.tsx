@@ -3,13 +3,16 @@ import type { Metadata } from 'next';
 import { SalePage } from '../../components/SalePage';
 import { productService } from '../../services/productService';
 
+export const revalidate = 60; // ISR: build anında boş veriyle statik üretilmesin
+
 export const metadata: Metadata = {
   title: 'İndirimli Ürünler & Kampanyalar | Ermay Mobilya',
-  description: 'Seçkin İtalyan ve İskandinav mobilya tasarımlarında %30’a varan net indirim fırsatları.',
+  description: 'Doğrudan üreticiden standart seri ofis mobilyalarında fabrika satış indirimleri: makam takımları, toplantı masaları, ofis koltukları ve daha fazlası.',
 };
 
 export default async function SaleRoute() {
-  const products = await productService.getProducts();
+  // Varsayılan 24 ürün limiti indirimli ürünlerin bir kısmını SSR HTML'inden düşürüyordu
+  const products = await productService.getProducts({ limit: 60 });
 
   return <SalePage initialProducts={products} />;
 }

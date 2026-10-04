@@ -10,12 +10,15 @@ interface AdminHeaderProps {
   activeModule: AdminModuleMode;
   setActiveModule: (mode: AdminModuleMode) => void;
   onLogout: () => void;
+  /** STAFF: CMS modülü gizlenir */
+  isStaffOnly?: boolean;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
   activeModule,
   setActiveModule,
   onLogout,
+  isStaffOnly = false,
 }) => {
   return (
     <div className="bg-white text-neutral-900 p-6 md:p-8 rounded-sm shadow-xs mb-6 flex flex-col lg:flex-row items-center justify-between gap-6 border border-neutral-200">
@@ -41,7 +44,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
 
       {/* Dual Panel Switcher (E-Commerce vs CMS) */}
-      <div className="flex items-center bg-neutral-100 p-1.5 rounded-sm border border-neutral-200">
+      <div className={`${isStaffOnly ? 'hidden' : 'flex'} items-center bg-neutral-100 p-1.5 rounded-sm border border-neutral-200`}>
         <button
           onClick={() => setActiveModule('ecommerce')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xs text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${

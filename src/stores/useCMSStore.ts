@@ -1,7 +1,17 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { Product, Category, StoreItem, SocialLinksConfig } from '../types';
 import apiClient from '../services/api';
+import { isAxiosError } from 'axios';
+import { toast } from './useToastStore';
+
+/**
+ * CMS kayıtları iyimser (optimistic) yapılır; sunucu reddederse admin "kaydedildi" sanmasın diye görünür hata gösterilir.
+ */
+const reportCmsSaveError = (label: string) => (err: unknown) => {
+  console.warn(`${label} kaydetme hatası:`, err);
+  const serverMsg = isAxiosError(err) ? (err.response?.data as { message?: string } | undefined)?.message : undefined;
+  toast.error('Kaydedilemedi', `${label} sunucuya kaydedilemedi. ${serverMsg || 'Lütfen sayfayı yenileyip tekrar deneyiniz.'}`);
+};
 
 export interface CampaignPopupConfig {
   enabled: boolean;
@@ -83,7 +93,8 @@ interface CMSState {
 
   // Actions
   fetchCmsBlocks: () => Promise<void>;
-  fetchProductsAndCategories: () => Promise<void>;
+  /** includeDrafts: yalnızca admin paneli; taslak/yayında olmayan ürünleri de yükler. */
+  fetchProductsAndCategories: (options?: { includeDrafts?: boolean }) => Promise<void>;
   updateLandingPageConfig: (config: LandingPageConfig) => Promise<void>;
 
   setTickerItems: (items: string[]) => void;
@@ -106,7 +117,8 @@ interface CMSState {
   resetProductsToDefault: () => void;
 
   // Store CRUD
-  fetchStores: () => Promise<void>;
+  /** includeInactive: yalnızca admin paneli; pasif mağazaları da yükler (aksi halde pasife alınan mağaza panelden kaybolur). */
+  fetchStores: (options?: { includeInactive?: boolean }) => Promise<void>;
   addStore: (store: StoreItem) => Promise<void>;
   updateStore: (id: string, store: Partial<StoreItem>) => Promise<void>;
   deleteStore: (id: string) => Promise<void>;
@@ -235,14 +247,20 @@ const DEFAULT_CORPORATE_CONFIG: CorporateConfig = {
 
 export const DEFAULT_CATEGORIES: Category[] = [];
 
+// Admin paneli taslaklar dahil tam kataloğu yüklediğinde true olur (bkz. fetchProductsAndCategories)
+let adminCatalogMode = false;
+// Admin paneli pasif mağazalar dahil tüm listeyi yüklediğinde true olur (bkz. fetchStores)
+let adminStoresMode = false;
+
 export const useCMSStore = create<CMSState>()((set, get) => ({
       tickerItems: DEFAULT_TICKER,
       campaignPopup: DEFAULT_POPUP,
       contactInfo: DEFAULT_CONTACT,
-      landingPageConfig: { type: 'home' } as LandingPageConfig,
+      // Sunucu tarafı varsayılanıyla aynı (services/landingService.ts): tercih kaydedilmemişse FAZ 15 kararı
+      landingPageConfig: { type: 'category', targetSlug: 'aksesuar-ve-diger' } as LandingPageConfig,
       products: [],
       categories: [],
-      stores: DEFAULT_STORES,
+      stores: [], // Gerçek liste API'den gelir; DEFAULT_STORES uydurma adresler içerdiği için başlangıçta gösterilmez
       homeConfig: DEFAULT_HOME_CONFIG,
       corporateConfig: DEFAULT_CORPORATE_CONFIG,
       socialLinks: DEFAULT_SOCIAL_LINKS,
@@ -294,19 +312,22 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
       updateSocialLinks: (config) => {
         set((state) => {
           const updated = { ...state.socialLinks, ...config };
-          apiClient.put('/cms/social_links', { content: updated }).catch((e) => console.warn('Social links save error:', e));
+          apiClient.put('/cms/social_links', { content: updated }).catch(reportCmsSaveError('Sosyal medya bağlantıları'));
           return { socialLinks: updated };
         });
       },
 
-      fetchProductsAndCategories: async () => {
+      fetchProductsAndCategories: async (options) => {
         try {
           const [prodRes, catRes] = await Promise.all([
-            apiClient.get('/products').catch(() => ({ data: { success: false, products: [] } })),
+            apiClient.get('/products', options?.includeDrafts ? { params: { includeUnpublished: 'true', limit: 1000 } } : undefined).catch(() => ({ data: { success: false, products: [] } })),
             apiClient.get('/categories').catch(() => ({ data: { success: false, categories: [] } })),
           ]);
 
-          if (prodRes.data?.success && Array.isArray(prodRes.data.products)) {
+          if (options?.includeDrafts) adminCatalogMode = true;
+          // Admin tam kataloğu yüklendiyse, geç dönen vitrin isteği (yalnızca yayındakiler) listeyi ezmesin
+          const isStalePublicResult = adminCatalogMode && !options?.includeDrafts;
+          if (!isStalePublicResult && prodRes.data?.success && Array.isArray(prodRes.data.products)) {
             set({ products: prodRes.data.products });
           }
 
@@ -320,31 +341,31 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
 
       setTickerItems: (items) => {
         set({ tickerItems: items });
-        apiClient.put('/cms/ticker_items', { content: items }).catch((e) => console.warn(e));
+        apiClient.put('/cms/ticker_items', { content: items }).catch(reportCmsSaveError('Duyuru bandı'));
       },
 
       addTickerItem: (item) => {
         const updated = [...get().tickerItems, item];
         set({ tickerItems: updated });
-        apiClient.put('/cms/ticker_items', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/ticker_items', { content: updated }).catch(reportCmsSaveError('Duyuru bandı'));
       },
 
       removeTickerItem: (index) => {
         const updated = get().tickerItems.filter((_, i) => i !== index);
         set({ tickerItems: updated });
-        apiClient.put('/cms/ticker_items', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/ticker_items', { content: updated }).catch(reportCmsSaveError('Duyuru bandı'));
       },
 
       updateCampaignPopup: (config) => {
         const updated = { ...get().campaignPopup, ...config };
         set({ campaignPopup: updated });
-        apiClient.put('/cms/campaign_popup', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/campaign_popup', { content: updated }).catch(reportCmsSaveError('Kampanya popup'));
       },
 
       updateContactInfo: (config) => {
         const updated = { ...get().contactInfo, ...config };
         set({ contactInfo: updated });
-        apiClient.put('/cms/contact_info', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/contact_info', { content: updated }).catch(reportCmsSaveError('İletişim bilgileri'));
       },
 
       addCategory: async (category) => {
@@ -352,7 +373,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         try {
           const res = await apiClient.post('/categories', category);
           if (res.data?.success && res.data.category) {
-            get().fetchProductsAndCategories();
+            get().fetchProductsAndCategories({ includeDrafts: true });
           }
         } catch (e) {
           console.warn('Kategori ekleme hatası:', e);
@@ -377,7 +398,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
             set((state) => ({
               categories: state.categories.filter((c) => c.id !== id)
             }));
-            await get().fetchProductsAndCategories();
+            await get().fetchProductsAndCategories({ includeDrafts: true });
             return { success: true, message: res.data.message || 'Kategori silindi.' };
           }
           return { success: false, message: res.data?.message || 'Kategori silinemedi.' };
@@ -410,7 +431,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         try {
           const res = await apiClient.post('/products', product);
           if (res.data?.success && res.data.product) {
-            await get().fetchProductsAndCategories();
+            await get().fetchProductsAndCategories({ includeDrafts: true });
           }
         } catch (e: unknown) {
           const msg = e && typeof e === 'object' && 'response' in e
@@ -444,10 +465,13 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
 
       resetProductsToDefault: () => {},
 
-      fetchStores: async () => {
+      fetchStores: async (options) => {
         try {
-          const res = await apiClient.get('/stores');
-          if (res.data?.success && Array.isArray(res.data.stores) && res.data.stores.length > 0) {
+          const res = await apiClient.get('/stores', options?.includeInactive ? { params: { all: 'true' } } : undefined);
+          if (options?.includeInactive) adminStoresMode = true;
+          // Admin tüm mağazaları yüklediyse, geç dönen vitrin isteği (yalnızca aktifler) listeyi ezmesin
+          const isStalePublicResult = adminStoresMode && !options?.includeInactive;
+          if (!isStalePublicResult && res.data?.success && Array.isArray(res.data.stores)) {
             set({ stores: res.data.stores });
           }
         } catch (e) {
@@ -460,7 +484,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         try {
           const res = await apiClient.post('/stores', store);
           if (res.data?.success && res.data.store) {
-            get().fetchStores();
+            get().fetchStores({ includeInactive: true });
           }
         } catch (e) {
           console.warn('Mağaza API ekleme hatası:', e);
@@ -483,23 +507,29 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
           stores: state.stores.filter((s) => s.id !== id)
         }));
         try {
-          await apiClient.delete(`/stores/${id}`);
+          const res = await apiClient.delete(`/stores/${id}`);
+          // Geçmiş talebi olan mağaza silinmez, pasife alınır: admin'e bunu söyle ve gerçek listeyi geri yükle
+          if (typeof res.data?.message === 'string' && res.data.message.includes('pasife')) {
+            toast.info('Mağaza Pasife Alındı', res.data.message);
+          }
+          await get().fetchStores({ includeInactive: true });
         } catch (e) {
-          console.warn('Mağaza API silme hatası:', e);
+          reportCmsSaveError('Mağaza silme')(e);
+          await get().fetchStores({ includeInactive: true });
         }
       },
 
       updateHomeConfig: (config) => {
         const updated = { ...get().homeConfig, ...config };
         set({ homeConfig: updated });
-        apiClient.put('/cms/home_hero', { content: updated.heroSlides || [] }).catch((e) => console.warn(e));
-        apiClient.put('/cms/home_config', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/home_hero', { content: updated.heroSlides || [] }).catch(reportCmsSaveError('Ana sayfa slaytları'));
+        apiClient.put('/cms/home_config', { content: updated }).catch(reportCmsSaveError('Ana sayfa ayarları'));
       },
 
       updateCorporateConfig: (config) => {
         const updated = { ...get().corporateConfig, ...config };
         set({ corporateConfig: updated });
-        apiClient.put('/cms/corporate_config', { content: updated }).catch((e) => console.warn(e));
+        apiClient.put('/cms/corporate_config', { content: updated }).catch(reportCmsSaveError('Kurumsal sayfa'));
       }
     })
 );

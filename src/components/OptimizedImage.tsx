@@ -18,10 +18,13 @@ interface OptimizedImageProps {
 
 const cleanImageSrc = (src: string): string => {
   if (!src) return '';
-  if (src.includes('%252F')) {
-    return src.replace(/%252F/g, '%2F');
+  // Eski kayıtlarda backend'in mutlak adresi (http://localhost:5000/uploads/...) saklanmış olabilir;
+  // /uploads/* Next.js rewrite ile backend'e proxylendiği için göreli yola çevir.
+  const relative = src.replace(/^https?:\/\/(localhost|127\.0\.0\.1|ermayweb_backend)(:\d+)?(?=\/uploads\/)/i, '');
+  if (relative.includes('%252F')) {
+    return relative.replace(/%252F/g, '%2F');
   }
-  return src;
+  return relative;
 };
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = memo(({

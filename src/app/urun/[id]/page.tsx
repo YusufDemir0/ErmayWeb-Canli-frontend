@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import ProductDetailClient from '../../../components/ProductDetailClient';
 import { getProductByIdCached } from '../../../services/productService';
 
@@ -13,7 +14,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const product = await getProductByIdCached(id);
+  const lookup = await getProductByIdCached(id);
+  const product = lookup.status === 'found' ? lookup.product : null;
 
   if (!product) {
     return {
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const categoryName = typeof product.category === 'object' && product.category !== null ? product.category.name : String(product.category);
   const title = `${product.name} - ${categoryName} | Ermay Mobilya`;
-  const description = `${product.name} ${categoryName}. ${product.description || 'Masif fırınlanmış gürgen iskelet, İtalyan deri ve kumaş işçiliği. 5 yıl garanti ve ücretsiz montaj avantajıyla hemen keşfedin.'}`;
+  const description = `${product.name} ${categoryName}. ${product.description || 'Doğrudan üreticiden standart seri ofis mobilyası. 2 yıl üretici garantisi ve fabrika satış fiyatıyla hemen keşfedin.'}`;
 
   return {
     title,
@@ -54,7 +56,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
-  const product = await getProductByIdCached(id);
+  const lookup = await getProductByIdCached(id);
 
-  return <ProductDetailClient id={id} initialProduct={product} />;
+  // Gerçek 404: HTTP 404 dön (soft 404 SEO'ya zarar verir). Geçici API hatasında istemci tekrar dener.
+  if (lookup.status === 'not_found') {
+    notFound();
+  }
+
+  return <ProductDetailClient id={id} initialProduct={lookup.status === 'found' ? lookup.product : undefined} />;
 }

@@ -19,12 +19,14 @@ import type { StoreItem } from '../../types';
 import { TurkeyMap, REGION_NAMES } from '../../components/TurkeyMap';
 import { TURKEY_PROVINCES } from '../../data/turkeyProvinces';
 import { toast } from '../../stores/useToastStore';
+import { useWhatsappNumber } from '../../lib/whatsapp';
 
 interface BayilerContentProps {
   stores: StoreItem[];
 }
 
 export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const activeStores = useMemo(() => stores.filter((s) => s.isActive !== false), [stores]);
 
   // Compute store density per region
@@ -83,51 +85,14 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
   const isAutoScrollingRef = useRef<boolean>(false);
 
-  // 1. IP-BASED USER LOCATION DETECTION (Fast timeout with fallback)
+  // 1. LOCAL STORE REGION FOCUS (KVKK compliant, no 3rd-party IP tracking)
   useEffect(() => {
-    let isMounted = true;
-    async function detectUserLocation() {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1200);
-
-        const res = await fetch('https://ipapi.co/json/', {
-          signal: controller.signal,
-          headers: { Accept: 'application/json' },
-        });
-        clearTimeout(timeoutId);
-
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!isMounted) return;
-
-        const rawCity = (data.city || data.region || '').trim().toLowerCase();
-        if (rawCity) {
-          const matchedProv = TURKEY_PROVINCES.find(
-            (p) =>
-              p.name.toLowerCase() === rawCity ||
-              rawCity.includes(p.name.toLowerCase()) ||
-              p.name.toLowerCase().includes(rawCity)
-          );
-
-          if (matchedProv) {
-            setUserDetectedCity(matchedProv.name);
-            // Check if user's region has stores
-            const hasStoresInRegion = regionStats.some((r) => r.regionId === matchedProv.region);
-            if (hasStoresInRegion) {
-              setTargetPrimaryRegion(matchedProv.region);
-            }
-          }
-        }
-      } catch {
-        // Silently fallback to region with most stores (Marmara)
+    if (regionStats.length > 0) {
+      const sorted = [...regionStats].sort((a, b) => b.count - a.count);
+      if (sorted[0]?.regionId) {
+        setTargetPrimaryRegion(sorted[0].regionId);
       }
     }
-
-    detectUserLocation();
-    return () => {
-      isMounted = false;
-    };
   }, [regionStats]);
 
   // Lock timestamp when user explicitly clicks on a region or bubble
@@ -141,6 +106,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
   // - Deadzone (30px-90px) prevents threshold flipping and jitter!
   useEffect(() => {
     let ticking = false;
+    let lastMeasurementTime = 0;
+    let trailingTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleScroll = () => {
       if (isAutoScrollingRef.current) return;
@@ -153,6 +120,20 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         setActiveRegionId(null);
         return;
       }
+
+      // Throttle heavy DOM layout queries (getBoundingClientRect) to 80ms intervals
+      const now = Date.now();
+      if (now - lastMeasurementTime < 80) {
+        // Trailing ölçüm: kaydırma bu 80ms penceresinde biterse son konum yine ölçülsün (yoksa harita yanlış bölgede kalır)
+        if (!trailingTimer) {
+          trailingTimer = setTimeout(() => {
+            trailingTimer = null;
+            handleScroll();
+          }, 80 - (now - lastMeasurementTime) + 5);
+        }
+        return;
+      }
+      lastMeasurementTime = now;
 
       // Check which region section is currently in viewport
       let matchedRegion: string | null = null;
@@ -199,7 +180,10 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (trailingTimer) clearTimeout(trailingTimer);
+    };
   }, [regionStats, activeStores, targetPrimaryRegion]);
 
   // Click handler on map city / province
@@ -242,7 +226,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
   };
 
   return (
-    <div className="w-full bg-[#FAF9F6] min-h-screen py-8 sm:py-14 overflow-x-hidden">
+    <div className="w-full bg-[#FAF9F6] min-h-screen py-8 sm:py-14 overflow-x-clip">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Navigation Breadcrumb */}
@@ -345,6 +329,16 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
         {/* STORE CARDS LIST (ORDERED BY REGION DENSITY) */}
         <div className="space-y-12 sm:space-y-16">
+          {activeStores.length === 0 && (
+            <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center text-sm text-neutral-600">
+              Mağaza bilgileri şu anda yüklenemedi. Showroom adreslerimiz için{' '}
+              <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-[#8A4B20] font-semibold underline">
+                WhatsApp hattımızdan
+              </a>{' '}
+              bize ulaşabilirsiniz.
+            </div>
+          )}
+
           {regionStats.map((region) => (
             <div
               key={region.regionId}
@@ -482,7 +476,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           </a>
 
                           <a
-                            href={`https://wa.me/905324194151?text=${encodeURIComponent(
+                            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                               `Merhaba, ${store.name} mağazanız hakkında bilgi almak istiyorum.`
                             )}`}
                             target="_blank"
@@ -520,7 +514,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           </div>
 
           <a
-            href="https://wa.me/905324194151?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum."
+            href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-3.5 bg-[#C5A880] hover:bg-[#b3956e] text-neutral-900 font-medium text-xs rounded-full transition-colors shrink-0 shadow-sm flex items-center gap-2"

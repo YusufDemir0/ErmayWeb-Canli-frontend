@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import type { Product, Category } from '../types';
 import apiClient from './api';
+import { isAxiosError } from 'axios';
 
 export interface ProductQueryParams {
   category?: string;
@@ -67,10 +68,28 @@ export const productService = {
   },
 };
 
+export type ProductLookup =
+  | { status: 'found'; product: Product }
+  | { status: 'not_found' }
+  | { status: 'error' };
+
 /**
  * Server-Side deduplicated product fetcher using React's cache().
  * Prevents redundant HTTP requests between generateMetadata and Page component in Next.js App Router.
+ * Distinguishes a real 404 (render notFound) from a transient API error (let the client retry).
  */
-export const getProductByIdCached = cache(async (id: string): Promise<Product | null> => {
-  return productService.getProductById(id);
+export const getProductByIdCached = cache(async (id: string): Promise<ProductLookup> => {
+  try {
+    const response = await apiClient.get(`/products/${encodeURIComponent(id)}`);
+    if (response.data?.success && response.data.product) {
+      return { status: 'found', product: response.data.product };
+    }
+    return { status: 'not_found' };
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 404) {
+      return { status: 'not_found' };
+    }
+    console.warn('REST API Ürün Detay Uyarısı (Sunucuya ulaşılamadı):', error);
+    return { status: 'error' };
+  }
 });

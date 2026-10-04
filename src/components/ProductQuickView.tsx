@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Heart, ShoppingBag, Star, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
+import { X, Heart, ShoppingBag, ShieldCheck, Truck, RefreshCw } from 'lucide-react';
 import { useUIStore } from '../stores/useUIStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { useCartStore } from '../stores/useCartStore';
 import type { ProductImages } from '../types';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 export const ProductQuickView: React.FC = () => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const product = useUIStore((state) => state.selectedQuickViewProduct);
   const onClose = useUIStore((state) => state.closeQuickView);
 
@@ -47,7 +49,7 @@ export const ProductQuickView: React.FC = () => {
     }).format(price).replace('TRY', 'TL');
   };
 
-  const isDiscounted = !!product.originalPrice;
+  const isDiscounted = !!product.originalPrice && Number(product.originalPrice) > Number(product.price);
 
   return (
     <div 
@@ -118,21 +120,13 @@ export const ProductQuickView: React.FC = () => {
             </h3>
           </div>
 
-          {/* Rating and reviews */}
+          {/* Craftsmanship & Origin Badge */}
           <div className="flex items-center gap-2 mb-4 border-b border-neutral-100 pb-3">
-            <div className="flex items-center text-amber-500">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${
-                    i < Math.floor(product.rating) ? 'fill-current' : 'opacity-30'
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-neutral-500 font-medium">{product.rating}</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-xs text-[11px] font-semibold bg-brand-camel/10 text-brand-camel border border-brand-camel/20">
+              Standart Seri Fabrika İmalatı
+            </span>
             <span className="text-neutral-300">|</span>
-            <span className="text-xs text-neutral-400 font-light">({product.reviewsCount} Değerlendirme)</span>
+            <span className="text-xs text-neutral-500 font-normal">Modoko Showroom Teşhirli</span>
           </div>
 
           {/* Prices */}
@@ -267,7 +261,7 @@ export const ProductQuickView: React.FC = () => {
 
             {/* WhatsApp Direct Order CTA */}
             <a
-              href={`https://wa.me/905320000000?text=${encodeURIComponent(`Selamlar Ermay Mobilya, "${product.name}" (${formatPrice(product.price)}) ürününüz için WhatsApp üzerinden doğrudan sipariş vermek ve teslimat durumunu öğrenmek istiyorum.`)}`}
+              href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Selamlar Ermay Mobilya, "${product.name}" (${formatPrice(product.price)}) ürününüz için WhatsApp üzerinden doğrudan sipariş vermek ve teslimat durumunu öğrenmek istiyorum.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-bold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 mb-4 cursor-pointer"
@@ -290,7 +284,7 @@ export const ProductQuickView: React.FC = () => {
               </div>
               <div className="flex flex-col items-center gap-1 p-2 bg-neutral-50 rounded border border-neutral-100">
                 <RefreshCw className="h-4 w-4 text-amber-700" />
-                <span>Koşulsuz Değişim</span>
+                <span>14 Gün Cayma Hakkı</span>
               </div>
             </div>
           </div>

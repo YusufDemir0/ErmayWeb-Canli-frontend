@@ -6,8 +6,10 @@ import { X, Trash2, ShoppingBag, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { OptimizedImage } from './OptimizedImage';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 export const CartDrawer: React.FC = () => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const isOpen = useUIStore((state) => state.isCartOpen);
   const onClose = useUIStore((state) => state.closeCart);
 
@@ -119,12 +121,12 @@ export const CartDrawer: React.FC = () => {
                           {/* Dynamic Manufacturing Lead Time / Stock Status */}
                           <div className="mt-1.5 flex items-center gap-1.5">
                             {item.product.stock && item.product.stock > 0 ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-2xs border border-emerald-200/60">
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200/60">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 Stokta Hazır (1-2 İş Günü Fabrika Sevkiyatı)
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded-2xs border border-amber-200/60">
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded-xs border border-amber-200/60">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                 Fabrika Seri Üretimi (3-5 İş Günü)
                               </span>
@@ -195,7 +197,7 @@ export const CartDrawer: React.FC = () => {
                   <span>Çoklu Alım / Ofis Kurulumu</span>
                 </span>
                 <a
-                  href="https://wa.me/905324194151?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F"
+                  href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-bold text-[#8A4B20] hover:underline shrink-0 ml-2"

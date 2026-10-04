@@ -28,8 +28,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      { source: '/vitrin', destination: '/anasayfa', permanent: true },
       { source: '/odeme', destination: '/talep', permanent: true },
       { source: '/siparis-takip', destination: '/iletisim', permanent: true },
+      { source: '/siparis/:path*', destination: '/iletisim', permanent: true },
       { source: '/giris', destination: '/', permanent: true },
       { source: '/kayit', destination: '/', permanent: true },
       { source: '/hesabim', destination: '/', permanent: true },

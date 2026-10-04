@@ -8,7 +8,8 @@ import type { Product, ProductImages } from '../types';
  */
 export function resolveImageUrl(url?: string | null): string {
   if (!url || typeof url !== 'string' || url.trim().length === 0) return '';
-  return url.trim();
+  // Legacy rows may hold the backend's absolute dev origin; /uploads/* is proxied by Next.js rewrites.
+  return url.trim().replace(/^https?:\/\/(localhost|127\.0\.0\.1|ermayweb_backend)(:\d+)?(?=\/uploads\/)/i, '');
 }
 
 /**

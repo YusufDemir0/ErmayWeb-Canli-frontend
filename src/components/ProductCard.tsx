@@ -91,7 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
     }
   };
 
-  const isDiscounted = !!product.originalPrice;
+  const isDiscounted = !!product.originalPrice && Number(product.originalPrice) > Number(product.price);
   const { main: mainImage, secondary: secondaryImage } = getProductImages(product);
   const categoryLabel = getCategoryLabel(product.category);
 

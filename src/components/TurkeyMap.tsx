@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { StoreItem } from '../types';
 import { TURKEY_PROVINCES, ProvinceData } from '../data/turkeyProvinces';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 // Accurate province centers on 1000x422 viewBox
 export const PROVINCE_CENTERS: Record<string, { x: number; y: number }> = {
@@ -184,6 +185,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
   onCloseBubble,
   onScrollToStore,
 }) => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const [internalBubbleCity, setInternalBubbleCity] = useState<string | null>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null);
@@ -563,7 +565,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                       </a>
 
                       <a
-                        href={`https://wa.me/905324194151?text=${encodeURIComponent(
+                        href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                           `Merhaba, ${activeBubbleCity} ${store.name} mağazanız hakkında bilgi almak istiyorum.`
                         )}`}
                         target="_blank"
@@ -606,7 +608,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
                   <div className="space-y-2">
                     <a
-                      href={`https://wa.me/905324194151?text=${encodeURIComponent(
+                      href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                         `Merhaba, ${activeBubbleCity} teslimatı, fabrika satış fiyatları ve nakliye koşulları hakkında bilgi almak istiyorum.`
                       )}`}
                       target="_blank"

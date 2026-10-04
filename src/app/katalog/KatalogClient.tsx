@@ -46,7 +46,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
 
   const formatCategoryName = (cat: string | { name?: string; slug?: string }) => {
     if (typeof cat === 'object' && cat !== null && cat.name) {
-      return cat.name.toUpperCase();
+      return cat.name.toLocaleUpperCase('tr-TR');
     }
     const s = String(cat || '').toLowerCase();
     if (s.includes('dining') || s.includes('yemek')) return 'YEMEK ODASI';
@@ -55,7 +55,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
     if (s.includes('makam') || s.includes('ofis')) return 'MAKAM & OFİS';
     if (s.includes('tv') || s.includes('unite')) return 'TV ÜNİTELERİ';
     if (s.includes('access') || s.includes('aksesuar')) return 'AKSESUARLAR';
-    return s ? s.toUpperCase() : 'ERMAY ÖZEL SERİ';
+    return s ? s.toLocaleUpperCase('tr-TR') : 'ERMAY STANDART SERİ';
   };
 
   return (
@@ -158,7 +158,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                           key={tIdx}
                           type="button"
                           onClick={() => setActiveThumbMap((prev) => ({ ...prev, [product.id]: tIdx }))}
-                          className={`aspect-[4/3] rounded-3xs overflow-hidden border transition-all cursor-pointer ${
+                          className={`aspect-[4/3] rounded-xs overflow-hidden border transition-all cursor-pointer ${
                             currentThumbIdx === tIdx
                               ? 'border-[#C5A880] ring-1.5 ring-[#C5A880]/40'
                               : 'border-neutral-200 opacity-80 hover:opacity-100'
@@ -195,7 +195,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                     </p>
 
                     {/* Specifications Box */}
-                    <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-2xs p-3 space-y-2 text-xs">
+                    <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-3 space-y-2 text-xs">
                       <div className="space-y-1.5 text-[11px] print:text-[10px]">
                         <div className="flex items-start gap-2">
                           <Ruler className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
@@ -255,7 +255,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                         </div>
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-[9.5px] font-semibold text-[#8D7B68] bg-[#C5A880]/10 px-3 py-1.5 rounded-3xs border border-[#C5A880]/20">
+                      <span className="inline-flex items-center gap-1 text-[9.5px] font-semibold text-[#8D7B68] bg-[#C5A880]/10 px-3 py-1.5 rounded-xs border border-[#C5A880]/20">
                         <ShieldCheck className="h-3.5 w-3.5 text-[#C5A880]" />
                         <span>2 Yıl Garanti & Kargo Dahil</span>
                       </span>

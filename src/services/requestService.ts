@@ -111,11 +111,24 @@ export interface AdminOrderRequestEvent {
   createdAt: string;
 }
 
+export type RequestStatusType =
+  | 'NEW'
+  | 'CONTACTED'
+  | 'STORE_VISIT_SCHEDULED'
+  | 'AWAITING_PAYMENT'
+  | 'PAID_OFFLINE'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'SPAM'
+  | 'EXPIRED';
+
+export type ErpSyncStatusType = 'PENDING' | 'IN_PROGRESS' | 'SYNCED' | 'FAILED';
+
 export interface AdminOrderRequest {
   id: string;
   code: string;
   publicToken: string;
-  status: 'NEW' | 'CONTACTED' | 'OFFER_SENT' | 'VISIT_SCHEDULED' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: RequestStatusType;
   preference: 'WHATSAPP' | 'STORE_VISIT';
   customerName: string;
   customerPhone: string;
@@ -124,10 +137,11 @@ export interface AdminOrderRequest {
   district?: string | null;
   addressLine?: string | null;
   totalAmount: number;
-  erpStatus: 'PENDING' | 'SYNCED' | 'FAILED';
+  erpStatus: ErpSyncStatusType;
   erpSaleCode?: string | null;
   erpSaleId?: string | null;
   erpErrorMessage?: string | null;
+  erpLastError?: string | null;
   staffNote?: string | null;
   createdAt: string;
   updatedAt: string;

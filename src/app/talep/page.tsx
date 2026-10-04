@@ -33,8 +33,8 @@ export default function OrderRequestPage() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [city, setCity] = useState('İstanbul');
-  const [district, setDistrict] = useState('Kadıköy');
+  const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
   const [addressLine, setAddressLine] = useState('');
   const [preference, setPreference] = useState<'WHATSAPP' | 'STORE_VISIT'>('WHATSAPP');
   const [preferredStoreId, setPreferredStoreId] = useState<string>('');
@@ -63,7 +63,9 @@ export default function OrderRequestPage() {
     return `req-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   });
 
-  const availableDistricts = getDistrictsByCityName(city);
+  const availableDistricts = city ? getDistrictsByCityName(city) : [];
+  // İller plaka sırasıyla geliyor; kullanıcı alfabetik arar
+  const sortedCities = [...TURKEY_CITIES].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
 
   // 1. Fetch stores and delivery zones
   useEffect(() => {
@@ -154,8 +156,8 @@ export default function OrderRequestPage() {
   // Handle city change
   const handleCityChange = (newCity: string) => {
     setCity(newCity);
-    const districts = getDistrictsByCityName(newCity);
-    setDistrict(districts[0] || 'Merkez');
+    // İlçe otomatik seçilmez: fark edilmeyen yanlış ilçe hatalı teslimat planlamasına yol açar
+    setDistrict('');
   };
 
   const isCityDisabled = disabledCities.some(
@@ -198,6 +200,11 @@ export default function OrderRequestPage() {
       return;
     }
 
+    if (!city || !district) {
+      setFormError('Lütfen il ve ilçe seçiniz.');
+      return;
+    }
+
     if (isCityDisabled) {
       setFormError(`Üzgünüz, geçici olarak ${city} iline teslimat ve kurulum hizmetimiz bulunmamaktadır.`);
       return;
@@ -209,7 +216,7 @@ export default function OrderRequestPage() {
     }
 
     if (!kvkkAccepted) {
-      setFormError('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      setFormError('Lütfen KVKK Aydınlatma Metni\'ni okuduğunuzu işaretleyiniz.');
       return;
     }
 
@@ -334,11 +341,14 @@ export default function OrderRequestPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                  <label htmlFor="talep-name" className="block text-xs font-medium text-neutral-700 mb-1">
                     Ad Soyad <span className="text-rose-500">*</span>
                   </label>
                   <input
+                    id="talep-name"
+                    name="name"
                     type="text"
+                    autoComplete="name"
                     required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
@@ -349,11 +359,15 @@ export default function OrderRequestPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    <label htmlFor="talep-phone" className="block text-xs font-medium text-neutral-700 mb-1">
                       Telefon Numarası <span className="text-rose-500">*</span>
                     </label>
                     <input
+                      id="talep-phone"
+                      name="tel"
                       type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
                       required
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
@@ -364,11 +378,14 @@ export default function OrderRequestPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    <label htmlFor="talep-email" className="block text-xs font-medium text-neutral-700 mb-1">
                       E-posta Adresi <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
                     </label>
                     <input
+                      id="talep-email"
+                      name="email"
                       type="email"
+                      autoComplete="email"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="ahmet@ornek.com"
@@ -388,15 +405,20 @@ export default function OrderRequestPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    <label htmlFor="talep-city" className="block text-xs font-medium text-neutral-700 mb-1">
                       İl <span className="text-rose-500">*</span>
                     </label>
                     <select
+                      id="talep-city"
+                      name="address-level1"
+                      autoComplete="address-level1"
+                      required
                       value={city}
                       onChange={(e) => handleCityChange(e.target.value)}
                       className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
                     >
-                      {TURKEY_CITIES.map((c) => (
+                      <option value="" disabled>İl seçiniz</option>
+                      {sortedCities.map((c) => (
                         <option key={c.id} value={c.name}>
                           {c.name}
                         </option>
@@ -405,14 +427,20 @@ export default function OrderRequestPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-neutral-700 mb-1">
+                    <label htmlFor="talep-district" className="block text-xs font-medium text-neutral-700 mb-1">
                       İlçe <span className="text-rose-500">*</span>
                     </label>
                     <select
+                      id="talep-district"
+                      name="address-level2"
+                      autoComplete="address-level2"
+                      required
+                      disabled={!city}
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                       className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
                     >
+                      <option value="" disabled>{city ? 'İlçe seçiniz' : 'Önce il seçiniz'}</option>
                       {availableDistricts.map((d) => (
                         <option key={d} value={d}>
                           {d}
@@ -429,11 +457,14 @@ export default function OrderRequestPage() {
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-neutral-700 mb-1">
+                  <label htmlFor="talep-address" className="block text-xs font-medium text-neutral-700 mb-1">
                     Açık Adres / Semt <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
                   </label>
                   <input
+                    id="talep-address"
+                    name="street-address"
                     type="text"
+                    autoComplete="street-address"
                     value={addressLine}
                     onChange={(e) => setAddressLine(e.target.value)}
                     placeholder="Mahalle, Cadde, Sokak veya site adı..."
@@ -509,17 +540,20 @@ export default function OrderRequestPage() {
               {/* Showroom Selector if STORE_VISIT selected */}
               {preference === 'STORE_VISIT' && (
                 <div className="p-4 bg-neutral-50 border border-neutral-200/80 rounded-sm space-y-3">
-                  <label className="block text-xs font-semibold text-neutral-800">
+                  <label htmlFor="talep-store" className="block text-xs font-semibold text-neutral-800">
                     Ziyaret Etmek İstediğiniz Showroom / Mağaza <span className="text-rose-500">*</span>
                   </label>
                   {stores.length === 0 ? (
                     <p className="text-xs text-neutral-500">Showroom bilgileri yükleniyor...</p>
                   ) : (
                     <select
+                      id="talep-store"
+                      required
                       value={preferredStoreId}
                       onChange={(e) => setPreferredStoreId(e.target.value)}
                       className="w-full bg-white border border-neutral-300 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:outline-none focus:ring-1 focus:ring-brand-camel"
                     >
+                      <option value="" disabled>Showroom / mağaza seçiniz</option>
                       {stores.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.name} ({s.city}{s.district ? ` / ${s.district}` : ''}) - {s.address}
@@ -535,10 +569,12 @@ export default function OrderRequestPage() {
 
               {/* Note input */}
               <div className="mt-6">
-                <label className="block text-xs font-medium text-neutral-700 mb-1">
+                <label htmlFor="talep-note" className="block text-xs font-medium text-neutral-700 mb-1">
                   Özel Not / İstekleriniz <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
                 </label>
                 <textarea
+                  id="talep-note"
+                  name="note"
                   rows={3}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
@@ -562,11 +598,11 @@ export default function OrderRequestPage() {
                   <button
                     type="button"
                     onClick={() => setShowKvkkModal(true)}
-                    className="text-brand-dark font-medium underline hover:text-brand-camel mr-1 cursor-pointer"
+                    className="text-brand-dark font-medium underline hover:text-brand-camel cursor-pointer"
                   >
                     KVKK Aydınlatma Metni
                   </button>
-                  kapsamında kişisel verilerimin sipariş talebimin işlenmesi ve tarafımla iletişime geçilmesi amacıyla işlenmesini onaylıyorum. <span className="text-rose-500">*</span>
+                  &apos;ni okudum; sipariş talebimin değerlendirilmesi ve benimle iletişime geçilmesi için bilgilerimin işleneceği konusunda bilgilendirildim. <span className="text-rose-500">*</span>
                 </span>
               </label>
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import type { CampaignPopupConfig } from '../../../stores/useCMSStore';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 import { Sparkles, Image as ImageIcon, Tag, Megaphone, Layers, CheckCircle } from 'lucide-react';
+import { toast } from '../../../stores/useToastStore';
 
 interface PopupTabProps {
   campaignPopup: CampaignPopupConfig;
@@ -31,7 +32,8 @@ export const PopupTab: React.FC<PopupTabProps> = ({
         setLocalPopup((prev) => ({ ...prev, image: url }));
         onShowSuccess('Popup görseli başarıyla yüklendi!');
       } catch (err) {
-        console.error('Yükleme hatası:', err);
+        console.error('Görsel yükleme hatası:', err);
+        toast.error('Yükleme Hatası', err instanceof Error ? err.message : 'Görsel yüklenemedi.');
       } finally {
         setUploading(false);
       }

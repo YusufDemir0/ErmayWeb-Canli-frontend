@@ -64,7 +64,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   const handleManualSyncNow = async () => {
     setIsSyncingErp(true);
     try {
-      const res = await apiClient.post('/erp/sync-now');
+      const res = await apiClient.post('/integration/sync-now');
       if (res.data?.success) {
         toast.success(
           'Katalog Senkronize Edildi',

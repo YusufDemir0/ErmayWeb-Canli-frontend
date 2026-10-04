@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import CategorySsrFallback from '../../components/CategorySsrFallback';
 import type { Metadata } from 'next';
 import { CategoryPage } from '../../components/CategoryPage';
 import { productService } from '../../services/productService';
@@ -34,7 +35,7 @@ export default async function KategoriIndexPage() {
   }
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center text-xs text-neutral-400">Yükleniyor...</div>}>
+    <Suspense fallback={<CategorySsrFallback title="Tüm Ürünler" products={initialProducts} />}>
       <CategoryPage
         categorySlug="hepsi"
         initialProducts={initialProducts}

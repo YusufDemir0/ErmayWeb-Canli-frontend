@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const ANNOUNCEMENTS = [
-  'İstanbul İçi Ücretsiz Teslimat ve Profesyonel Montaj',
+  'İstanbul İçi Kendi Ekibimizle Teslimat ve Montaj',
   'Modoko Showroom & İmalat Atölyesi — Doğrudan Üretici Güvencesi',
   'WhatsApp Üzerinden Fabrika Satış & Toplu Sipariş Temsilcisi'
 ];

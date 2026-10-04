@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import { LayoutGrid, List, SlidersHorizontal, Star, ShoppingBag, Eye, Heart, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutGrid, List, SlidersHorizontal, ShoppingBag, Eye, Heart, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '../types';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useUIStore } from '../stores/useUIStore';
@@ -77,7 +77,19 @@ export const SalePage: React.FC<SalePageProps> = ({
   const itemsPerPage = 6;
 
   // Filter ONLY discounted items (i.e. originalPrice exists)
-  const campaignBaseProducts = useMemo(() => allProducts.filter(p => !!p.originalPrice), [allProducts]);
+  const campaignBaseProducts = useMemo(() => allProducts.filter(p => !!p.originalPrice && p.originalPrice > p.price), [allProducts]);
+
+  // Kategori filtresi yalnızca indirimli ürünü olan GERÇEK kategorilerden üretilir (sabit slug listesi eşleşmiyordu)
+  const saleCategories = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; count: number }>();
+    for (const p of campaignBaseProducts) {
+      if (typeof p.category !== 'object' || p.category === null || !p.category.slug) continue;
+      const existing = map.get(p.category.slug);
+      if (existing) existing.count++;
+      else map.set(p.category.slug, { id: p.category.slug, name: p.category.name, count: 1 });
+    }
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+  }, [campaignBaseProducts]);
 
   // Filter application - memoized for performance
   const filteredProducts = useMemo(() => {
@@ -115,8 +127,7 @@ export const SalePage: React.FC<SalePageProps> = ({
     return [...filteredProducts].sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'popular') return b.salesCount - a.salesCount;
-      if (sortBy === 'rating') return b.rating - a.rating;
+      if (sortBy === 'popular') return (b.salesCount || 0) - (a.salesCount || 0);
       if (sortBy === 'discount') {
         const discA = getDiscountRate(a.price, a.originalPrice);
         const discB = getDiscountRate(b.price, b.originalPrice);
@@ -202,12 +213,7 @@ export const SalePage: React.FC<SalePageProps> = ({
           <div className="mb-6 pb-6 border-b border-neutral-100">
             <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800 mb-3">Kategoriler</h4>
             <div className="space-y-2">
-              {[
-                { id: 'living-room', name: 'Oturma Odası' },
-                { id: 'bedroom', name: 'Yatak Odası' },
-                { id: 'dining', name: 'Yemek Odası' },
-                { id: 'accessories', name: 'Aksesuar' }
-              ].map((c) => (
+              {saleCategories.map((c) => (
                 <label key={c.id} className="flex items-center gap-2.5 text-xs text-neutral-600 hover:text-brand-dark cursor-pointer">
                   <input
                     type="checkbox"
@@ -216,8 +222,12 @@ export const SalePage: React.FC<SalePageProps> = ({
                     className="h-4 w-4 border-neutral-300 rounded-sm text-brand-camel focus:ring-brand-camel"
                   />
                   <span>{c.name}</span>
+                  <span className="ml-auto text-[10px] font-mono text-neutral-400">{c.count}</span>
                 </label>
               ))}
+              {saleCategories.length === 0 && (
+                <p className="text-[11px] text-neutral-400">İndirimli ürün bulunan kategori yok.</p>
+              )}
             </div>
           </div>
 
@@ -320,7 +330,6 @@ export const SalePage: React.FC<SalePageProps> = ({
                   <option value="price-asc">Fiyata Göre: Artan</option>
                   <option value="price-desc">Fiyata Göre: Azalan</option>
                   <option value="popular">En Çok Satanlar</option>
-                  <option value="rating">Değerlendirme Puanı</option>
                   <option value="discount">İndirim Oranı</option>
                 </select>
               </div>
@@ -541,12 +550,11 @@ export const SalePage: React.FC<SalePageProps> = ({
                             </h4>
                           </div>
 
-                          {/* Ratings */}
+                          {/* Craftsmanship Badge */}
                           <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                            <span className="text-xs font-semibold text-neutral-700">{product.rating}</span>
-                            <span className="text-neutral-300 text-xs">|</span>
-                            <span className="text-[10px] text-neutral-400 font-light">({product.reviewsCount} Yorum)</span>
+                            <span className="text-[10.5px] font-semibold text-brand-camel bg-brand-camel/10 px-2 py-0.5 rounded-xs">
+                              Fabrika Seri İmalatı
+                            </span>
                           </div>
                         </div>
 

@@ -161,7 +161,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
       if (res.data?.success) {
         toast.success('Toplu Eşleme Tamamlandı', res.data.message || `${wizardSelectedIds.length} ürün başarıyla bağlandı.`);
         onShowSuccess(res.data.message || 'Ürünler başarıyla kategoriye bağlandı.');
-        await fetchProductsAndCategories();
+        await fetchProductsAndCategories({ includeDrafts: true });
         setIsBulkWizardOpen(false);
         setWizardSelectedIds([]);
       } else {

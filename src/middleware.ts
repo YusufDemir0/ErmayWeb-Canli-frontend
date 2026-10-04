@@ -2,18 +2,28 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const rawJwtSecret = process.env.JWT_SECRET;
-if (!rawJwtSecret && process.env.NODE_ENV === 'production') {
-  console.error('[SECURITY FATAL] JWT_SECRET is missing from environment variables!');
+function getSecretKey(): Uint8Array | null {
+  const rawJwtSecret = process.env.JWT_SECRET;
+  if (!rawJwtSecret) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[SECURITY] JWT_SECRET is not configured in frontend environment; admin sub-routes are denied (fail-closed).');
+    }
+    return null;
+  }
+  return new TextEncoder().encode(rawJwtSecret);
 }
-
-const secretKey = rawJwtSecret ? new TextEncoder().encode(rawJwtSecret) : null;
 
 /**
  * Edge-compatible Cryptographic JWT Verification using 'jose'
  */
 async function verifyAdminJwt(token?: string): Promise<{ valid: boolean; role?: string }> {
-  if (!token || typeof token !== 'string' || !secretKey) return { valid: false };
+  if (!token || typeof token !== 'string') return { valid: false };
+
+  const secretKey = getSecretKey();
+  if (!secretKey) {
+    // Fail-closed: imzayı doğrulayamıyorsak token'ı geçerli SAYMAYIZ (önceden herkes ADMIN kabul ediliyordu)
+    return { valid: false };
+  }
 
   try {
     const { payload } = await jwtVerify(token, secretKey);

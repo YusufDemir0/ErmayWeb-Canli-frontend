@@ -5,6 +5,7 @@ import { Plus, X, Image as ImageIcon, Link as LinkIcon, Sparkles } from 'lucide-
 import type { HomeConfig } from '../../../stores/useCMSStore';
 import { useCMSStore } from '../../../stores/useCMSStore';
 import { uploadProductImage } from '../../../lib/uploadHelper';
+import { toast } from '../../../stores/useToastStore';
 
 interface HomeCMSTabProps {
   homeConfig: HomeConfig;
@@ -46,6 +47,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
         onShowSuccess('Slayt görseli yüklendi!');
       } catch (err) {
         console.error('Görsel yükleme hatası:', err);
+        toast.error('Yükleme Hatası', err instanceof Error ? err.message : 'Görsel yüklenemedi.');
       } finally {
         setUploadingIndex(null);
       }

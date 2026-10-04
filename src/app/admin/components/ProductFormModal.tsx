@@ -319,8 +319,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         if (p.height) setHeight(p.height);
         if (p.material) setMaterial(p.material);
         if (p.drawerCount) setDrawerCount(p.drawerCount);
-        if (p.leadTimeDays) setLeadTimeDays(p.leadTimeDays);
-        if (p.vatRate) setVatRate(p.vatRate);
+        if (p.leadTimeDays !== undefined) setLeadTimeDays(p.leadTimeDays);
+        if (p.vatRate !== undefined && p.vatRate !== null) setVatRate(String(p.vatRate));
         if (p.features) setFeatures(p.features);
         if (p.description) setDescription(p.description);
         if (p.badge) setBadge(p.badge);
@@ -345,7 +345,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   };
 
   const numericPrice = parseFloat(price) || 0;
-  const numericVat = parseFloat(vatRate) || 0.20;
+  const numericVat = vatRate !== '' && !isNaN(parseFloat(vatRate)) ? parseFloat(vatRate) : 0.20;
   const netPrice = numericPrice > 0 ? numericPrice / (1 + numericVat) : 0;
   const vatAmount = numericPrice > 0 ? numericPrice - netPrice : 0;
 
@@ -436,7 +436,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         image3: image3 || undefined,
         inStock,
         leadTimeDays: parseInt(leadTimeDays, 10) || 15,
-        vatRate: parseFloat(vatRate) || 0.20,
+        vatRate: vatRate !== '' && !isNaN(parseFloat(vatRate)) ? parseFloat(vatRate) : 0.20,
         erpItemId: erpItemId ? erpItemId : undefined,
         erpItemCode: erpItemCode ? erpItemCode : undefined,
         colors,

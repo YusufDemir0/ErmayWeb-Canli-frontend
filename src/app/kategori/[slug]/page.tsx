@@ -1,4 +1,6 @@
 import React, { Suspense } from 'react';
+import { isAxiosError } from 'axios';
+import CategorySsrFallback from '../../../components/CategorySsrFallback';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CategoryPage } from '../../../components/CategoryPage';
@@ -16,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const formattedTitle = slug
     .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1))
     .join(' ');
 
   return {
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Ermay Mobilya doğrudan fabrika üretimi ${formattedTitle} modelleri. 1. Sınıf E1 melamin, DKP çelik profil ve aracısız üretici fiyatlarıyla hemen keşfedin.`,
     openGraph: {
       title: `${formattedTitle} Modelleri & Fiyatları | Ermay Mobilya`,
-      description: `En yeni ${formattedTitle} tasarımları, takım seçenekleri ve 12 taksit fırsatları.`,
+      description: `En yeni ${formattedTitle} tasarımları, modüler takım seçenekleri ve doğrudan üretici fiyat avantajları.`,
       url: `https://ermaymobilya.com/kategori/${slug}`,
       siteName: 'Ermay Mobilya',
       locale: 'tr_TR',
@@ -39,17 +41,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CategoryRoute({ params }: Props) {
   const { slug } = await params;
 
-  // Validate category existence for non-generic slugs
+  // Validate category existence for non-generic slugs.
+  // Yalnızca GERÇEK 404'te notFound(): backend geçici olarak erişilemezse tüm kategori sayfaları 404 olup önbelleğe
+  // girmesin, istemci tarafı CategoryPage veriyi kendisi yüklesin.
+  let categoryTitle = slug === 'hepsi' || slug === 'all' ? 'Tüm Ürünler' : slug;
   if (slug !== 'hepsi' && slug !== 'all') {
+    let isMissing = false;
     try {
       const catCheck = await apiClient.get(`/categories/${slug}`);
       if (!catCheck.data?.success || !catCheck.data?.category) {
-        notFound();
+        isMissing = true;
+      } else {
+        categoryTitle = catCheck.data.category.name || categoryTitle;
       }
-    } catch {
-      // Category not found (404) or deleted -> trigger dead link 404
-      notFound();
+    } catch (err) {
+      isMissing = isAxiosError(err) && err.response?.status === 404;
+      if (!isMissing) console.warn('CategoryRoute kategori doğrulama uyarısı (API erişilemedi):', err);
     }
+    if (isMissing) notFound();
   }
 
   let initialProducts: Product[] = [];
@@ -63,8 +72,8 @@ export default async function CategoryRoute({ params }: Props) {
   }
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center text-xs text-neutral-400">Yükleniyor...</div>}>
-      <CategoryPage categorySlug={slug} initialProducts={initialProducts} />
+    <Suspense fallback={<CategorySsrFallback title={categoryTitle} products={initialProducts} />}>
+      <CategoryPage categorySlug={slug} initialProducts={initialProducts} initialCategoryName={categoryTitle} />
     </Suspense>
   );
 }

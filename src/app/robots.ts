@@ -9,6 +9,8 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/admin',
           '/admin/*',
+          '/talep',
+          '/talep/*',
           '/odeme',
           '/odeme/*',
           '/siparis',

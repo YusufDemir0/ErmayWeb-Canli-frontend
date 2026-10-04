@@ -4,8 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, ShieldCheck, Truck, Sparkles } from 'lucide-react';
 import { useCartStore } from '../stores/useCartStore';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 export const CartPage: React.FC = () => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const cartItems = useCartStore((state) => state.cartItems);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -34,7 +41,12 @@ export const CartPage: React.FC = () => {
           Alışveriş Sepetim
         </h2>
 
-        {cartItems.length === 0 ? (
+        {!isMounted ? (
+          <div className="py-24 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-camel mb-3"></div>
+            <p className="text-xs text-neutral-400 font-light">Sepetiniz yükleniyor...</p>
+          </div>
+        ) : cartItems.length === 0 ? (
           /* --- EMPTY STATE --- */
           <div className="text-center py-20 bg-white border border-neutral-200/60 rounded-sm shadow-sm max-w-xl mx-auto">
             <ShoppingBag className="h-16 w-16 text-neutral-300 stroke-[1.5] mx-auto mb-6" />
@@ -103,12 +115,12 @@ export const CartPage: React.FC = () => {
                         {/* Manufacturing Lead Time Badge */}
                         <div className="mt-2 flex items-center gap-1.5">
                           {item.product.stock && item.product.stock > 0 ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-2xs border border-emerald-200/70">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-xs border border-emerald-200/70">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               Stokta Hazır (1-2 İş Günü Fabrika Sevkiyatı)
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-2xs border border-amber-200/60">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-xs border border-amber-200/60">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                               Fabrika Seri Üretimi (3-5 İş Günü Bant Çıkışı)
                             </span>
@@ -204,7 +216,7 @@ export const CartPage: React.FC = () => {
                     <span className="font-medium">Çoklu Alım / Şirket Kurulumu</span>
                   </div>
                   <a
-                    href="https://wa.me/905324194151?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F"
+                    href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold text-[#8A4B20] hover:underline shrink-0 ml-2"

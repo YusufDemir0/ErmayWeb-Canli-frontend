@@ -104,6 +104,7 @@ export const useCartStore = create<CartState>()(
         setItem: () => {},
         removeItem: () => {},
       })),
+      skipHydration: true,
     }
   )
 );

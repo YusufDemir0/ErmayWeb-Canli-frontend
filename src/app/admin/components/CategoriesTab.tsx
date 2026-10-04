@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { Category, Product } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
+import { slugifyTurkish } from '../../../lib/slug';
 
 interface CategoriesTabProps {
   categories: Category[];
@@ -68,10 +69,15 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadingImage(true);
-      const url = await uploadProductImage(e.target.files[0]);
-      setCatForm((prev) => ({ ...prev, image: url }));
-      setUploadingImage(false);
-      onShowSuccess('Görsel başarıyla yüklendi!');
+      try {
+        const url = await uploadProductImage(e.target.files[0]);
+        setCatForm((prev) => ({ ...prev, image: url }));
+        onShowSuccess('Görsel başarıyla yüklendi!');
+      } catch (err) {
+        onShowError(err instanceof Error ? err.message : 'Görsel yüklenemedi.');
+      } finally {
+        setUploadingImage(false);
+      }
     }
   };
 
@@ -79,18 +85,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
     e.preventDefault();
     if (!catForm.name) return;
 
-    const generatedSlug =
-      catForm.slug ||
-      catForm.name
-        .toLowerCase()
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ı/g, 'i')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c')
-        .replace(/ /g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+    const generatedSlug = catForm.slug ? slugifyTurkish(catForm.slug) : slugifyTurkish(catForm.name);
 
     const imgUrl = catForm.image || '';
     const parentIdVal = catForm.parentId || null;

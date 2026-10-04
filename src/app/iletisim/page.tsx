@@ -1,8 +1,41 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Printer } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import ContactFormClient from './ContactFormClient';
+import apiClient from '../../services/api';
+
+
+interface CmsContact {
+  phone?: string;
+  phoneSecondary?: string;
+  whatsapp?: string;
+  email?: string;
+  address?: string;
+  workingHours?: string;
+}
+
+const FALLBACK_CONTACT: Required<Pick<CmsContact, 'phone' | 'email' | 'address'>> = {
+  phone: '0532 419 41 51',
+  email: 'info@ermaymobilya.com',
+  address: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul',
+};
+
+async function getContactInfo(): Promise<CmsContact> {
+  try {
+    const res = await apiClient.get('/cms/contact_info');
+    return (res.data?.content as CmsContact) || {};
+  } catch {
+    return {};
+  }
+}
+
+/** "0532 419 41 51" / "905324194151" -> "+905324194151" (tel: ve schema.org için) */
+function toE164(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('90')) return `+${digits}`;
+  return `+90${digits.replace(/^0/, '')}`;
+}
 
 export const revalidate = 60; // ISR
 
@@ -31,13 +64,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function IletisimPage() {
+export default async function IletisimPage() {
+  // Sabit kodlu bilgiler admin panelindeki "İletişim Bilgileri" değişikliklerini yok sayıyordu
+  const cms = await getContactInfo();
   const contactInfo = {
-    phone: '0532 419 41 51',
-    fax: '+90 (216) 555 42 42',
-    email: 'info@ermaymobilya.com',
-    address: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul',
+    phones: [cms.phone, cms.phoneSecondary].filter((p): p is string => Boolean(p && p.trim())),
+    email: cms.email || FALLBACK_CONTACT.email,
+    address: cms.address || FALLBACK_CONTACT.address,
+    workingHours: cms.workingHours || '',
   };
+  if (contactInfo.phones.length === 0) contactInfo.phones.push(FALLBACK_CONTACT.phone);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -47,8 +83,8 @@ export default function IletisimPage() {
     mainEntity: {
       '@type': 'FurnitureStore',
       name: 'Ermay Mobilya',
-      telephone: '+905324194151',
-      email: 'info@ermaymobilya.com',
+      telephone: toE164(contactInfo.phones[0]),
+      email: contactInfo.email,
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42',
@@ -64,7 +100,7 @@ export default function IletisimPage() {
     <div className="w-full bg-neutral-50 min-h-screen py-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
@@ -80,7 +116,7 @@ export default function IletisimPage() {
             İLETİŞİM
           </h1>
           <p className="text-xs text-neutral-500 font-light tracking-wider">
-            Anasayfa ■ İletişim
+            Fabrika satış, toplu alım ve showroom ziyaretleriniz için bize ulaşın
           </p>
         </div>
 
@@ -100,20 +136,26 @@ export default function IletisimPage() {
               </div>
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Telefon</h3>
-                <p className="text-sm font-semibold text-neutral-900 mt-1">{contactInfo.phone}</p>
+                {contactInfo.phones.map((phone) => (
+                  <a key={phone} href={`tel:${toE164(phone)}`} className="block text-sm font-semibold text-neutral-900 mt-1 hover:text-[#C5A880]">
+                    {phone}
+                  </a>
+                ))}
               </div>
             </div>
 
-            {/* Fax Card */}
-            <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
-              <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
-                <Printer className="h-6 w-6" />
+            {/* Çalışma Saatleri (yer tutucu faks numarasının yerine, CMS'ten) */}
+            {contactInfo.workingHours && (
+              <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
+                <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
+                  <Clock className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Çalışma Saatleri</h3>
+                  <p className="text-sm font-semibold text-neutral-900 mt-1">{contactInfo.workingHours}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Fax</h3>
-                <p className="text-sm font-semibold text-neutral-900 mt-1">{contactInfo.fax}</p>
-              </div>
-            </div>
+            )}
 
             {/* E-Posta Card */}
             <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">

@@ -139,14 +139,40 @@ export const ContactTab: React.FC<ContactTabProps> = ({
 
           <div className="md:col-span-2">
             <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-              Fabrika & Showroom Açık Adresi
+              Fabrika & Üretim Merkezi Açık Adresi
             </label>
             <input
               type="text"
               value={localContact.address}
               onChange={(e) => setLocalContact({ ...localContact, address: e.target.value })}
               className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="Modoko Mobilyacılar Sitesi, 3. Cadde No: 42, Ümraniye / İstanbul"
+              placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              Showroom / Mağaza Konumu (Footer & Nav)
+            </label>
+            <input
+              type="text"
+              value={localContact.showroom || ''}
+              onChange={(e) => setLocalContact({ ...localContact, showroom: e.target.value })}
+              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              Resmi WhatsApp Sipariş / İletişim Numarası
+            </label>
+            <input
+              type="text"
+              value={localContact.whatsapp || ''}
+              onChange={(e) => setLocalContact({ ...localContact, whatsapp: e.target.value })}
+              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
+              placeholder="+90 532 419 41 51"
             />
           </div>
         </div>

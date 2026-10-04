@@ -9,6 +9,7 @@ import OptimizedImage from './OptimizedImage';
 export const Hero: React.FC = () => {
   const homeConfig = useCMSStore((state) => state.homeConfig);
   const slides = homeConfig?.heroSlides || [];
+  const categories = useCMSStore((state) => state.categories);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -32,6 +33,16 @@ export const Hero: React.FC = () => {
   if (!slides || slides.length === 0) return null;
 
   const activeSlide = slides[currentSlide];
+
+  // CMS'te silinmiş bir kategoriye işaret eden buton 404'e düşmesin: tüm ürünler sayfasına yönlendir.
+  const resolveButtonLink = (link?: string): string => {
+    if (!link) return '/kategori';
+    const match = link.match(/^\/kategori\/([^/?#]+)/);
+    if (match && categories.length > 0 && !categories.some((c) => c.slug === match[1])) {
+      return '/kategori';
+    }
+    return link;
+  };
 
   return (
     <section 
@@ -70,7 +81,7 @@ export const Hero: React.FC = () => {
       <div className="absolute inset-0 z-20 flex items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-xl bg-white/95 backdrop-blur-md p-8 md:p-12 shadow-2xl rounded-sm border border-neutral-100 animate-fade-in-up">
           <span className="text-[10px] md:text-xs font-black tracking-[0.3em] text-[#C5A880] uppercase block mb-3 md:mb-4">
-            {activeSlide.badge || 'ERMAY MOBİLYA • ÖZEL İMALAT'}
+            {activeSlide.badge || 'ERMAY MOBİLYA • DOĞRUDAN ÜRETİCİDEN'}
           </span>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-neutral-900 leading-tight tracking-tight mb-4 md:mb-6">
             {activeSlide.title}
@@ -79,7 +90,7 @@ export const Hero: React.FC = () => {
             {activeSlide.subtitle}
           </p>
           <Link
-            href={activeSlide.buttonLink || '/katalog'}
+            href={resolveButtonLink(activeSlide.buttonLink)}
             className="group inline-flex items-center gap-2.5 bg-neutral-900 hover:bg-[#C5A880] text-white text-xs md:text-sm uppercase tracking-widest font-bold py-3.5 px-7 md:py-4 md:px-8 transition-colors duration-300 rounded-xs cursor-pointer shadow-lg"
           >
             <span>{activeSlide.buttonText || 'Koleksiyonu İncele'}</span>

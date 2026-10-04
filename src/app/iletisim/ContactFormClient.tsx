@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { isAxiosError } from 'axios';
 import { contactFormSchema } from '../../lib/validations';
+import apiClient from '../../services/api';
 
 export default function ContactFormClient() {
   const [formData, setFormData] = useState({
@@ -13,9 +15,12 @@ export default function ContactFormClient() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  // Bot tuzağı (honeypot): gerçek kullanıcılar bu alanı görmez ve doldurmaz
+  const [website, setWebsite] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -32,11 +37,22 @@ export default function ContactFormClient() {
       return;
     }
 
-    setSubmitted(true);
-    setTimeout(() => {
-      setFormData({ name: '', email: '', phone: '', subject: 'Özel İmalat & Mobilya Talebi', message: '' });
-      setSubmitted(false);
-    }, 4000);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      await apiClient.post('/contact', { ...valRes.data, website });
+      setSubmitted(true);
+      setTimeout(() => {
+        setFormData({ name: '', email: '', phone: '', subject: 'Özel İmalat & Mobilya Talebi', message: '' });
+        setSubmitted(false);
+      }, 4000);
+    } catch (err) {
+      const serverMsg = isAxiosError(err) ? (err.response?.data as { message?: string } | undefined)?.message : undefined;
+      setErrorMsg(serverMsg || 'Mesajınız iletilemedi. Lütfen tekrar deneyiniz veya WhatsApp hattımızdan bize ulaşınız.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,7 +70,7 @@ export default function ContactFormClient() {
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 relative">
           {errorMsg && (
             <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -136,11 +152,19 @@ export default function ContactFormClient() {
             />
           </div>
 
+          <div aria-hidden="true" className="absolute -left-[10000px] h-0 w-0 overflow-hidden">
+            <label>
+              Web siteniz
+              <input type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+            </label>
+          </div>
+
           <button
             type="submit"
-            className="bg-neutral-900 hover:bg-[#C5A880] text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
+            disabled={isSubmitting}
+            className="bg-neutral-900 hover:bg-[#C5A880] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <span>GÖNDER</span>
+            <span>{isSubmitting ? 'GÖNDERİLİYOR...' : 'GÖNDER'}</span>
             <Send className="h-3.5 w-3.5" />
           </button>
         </form>

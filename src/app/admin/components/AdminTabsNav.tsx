@@ -3,13 +3,14 @@
 import React from 'react';
 import { 
   LayoutGrid, Truck, FolderTree, Package, Tag, Sliders, FileText, 
-  Megaphone, Sparkles, Phone, Building2, RefreshCw, MapPin 
+  Megaphone, Sparkles, Phone, Building2, RefreshCw, MapPin, Inbox 
 } from 'lucide-react';
 import { AdminModuleMode } from './AdminHeader';
 
 export type AdminTabId = 
   | 'overview' 
   | 'orders' 
+  | 'messages'
   | 'products'
   | 'erpSync'
   | 'deliveryZones'
@@ -28,8 +29,11 @@ interface AdminTabsNavProps {
   activeModule: AdminModuleMode;
   activeTab: AdminTabId;
   setActiveTab: (tab: AdminTabId) => void;
+  /** STAFF yalnızca talepler ve gelen mesajlar sekmelerini görür */
+  isStaffOnly?: boolean;
   counts: {
     orders: number;
+    messages?: number;
     categories: number;
     products: number;
     coupons?: number;
@@ -44,10 +48,12 @@ export const AdminTabsNav: React.FC<AdminTabsNavProps> = ({
   activeTab,
   setActiveTab,
   counts,
+  isStaffOnly = false,
 }) => {
   const ecommerceTabs = [
     { id: 'overview', label: 'Genel Bakış', icon: LayoutGrid },
     { id: 'orders', label: 'Sipariş Talepleri', count: counts.orders, icon: Truck },
+    { id: 'messages', label: 'Gelen Mesajlar', count: counts.messages, icon: Inbox },
     { id: 'products', label: 'Web Kataloğu', count: counts.products, icon: Package },
     { id: 'erpSync', label: 'CRM / ERP Senkronizasyonu', icon: RefreshCw },
     { id: 'deliveryZones', label: 'Teslimat & Şehirler', icon: MapPin },
@@ -65,7 +71,9 @@ export const AdminTabsNav: React.FC<AdminTabsNavProps> = ({
     { id: 'contact', label: 'İletişim Bilgileri', icon: Phone },
   ];
 
-  const currentTabs = activeModule === 'ecommerce' ? ecommerceTabs : cmsTabs;
+  const currentTabs = isStaffOnly
+    ? ecommerceTabs.filter((t) => t.id === 'orders' || t.id === 'messages')
+    : activeModule === 'ecommerce' ? ecommerceTabs : cmsTabs;
 
   return (
     <div className="flex overflow-x-auto bg-white border border-neutral-200 rounded-sm mb-6 shadow-xs divide-x divide-neutral-100">

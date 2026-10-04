@@ -12,8 +12,10 @@ import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { useCMSStore } from '../stores/useCMSStore';
+import { useWhatsappNumber } from '../lib/whatsapp';
 
 export const Navbar: React.FC = () => {
+  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const pathname = usePathname();
   const router = useRouter();
 
@@ -86,10 +88,12 @@ export const Navbar: React.FC = () => {
   };
 
   const landingPageConfig = useCMSStore((state) => state.landingPageConfig);
+  // Açılış tercihi "home" değilse kök URL ürün listesini gösterir; vitrin /anasayfa'dadır (FAZ 15)
   const isCustomLanding = landingPageConfig?.type === 'category' || landingPageConfig?.type === 'catalog';
+  const homeHref = isCustomLanding ? '/anasayfa' : '/';
 
   const navLinks = [
-    { name: 'ANASAYFA', href: '/anasayfa' },
+    { name: 'ANASAYFA', href: homeHref },
     { name: 'ÜRÜNLER', href: '/kategori' },
     { name: 'KATALOG', href: '/katalog' },
     { name: 'BAYİLER', href: '/bayiler' },
@@ -133,11 +137,12 @@ export const Navbar: React.FC = () => {
           {/* Center Main Nav Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-7">
             {navLinks.map((link) => {
-              const isActive = 
-                pathname === link.href || 
-                (link.href === '/kategori' && (pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/'))) ||
-                (link.href !== '/anasayfa' && link.href !== '/kategori' && link.href !== '/' && pathname.startsWith(link.href)) || 
-                (link.href === '/anasayfa' && (pathname === '/anasayfa' || pathname === '/vitrin'));
+              const isActive =
+                link.href === '/' || link.href === '/anasayfa'
+                  ? pathname === link.href
+                  : link.href === '/kategori'
+                  ? pathname.startsWith('/kategori') || pathname.startsWith('/urun/') || (isCustomLanding && pathname === '/')
+                  : pathname.startsWith(link.href);
               return (
                 <Link
                   key={link.name}
@@ -329,11 +334,12 @@ export const Navbar: React.FC = () => {
                   Menü
                 </span>
                 {navLinks.map((link) => {
-                  const isActive = 
-                    pathname === link.href || 
-                    (link.href === '/kategori' && (pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/'))) ||
-                    (link.href !== '/anasayfa' && link.href !== '/kategori' && link.href !== '/' && pathname.startsWith(link.href)) || 
-                    (link.href === '/anasayfa' && (pathname === '/anasayfa' || pathname === '/vitrin'));
+                  const isActive =
+                    link.href === '/' || link.href === '/anasayfa'
+                      ? pathname === link.href
+                      : link.href === '/kategori'
+                      ? pathname.startsWith('/kategori') || pathname.startsWith('/urun/') || (isCustomLanding && pathname === '/')
+                      : pathname.startsWith(link.href);
                   return (
                     <Link
                       key={link.name}
@@ -403,7 +409,7 @@ export const Navbar: React.FC = () => {
             {/* Footer Contact & Account */}
             <div className="p-5 border-t border-neutral-100 bg-[#FAF8F5] space-y-3">
               <a
-                href={`https://wa.me/${(socialLinks?.whatsapp || contactInfo.whatsapp || '0532 000 00 00').replace(/\D/g, '')}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobil sitenizden ulaşıyorum. Bilgi almak istiyorum.')}`}
+                href={`https://wa.me/${waNumber}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobil sitenizden ulaşıyorum. Bilgi almak istiyorum.')}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-4 rounded flex items-center justify-center gap-2 shadow-xs transition-colors"

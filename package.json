@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --test tests/unit-core.test.js",
     "cors:apply": "bash scripts/apply-cors.sh"
   },
   "dependencies": {

@@ -24,7 +24,10 @@ import {
 import {
   requestService,
   AdminOrderRequest,
+  RequestStatusType,
+  ErpSyncStatusType,
 } from '../../../services/requestService';
+import { isAxiosError } from 'axios';
 import { toast } from '../../../stores/useToastStore';
 import { Pagination } from '../../../components/Pagination';
 
@@ -32,20 +35,35 @@ interface OrdersTabProps {
   onShowSuccess?: (msg: string) => void;
 }
 
-const STATUS_LABELS: Record<AdminOrderRequest['status'], { label: string; bg: string; text: string; border: string }> = {
+const STATUS_LABELS: Record<RequestStatusType, { label: string; bg: string; text: string; border: string }> = {
   NEW: { label: 'Yeni Talep', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
   CONTACTED: { label: 'İletişime Geçildi', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  OFFER_SENT: { label: 'Teklif İletildi', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  VISIT_SCHEDULED: { label: 'Showroom Randevusu', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
-  CONFIRMED: { label: 'Satış Teyit Edildi', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  STORE_VISIT_SCHEDULED: { label: 'Showroom Randevusu', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  AWAITING_PAYMENT: { label: 'Ödeme Bekleniyor', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  PAID_OFFLINE: { label: 'Ödeme Teyit Edildi', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
   COMPLETED: { label: 'Tamamlandı', bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-neutral-300' },
-  CANCELLED: { label: 'İptal / Vazgeçildi', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  CANCELLED: { label: 'İptal Edildi', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  SPAM: { label: 'Geçersiz / Spam', bg: 'bg-neutral-100', text: 'text-neutral-500', border: 'border-neutral-200' },
+  EXPIRED: { label: 'Zaman Aşımı', bg: 'bg-neutral-50', text: 'text-neutral-600', border: 'border-neutral-200' },
 };
 
-const ERP_STATUS_LABELS: Record<AdminOrderRequest['erpStatus'], { label: string; bg: string }> = {
+const ERP_STATUS_LABELS: Record<ErpSyncStatusType, { label: string; bg: string }> = {
   PENDING: { label: 'ERP Kuyruğunda', bg: 'bg-amber-100 text-amber-800' },
+  IN_PROGRESS: { label: 'ERP İşleniyor', bg: 'bg-blue-100 text-blue-800' },
   SYNCED: { label: 'ERP Satış Oluştu', bg: 'bg-emerald-100 text-emerald-800' },
   FAILED: { label: 'ERP Hatası', bg: 'bg-rose-100 text-rose-800' },
+};
+
+const ALLOWED_TRANSITIONS: Record<RequestStatusType, RequestStatusType[]> = {
+  NEW: ['CONTACTED', 'CANCELLED', 'SPAM', 'EXPIRED'],
+  CONTACTED: ['STORE_VISIT_SCHEDULED', 'AWAITING_PAYMENT', 'CANCELLED', 'EXPIRED'],
+  STORE_VISIT_SCHEDULED: ['AWAITING_PAYMENT', 'COMPLETED', 'CANCELLED'],
+  AWAITING_PAYMENT: ['PAID_OFFLINE', 'CANCELLED'],
+  PAID_OFFLINE: ['COMPLETED'],
+  COMPLETED: [],
+  CANCELLED: [],
+  SPAM: [],
+  EXPIRED: [],
 };
 
 export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
@@ -121,16 +139,24 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
         staffNote.trim() || undefined
       );
 
-      toast.success('Durum Güncellendi', `${updated.code} talebinin durumu güncellendi.`);
+      const noteOnly = targetStatus === selectedRequest.status;
+      toast.success(
+        noteOnly ? 'Not Kaydedildi' : 'Durum Güncellendi',
+        noteOnly ? `${updated.code} talebine personel notu eklendi.` : `${updated.code} talebinin durumu güncellendi.`
+      );
       if (onShowSuccess) onShowSuccess(`${updated.code} güncellendi.`);
 
-      // Update in local state
-      setRequests((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
+      // Update in local state (yeni not listede hemen görünsün)
+      const newNote = staffNote.trim();
+      setRequests((prev) =>
+        prev.map((r) => (r.id === updated.id ? { ...r, ...updated, ...(newNote ? { staffNote: newNote } : {}) } : r))
+      );
       setSelectedRequest(null);
       setStaffNote('');
     } catch (err: unknown) {
       console.error('Durum güncellenemedi:', err);
-      toast.error('Hata', 'Durum güncellenirken bir sorun oluştu.');
+      const serverMsg = isAxiosError(err) ? (err.response?.data as { message?: string } | undefined)?.message : undefined;
+      toast.error('Hata', serverMsg || 'Durum güncellenirken bir sorun oluştu.');
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -222,11 +248,13 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
               <option value="ALL">Tüm Durumlar</option>
               <option value="NEW">Yeni Talepler</option>
               <option value="CONTACTED">İletişime Geçildi</option>
-              <option value="OFFER_SENT">Teklif İletildi</option>
-              <option value="VISIT_SCHEDULED">Showroom Randevusu</option>
-              <option value="CONFIRMED">Satış Teyit Edildi</option>
+              <option value="STORE_VISIT_SCHEDULED">Showroom Randevusu</option>
+              <option value="AWAITING_PAYMENT">Ödeme Bekleniyor</option>
+              <option value="PAID_OFFLINE">Ödeme Teyit Edildi</option>
               <option value="COMPLETED">Tamamlandı</option>
-              <option value="CANCELLED">İptal / Vazgeçildi</option>
+              <option value="CANCELLED">İptal Edildi</option>
+              <option value="SPAM">Geçersiz / Spam</option>
+              <option value="EXPIRED">Zaman Aşımı</option>
             </select>
           </div>
 
@@ -299,10 +327,20 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                       )}
 
                       {/* ERP Status Badge */}
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${erpCfg.bg}`}>
-                        {erpCfg.label}
-                        {req.erpSaleCode && ` (${req.erpSaleCode})`}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${erpCfg.bg}`}>
+                          {erpCfg.label}
+                          {req.erpSaleCode && ` (${req.erpSaleCode})`}
+                        </span>
+                        {req.erpStatus === 'FAILED' && (req.erpLastError || req.erpErrorMessage) && (
+                          <span
+                            className="text-[9px] text-rose-600 font-mono mt-0.5 max-w-[200px] truncate"
+                            title={req.erpLastError || req.erpErrorMessage || ''}
+                          >
+                            {req.erpLastError || req.erpErrorMessage}
+                          </span>
+                        )}
+                      </div>
 
                       <span className="text-[11px] text-neutral-400 font-mono">
                         {new Date(req.createdAt).toLocaleDateString('tr-TR', {
@@ -332,7 +370,8 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                       <button
                         onClick={() => {
                           setSelectedRequest(req);
-                          setTargetStatus(req.status);
+                          const nextAllowed = ALLOWED_TRANSITIONS[req.status]?.[0] || req.status;
+                          setTargetStatus(nextAllowed);
                           setStaffNote(req.staffNote || '');
                         }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
@@ -545,16 +584,18 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 </label>
                 <select
                   value={targetStatus}
-                  onChange={(e) => setTargetStatus(e.target.value as AdminOrderRequest['status'])}
+                  onChange={(e) => setTargetStatus(e.target.value as RequestStatusType)}
                   className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
                 >
-                  <option value="NEW">Yeni Talep</option>
-                  <option value="CONTACTED">İletişime Geçildi</option>
-                  <option value="OFFER_SENT">Teklif İletildi</option>
-                  <option value="VISIT_SCHEDULED">Showroom Randevusu</option>
-                  <option value="CONFIRMED">Satış Teyit Edildi</option>
-                  <option value="COMPLETED">Tamamlandı</option>
-                  <option value="CANCELLED">İptal / Vazgeçildi</option>
+                  {/* Mevcut durum: durumu değiştirmeden yalnızca personel notu eklemek için */}
+                  <option value={selectedRequest.status}>
+                    {STATUS_LABELS[selectedRequest.status]?.label || selectedRequest.status} (durum aynı kalsın, yalnızca not ekle)
+                  </option>
+                  {(ALLOWED_TRANSITIONS[selectedRequest.status] || []).map((st) => (
+                    <option key={st} value={st}>
+                      {STATUS_LABELS[st]?.label || st}
+                    </option>
+                  ))}
                 </select>
               </div>
 

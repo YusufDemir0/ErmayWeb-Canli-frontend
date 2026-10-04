@@ -10,7 +10,7 @@ export const getApiBaseUrl = (): string => {
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 45000, // 45s for serverless & cold-start resilience
+  timeout: 15000, // 15s optimal timeout for responsive UX & network resilience
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -18,16 +18,10 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request Interceptor: Attach JWT Bearer token if present & set baseURL dynamically
+// Request Interceptor: Set baseURL dynamically and ensure credentials are transmitted
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     config.baseURL = getApiBaseUrl();
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('admin_jwt_token');
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
@@ -37,10 +31,6 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      // Clear token and optional redirect on unauthorized
-      localStorage.removeItem('auth_token');
-    }
     return Promise.reject(error);
   }
 );

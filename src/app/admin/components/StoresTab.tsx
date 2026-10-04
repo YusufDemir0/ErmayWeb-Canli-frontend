@@ -8,6 +8,7 @@ import {
 import { useCMSStore } from '../../../stores/useCMSStore';
 import type { StoreItem } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
+import { toast } from '../../../stores/useToastStore';
 
 interface StoresTabProps {
   onShowSuccess: (msg: string) => void;
@@ -76,7 +77,8 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
         setFormData((prev) => ({ ...prev, image: url }));
         onShowSuccess('Mağaza görseli başarıyla yüklendi!');
       } catch (err) {
-        console.error('Yükleme hatası:', err);
+        console.error('Görsel yükleme hatası:', err);
+        toast.error('Yükleme Hatası', err instanceof Error ? err.message : 'Görsel yüklenemedi.');
       } finally {
         setUploading(false);
       }
