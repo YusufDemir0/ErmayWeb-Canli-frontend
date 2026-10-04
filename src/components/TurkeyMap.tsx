@@ -12,95 +12,106 @@ import {
   Check,
   Truck,
   Store,
-  Navigation,
 } from 'lucide-react';
 import type { StoreItem } from '../types';
 import { TURKEY_PROVINCES, ProvinceData } from '../data/turkeyProvinces';
 import { useWhatsappNumber } from '../lib/whatsapp';
+import { useCMSStore } from '../stores/useCMSStore';
 
-// Accurate province centers on 1000x422 viewBox
+// İl merkezleri: data/turkeyProvinces.ts path'lerinden alan ağırlıklı merkez (en büyük parça) olarak hesaplandı (viewBox 1000×422)
 export const PROVINCE_CENTERS: Record<string, { x: number; y: number }> = {
-  'Adana': { x: 442, y: 300 },
-  'Adıyaman': { x: 579, y: 268 },
-  'Afyonkarahisar': { x: 236, y: 204 },
-  'Ağrı': { x: 808, y: 164 },
-  'Amasya': { x: 457, y: 114 },
-  'Ankara': { x: 365, y: 171 },
-  'Antalya': { x: 247, y: 312 },
-  'Artvin': { x: 708, y: 73 },
-  'Aydın': { x: 139, y: 266 },
-  'Balıkesir': { x: 136, y: 147 },
-  'Bilecik': { x: 240, y: 141 },
-  'Bingöl': { x: 697, y: 204 },
-  'Bitlis': { x: 768, y: 219 },
-  'Bolu': { x: 305, y: 118 },
-  'Burdur': { x: 228, y: 274 },
-  'Bursa': { x: 194, y: 133 },
-  'Çanakkale': { x: 77, y: 125 },
-  'Çankırı': { x: 395, y: 118 },
-  'Çorum': { x: 440, y: 128 },
-  'Denizli': { x: 184, y: 267 },
-  'Diyarbakır': { x: 673, y: 249 },
-  'Edirne': { x: 80, y: 55 },
-  'Elazığ': { x: 629, y: 219 },
-  'Erzincan': { x: 638, y: 168 },
-  'Erzurum': { x: 719, y: 148 },
-  'Eskişehir': { x: 267, y: 163 },
-  'Gaziantep': { x: 536, y: 308 },
-  'Giresun': { x: 577, y: 104 },
-  'Gümüşhane': { x: 618, y: 132 },
-  'Hakkari': { x: 864, y: 284 },
-  'Hatay': { x: 472, y: 364 },
-  'Isparta': { x: 254, y: 254 },
-  'Mersin': { x: 388, y: 318 },
-  'İstanbul': { x: 205, y: 76 },
-  'İzmir': { x: 128, y: 232 },
-  'Kars': { x: 789, y: 104 },
-  'Kastamonu': { x: 394, y: 74 },
-  'Kayseri': { x: 477, y: 228 },
-  'Kırklareli': { x: 115, y: 44 },
-  'Kırşehir': { x: 412, y: 195 },
-  'Kocaeli': { x: 245, y: 96 },
-  'Konya': { x: 340, y: 262 },
-  'Kütahya': { x: 206, y: 178 },
-  'Malatya': { x: 574, y: 228 },
-  'Manisa': { x: 145, y: 205 },
-  'Kahramanmaraş': { x: 512, y: 268 },
-  'Mardin': { x: 712, y: 295 },
-  'Muğla': { x: 149, y: 312 },
-  'Muş': { x: 739, y: 204 },
-  'Nevşehir': { x: 432, y: 221 },
-  'Niğde': { x: 438, y: 264 },
-  'Ordu': { x: 537, y: 96 },
-  'Rize': { x: 673, y: 84 },
-  'Sakarya': { x: 273, y: 105 },
-  'Samsun': { x: 486, y: 80 },
-  'Siirt': { x: 772, y: 252 },
-  'Sinop': { x: 444, y: 46 },
-  'Sivas': { x: 546, y: 172 },
-  'Tekirdağ': { x: 121, y: 77 },
-  'Tokat': { x: 497, y: 133 },
-  'Trabzon': { x: 628, y: 94 },
-  'Tunceli': { x: 649, y: 194 },
-  'Şanlıurfa': { x: 618, y: 308 },
-  'Uşak': { x: 190, y: 216 },
-  'Van': { x: 824, y: 224 },
-  'Yozgat': { x: 447, y: 174 },
-  'Zonguldak': { x: 298, y: 78 },
-  'Aksaray': { x: 399, y: 241 },
-  'Bayburt': { x: 654, y: 123 },
-  'Karaman': { x: 366, y: 308 },
-  'Kırıkkale': { x: 388, y: 165 },
-  'Batman': { x: 729, y: 255 },
-  'Şırnak': { x: 798, y: 284 },
-  'Bartın': { x: 326, y: 64 },
-  'Ardahan': { x: 778, y: 68 },
-  'Iğdır': { x: 852, y: 140 },
-  'Yalova': { x: 213, y: 104 },
-  'Karabük': { x: 337, y: 88 },
-  'Kilis': { x: 512, y: 326 },
-  'Osmaniye': { x: 489, y: 298 },
-  'Düzce': { x: 290, y: 101 },
+  'Adana': { x: 517.8, y: 307.1 },
+  'Adıyaman': { x: 647.5, y: 285.4 },
+  'Afyonkarahisar': { x: 282.3, y: 235.8 },
+  'Aksaray': { x: 434.6, y: 250.4 },
+  'Amasya': { x: 522.9, y: 108.0 },
+  'Ankara': { x: 375.2, y: 164.6 },
+  'Antalya': { x: 295.7, y: 345.3 },
+  'Ardahan': { x: 857.2, y: 82.5 },
+  'Artvin': { x: 811.8, y: 82.7 },
+  'Aydın': { x: 157.0, y: 288.7 },
+  'Ağrı': { x: 879.0, y: 178.4 },
+  'Balıkesir': { x: 150.4, y: 171.6 },
+  'Bartın': { x: 371.0, y: 50.8 },
+  'Batman': { x: 793.2, y: 273.1 },
+  'Bayburt': { x: 736.9, y: 134.0 },
+  'Bilecik': { x: 256.3, y: 147.2 },
+  'Bingöl': { x: 759.7, y: 208.9 },
+  'Bitlis': { x: 840.0, y: 240.6 },
+  'Bolu': { x: 328.8, y: 113.8 },
+  'Burdur': { x: 256.0, y: 308.4 },
+  'Bursa': { x: 204.9, y: 144.2 },
+  'Denizli': { x: 216.6, y: 288.8 },
+  'Diyarbakır': { x: 742.5, y: 265.9 },
+  'Düzce': { x: 311.7, y: 94.4 },
+  'Edirne': { x: 88.3, y: 75.4 },
+  'Elazığ': { x: 699.4, y: 232.2 },
+  'Erzincan': { x: 693.8, y: 171.4 },
+  'Erzurum': { x: 799.5, y: 147.9 },
+  'Eskişehir': { x: 303.8, y: 176.2 },
+  'Gaziantep': { x: 601.0, y: 328.1 },
+  'Giresun': { x: 659.4, y: 115.3 },
+  'Gümüşhane': { x: 696.7, y: 131.7 },
+  'Hakkari': { x: 919.5, y: 304.7 },
+  'Hatay': { x: 548.0, y: 366.3 },
+  'Isparta': { x: 296.5, y: 278.0 },
+  'Iğdır': { x: 916.2, y: 159.8 },
+  'Kahramanmaraş': { x: 583.2, y: 278.0 },
+  'Karabük': { x: 376.8, y: 77.3 },
+  'Karaman': { x: 404.5, y: 328.5 },
+  'Kars': { x: 872.2, y: 123.5 },
+  'Kastamonu': { x: 426.0, y: 58.1 },
+  'Kayseri': { x: 528.6, y: 234.3 },
+  'Kilis': { x: 587.6, y: 345.8 },
+  'Kocaeli': { x: 247.0, y: 97.1 },
+  'Konya': { x: 375.7, y: 270.3 },
+  'Kütahya': { x: 231.2, y: 197.3 },
+  'Kırklareli': { x: 128.8, y: 45.6 },
+  'Kırıkkale': { x: 426.3, y: 160.8 },
+  'Kırşehir': { x: 448.4, y: 192.8 },
+  'Malatya': { x: 637.0, y: 242.8 },
+  'Manisa': { x: 165.0, y: 227.6 },
+  'Mardin': { x: 770.0, y: 311.7 },
+  'Mersin': { x: 433.7, y: 351.5 },
+  'Muğla': { x: 179.1, y: 332.1 },
+  'Muş': { x: 813.9, y: 211.6 },
+  'Nevşehir': { x: 474.2, y: 224.9 },
+  'Niğde': { x: 474.7, y: 277.7 },
+  'Ordu': { x: 609.4, y: 101.8 },
+  'Osmaniye': { x: 549.8, y: 317.1 },
+  'Rize': { x: 766.4, y: 93.0 },
+  'Sakarya': { x: 275.2, y: 105.9 },
+  'Samsun': { x: 537.5, y: 75.4 },
+  'Siirt': { x: 834.0, y: 278.6 },
+  'Sinop': { x: 483.1, y: 49.2 },
+  'Sivas': { x: 600.3, y: 176.7 },
+  'Tekirdağ': { x: 127.8, y: 82.9 },
+  'Tokat': { x: 564.1, y: 127.8 },
+  'Trabzon': { x: 717.0, y: 101.6 },
+  'Tunceli': { x: 701.7, y: 200.9 },
+  'Uşak': { x: 221.2, y: 241.1 },
+  'Van': { x: 896.7, y: 241.9 },
+  'Yalova': { x: 210.5, y: 114.7 },
+  'Yozgat': { x: 501.1, y: 171.8 },
+  'Zonguldak': { x: 340.6, y: 71.5 },
+  'Çanakkale': { x: 99.8, y: 152.2 },
+  'Çankırı': { x: 415.0, y: 108.5 },
+  'Çorum': { x: 472.3, y: 116.3 },
+  'İstanbul': { x: 183.6, y: 76.0 },
+  'İzmir': { x: 123.9, y: 243.2 },
+  'Şanlıurfa': { x: 683.9, y: 318.4 },
+  'Şırnak': { x: 848.0, y: 305.7 },
+};
+
+// Bölge sınır kutuları (aynı path verisinden): [minX, minY, maxX, maxY]
+export const REGION_BOUNDS: Record<string, [number, number, number, number]> = {
+  akdeniz: [216.3, 235.8, 621.0, 403.1],
+  guneydogu: [557.8, 228.8, 888.2, 356.0],
+  ege: [72.5, 156.1, 333.2, 375.3],
+  doguanadolu: [594.5, 51.7, 954.5, 335.3],
+  karadeniz: [279.6, 19.2, 846.8, 158.3],
+  icanadolu: [257.9, 82.4, 667.5, 367.1],
+  marmara: [45.5, 19.3, 297.1, 209.8],
 };
 
 export const REGION_NAMES: Record<string, string> = {
@@ -113,16 +124,45 @@ export const REGION_NAMES: Record<string, string> = {
   doguanadolu: 'Doğu Anadolu',
 };
 
-// Smooth GPU-accelerated transforms for each region (translate & scale on 1000x422 canvas)
-export const REGION_TRANSFORMS: Record<string, { scale: number; x: number; y: number }> = {
-  marmara: { scale: 2.3, x: 100, y: -50 },
-  ege: { scale: 2.2, x: 140, y: -350 },
-  icanadolu: { scale: 1.9, x: -300, y: -180 },
-  akdeniz: { scale: 2.0, x: -260, y: -400 },
-  karadeniz: { scale: 1.8, x: -430, y: 30 },
-  guneydogu: { scale: 2.2, x: -990, y: -400 },
-  doguanadolu: { scale: 1.9, x: -920, y: -130 },
+const VIEW_W = 1000;
+const VIEW_H = 422;
+
+/** Bölgeyi tuvale sığdıran dönüşüm (kenarda komşu bölgeler de görünsün diye %18 pay bırakılır) */
+const regionTransform = (regionId: string): { scale: number; x: number; y: number } => {
+  const b = REGION_BOUNDS[regionId];
+  if (!b) return { scale: 1, x: 0, y: 0 };
+  const w = b[2] - b[0];
+  const h = b[3] - b[1];
+  const scale = Math.min(3.2, Math.min(VIEW_W / (w * 1.18), VIEW_H / (h * 1.18)));
+  const cx = (b[0] + b[2]) / 2;
+  const cy = (b[1] + b[3]) / 2;
+  return { scale, x: VIEW_W / 2 - cx * scale, y: VIEW_H / 2 - cy * scale };
 };
+
+export const REGION_TRANSFORMS: Record<string, { scale: number; x: number; y: number }> = Object.fromEntries(
+  Object.keys(REGION_BOUNDS).map((id) => [id, regionTransform(id)])
+);
+
+/** Bölge sınır kutusunun ekranda görünen kısmının ortası (ekran = viewBox koordinatı); görünür alan çok küçükse null */
+const visibleRegionLabelPos = (
+  regionId: string,
+  t: { scale: number; x: number; y: number }
+): { x: number; y: number } | null => {
+  const b = REGION_BOUNDS[regionId];
+  if (!b) return null;
+  const margin = 24;
+  const x0 = Math.max(b[0] * t.scale + t.x, margin);
+  const y0 = Math.max(b[1] * t.scale + t.y, margin);
+  const x1 = Math.min(b[2] * t.scale + t.x, VIEW_W - margin);
+  const y1 = Math.min(b[3] * t.scale + t.y, VIEW_H - margin);
+  if (x1 - x0 < 60 || y1 - y0 < 28) return null;
+  return { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
+};
+
+// Bölge görünümünde seçili olmayan bölgeler tek renk alan olarak çizilir (il sınırları gizlenir)
+const REGION_FILL = '#EFE7D6';
+const REGION_FILL_HOVER = '#E5D9C0';
+const REGION_BORDER = '#B9A988';
 
 // Memoized province path for maximum 60fps rendering without re-parsing paths
 interface ProvincePathProps {
@@ -188,6 +228,8 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
   const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const [internalBubbleCity, setInternalBubbleCity] = useState<string | null>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const contactInfo = useCMSStore((state) => state.contactInfo);
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null);
 
   // Effective bubble city
@@ -207,6 +249,16 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
     }
     return map;
   }, [stores]);
+
+  // Bölge başına mağaza sayısı (bölge etiketlerinde gösterilir)
+  const regionStoreCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const prov of TURKEY_PROVINCES) {
+      const n = cityStoresMap.get(prov.name.toLowerCase())?.length || 0;
+      if (n) counts[prov.region] = (counts[prov.region] || 0) + n;
+    }
+    return counts;
+  }, [cityStoresMap]);
 
   const activeCityNorm = (selectedCityName || activeBubbleCity || '').trim().toLowerCase();
 
@@ -279,7 +331,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-wood animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-brand border border-ink" />
           <span className="font-semibold text-neutral-800">
             {activeRegionId && REGION_NAMES[activeRegionId]
               ? REGION_NAMES[activeRegionId]
@@ -293,7 +345,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               }}
               className="text-xs font-medium text-wood-dark hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-0.5 rounded-full transition-colors ml-1 cursor-pointer"
             >
-              Tam Görünüme Dön
+              Tüm Türkiye
             </button>
           )}
         </div>
@@ -301,16 +353,16 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         {/* Legend */}
         <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#CBD5E1] border border-neutral-400" />
+            <span className="w-2.5 h-2.5 rounded-full bg-brand-soft border border-line-strong" />
             <span className="hidden sm:inline">Mağaza Var</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-wood" />
+            <span className="w-2.5 h-2.5 rounded-full bg-brand border border-ink" />
             <span>Seçili İl</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF] border border-line-strong" />
-            <span className="hidden sm:inline">Diğer İller</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#EFE7D6] border border-[#B9A988]" />
+            <span className="hidden sm:inline">Diğer bölgeler (tıklayın)</span>
           </div>
         </div>
       </div>
@@ -326,110 +378,150 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
           xmlns="http://www.w3.org/2000/svg"
           shapeRendering="geometricPrecision"
         >
-          {/* HARDWARE GPU ACCELERATED SMOOTH ZOOM & PAN GROUP */}
           <g
             id="map-zoom-transform-group"
             style={{
               transform: `translate(${currentTransform.x}px, ${currentTransform.y}px) scale(${currentTransform.scale})`,
               transformOrigin: '0 0',
-              transition: 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
+              transition: 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
               willChange: 'transform',
             }}
           >
-            {/* 81 PROVINCES */}
+            {/* 1) Diğer bölgeler: her bölge önce kalın sınırla, sonra aynı renkte iç çizgiyle çizilir.
+                   Böylece il sınırları kaybolur, yalnız bölge dış hattı kalır. */}
+            {activeRegionId &&
+              Object.keys(REGION_NAMES)
+                .filter((regionId) => regionId !== activeRegionId)
+                .map((regionId) => {
+                  const provs = TURKEY_PROVINCES.filter((p) => p.region === regionId);
+                  const isHover = hoveredRegion === regionId;
+                  const fill = isHover ? REGION_FILL_HOVER : REGION_FILL;
+                  return (
+                    <g
+                      key={regionId}
+                      className="cursor-pointer"
+                      onMouseEnter={() => setHoveredRegion(regionId)}
+                      onMouseLeave={() => setHoveredRegion(null)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onSelectRegion) onSelectRegion(regionId);
+                      }}
+                    >
+                      {provs.map((prov) => (
+                        <path key={`b-${prov.id}`} d={prov.d} fill={fill} stroke={REGION_BORDER} strokeWidth={1.4} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+                      ))}
+                      {provs.map((prov) => (
+                        <path key={`f-${prov.id}`} d={prov.d} fill={fill} stroke={fill} strokeWidth={1.2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+                      ))}
+                    </g>
+                  );
+                })}
+
+            {/* 2) Seçili bölge (ya da tam görünümde tüm Türkiye): il il, mağazalı iller vurgulu */}
             <g id="turkey-provinces">
-            {TURKEY_PROVINCES.map((prov) => {
-              const provNorm = prov.name.toLowerCase();
-              const hasStores = cityStoresMap.has(provNorm);
-              const isSelected = activeCityNorm === provNorm;
+              {TURKEY_PROVINCES.filter((prov) => !activeRegionId || prov.region === activeRegionId).map((prov) => {
+                const provNorm = prov.name.toLowerCase();
+                const hasStores = cityStoresMap.has(provNorm);
+                const isSelected = activeCityNorm === provNorm;
 
-              // Visual styling: White background, slate gray for store cities, warm bronze for selected
-              let fill = '#FFFFFF';
-              let stroke = '#E2E8F0';
-              let strokeWidth = 0.5;
+                let fill = '#FFFFFF';
+                let stroke = '#D8CCB4';
+                let strokeWidth = 0.8;
+                if (hasStores) {
+                  fill = '#FFF3BF'; // marka sarısının açık tonu
+                  stroke = '#B9A988';
+                  strokeWidth = 1;
+                }
+                if (isSelected) {
+                  fill = '#FECC00';
+                  stroke = '#161514';
+                  strokeWidth = 1.6;
+                }
 
-              if (hasStores) {
-                fill = '#CBD5E1'; // Slate gray for store cities
-                stroke = '#94A3B8';
-                strokeWidth = 0.8;
-              }
-
-              if (isSelected) {
-                fill = '#C5A880'; // Main brand gold/bronze
-                stroke = '#8A4B20';
-                strokeWidth = 1.6;
-              }
-
-              return (
-                <MemoizedProvincePath
-                  key={prov.id}
-                  prov={prov}
-                  fill={fill}
-                  stroke={stroke}
-                  strokeWidth={strokeWidth}
-                  onHover={setHoveredCity}
-                  onClick={handleCityClick}
-                />
-              );
-            })}
-          </g>
-
-          {/* ACTIVE STORE PINS */}
-          {TURKEY_PROVINCES.filter((p) => cityStoresMap.has(p.name.toLowerCase())).map((prov) => {
-            const center = PROVINCE_CENTERS[prov.name] || { x: 200, y: 100 };
-            const isSelected = activeCityNorm === prov.name.toLowerCase();
-
-            return (
-              <g
-                key={`pin-${prov.id}`}
-                transform={`translate(${center.x}, ${center.y})`}
-                className="cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCityClick(prov);
-                }}
-              >
-                {/* Pulse ring for selected city */}
-                {isSelected && (
-                  <circle
-                    r={13}
-                    fill="#C5A880"
-                    opacity={0.35}
-                    className="animate-ping"
+                return (
+                  <MemoizedProvincePath
+                    key={prov.id}
+                    prov={prov}
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth={strokeWidth}
+                    onHover={setHoveredCity}
+                    onClick={handleCityClick}
                   />
-                )}
+                );
+              })}
+            </g>
 
-                {/* Outer dot */}
-                <circle
-                  r={isSelected ? 6.5 : 4.2}
-                  fill={isSelected ? '#8A4B20' : '#475569'}
-                  className="transition-all duration-300"
-                />
-
-                {/* Inner white core */}
-                <circle
-                  r={isSelected ? 2.5 : 1.8}
-                  fill="#FFFFFF"
-                />
-
-                {/* City label */}
-                <g transform="translate(0, -9)">
+            {/* 4) Mağaza işaretleri: yalnız seçili bölgede (tam görünümde hepsi). Boyut zoom'dan bağımsız. */}
+            {TURKEY_PROVINCES.filter(
+              (p) => cityStoresMap.has(p.name.toLowerCase()) && (!activeRegionId || p.region === activeRegionId)
+            ).map((prov) => {
+              const center = PROVINCE_CENTERS[prov.name];
+              if (!center) return null;
+              const isSelected = activeCityNorm === prov.name.toLowerCase();
+              return (
+                <g
+                  key={`pin-${prov.id}`}
+                  transform={`translate(${center.x}, ${center.y}) scale(${1 / currentTransform.scale})`}
+                  className="cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCityClick(prov);
+                  }}
+                >
+                  <circle r={isSelected ? 9 : 7} fill="#161514" stroke="#FECC00" strokeWidth={isSelected ? 3 : 2} />
+                  <circle r={2.5} fill="#FECC00" />
                   <text
-                    x="0"
-                    y="0"
+                    y={-13}
                     textAnchor="middle"
-                    fill={isSelected ? '#8A4B20' : '#1E293B'}
-                    fontSize="7.5"
+                    fill="#161514"
+                    fontSize="13"
                     fontWeight="700"
-                    className="font-sans select-none pointer-events-none tracking-wide"
+                    paintOrder="stroke"
+                    stroke="#FFFFFF"
+                    strokeWidth="3.5"
+                    className="font-sans select-none pointer-events-none"
                   >
                     {prov.name}
                   </text>
                 </g>
-              </g>
-            );
-          })}
+              );
+            })}
           </g>
+
+          {/* Diğer bölgelerin adları: zoom grubunun dışında, ekran koordinatında; bölgenin görünen kısmının ortasına
+              yerleşir ve bölge değişiminde aynı eğriyle kayar. Tıklanınca o bölgeye geçilir. */}
+          {activeRegionId &&
+            Object.keys(REGION_NAMES)
+              .filter((regionId) => regionId !== activeRegionId)
+              .map((regionId) => {
+                const pos = visibleRegionLabelPos(regionId, currentTransform);
+                if (!pos) return null;
+                const count = regionStoreCounts[regionId] || 0;
+                return (
+                  <g
+                    key={`label-${regionId}`}
+                    style={{
+                      transform: `translate(${pos.x}px, ${pos.y}px)`,
+                      transition: 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+                    }}
+                    className="cursor-pointer"
+                    onMouseEnter={() => setHoveredRegion(regionId)}
+                    onMouseLeave={() => setHoveredRegion(null)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onSelectRegion) onSelectRegion(regionId);
+                    }}
+                  >
+                    <text textAnchor="middle" fill="#523C22" fontSize="15" fontWeight="700" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
+                      {REGION_NAMES[regionId]}
+                    </text>
+                    <text y="17" textAnchor="middle" fill="#6E5231" fontSize="12" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
+                      {count > 0 ? `${count} mağaza · görüntüle` : 'görüntüle'}
+                    </text>
+                  </g>
+                );
+              })}
         </svg>
 
         {/* Hovered city tooltip (lightweight) */}
@@ -620,11 +712,11 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                     </a>
 
                     <a
-                      href="tel:05324194151"
+                      href={`tel:${(contactInfo?.phone || '').replace(/[^0-9+]/g, '') || waNumber}`}
                       className="w-full py-2 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium rounded-xs transition-colors flex items-center justify-center gap-2 text-xs"
                     >
                       <Phone className="w-3.5 h-3.5 text-neutral-500" />
-                      <span>Fabrika Satış Destek: 0532 419 41 51</span>
+                      <span>Destek hattı: {contactInfo?.phone || waNumber}</span>
                     </a>
                   </div>
                 </div>

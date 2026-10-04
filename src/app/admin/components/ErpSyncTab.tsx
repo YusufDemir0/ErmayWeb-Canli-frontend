@@ -282,49 +282,49 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
     <div className="space-y-6">
       {/* 1. TOP STATS BAR */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-neutral-200 rounded-sm p-4 shadow-xs flex items-center justify-between">
+        <div className="bg-white border border-line rounded-xs p-4 flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Toplam ERP Ürünü</p>
-            <p className="text-2xl font-black text-neutral-900 mt-1">{catalog.length}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Toplam ERP Ürünü</p>
+            <p className="text-2xl font-extrabold text-neutral-900 mt-1">{catalog.length}</p>
           </div>
-          <div className="p-3 bg-neutral-100 rounded-sm text-neutral-600">
+          <div className="p-3 bg-neutral-100 rounded-xs text-neutral-600">
             <Box className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-wood/30 rounded-sm p-4 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-paper">
+        <div className="bg-white border border-wood/30 rounded-xs p-4 flex items-center justify-between bg-gradient-to-br from-white to-paper">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#7A6140]">Web Satışına Açık</p>
-            <p className="text-2xl font-black text-[#7A6140] mt-1">{publishedCount}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-wood-dark">Web Satışına Açık</p>
+            <p className="text-2xl font-extrabold text-wood-dark mt-1">{publishedCount}</p>
           </div>
-          <div className="p-3 bg-wood/20 rounded-sm text-[#7A6140]">
+          <div className="p-3 bg-wood/20 rounded-xs text-wood-dark">
             <Sparkles className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-emerald-200 rounded-sm p-4 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-emerald-50/40">
+        <div className="bg-white border border-ok/25 rounded-xs p-4 flex items-center justify-between bg-gradient-to-br from-white to-emerald-50/40">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Stokta Bulunan</p>
-            <p className="text-2xl font-black text-emerald-800 mt-1">{inStockCount}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-ok">Stokta Bulunan</p>
+            <p className="text-2xl font-extrabold text-ok mt-1">{inStockCount}</p>
           </div>
-          <div className="p-3 bg-emerald-100 rounded-sm text-emerald-700">
+          <div className="p-3 bg-ok-soft rounded-xs text-ok">
             <CheckCircle2 className="h-6 w-6" />
           </div>
         </div>
       </div>
 
       {/* 2. FILTER & ACTION BAR */}
-      <div className="bg-white border border-neutral-200 rounded-sm p-5 shadow-xs space-y-4">
+      <div className="bg-white border border-line rounded-xs p-5 space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Ürün adı veya koduna göre ara (örn: MBL-334, İmaj Dolap)..."
-              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs text-neutral-800 focus:outline-none focus:border-wood focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-paper border border-line rounded-xs text-xs text-neutral-800 focus:outline-none focus:border-wood focus:bg-white transition-all"
             />
           </div>
 
@@ -332,7 +332,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <button
             onClick={() => fetchCatalog()}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span>ERP'den Güncelle</span>
@@ -340,17 +340,17 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-100">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mr-2 flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-line">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 mr-2 flex items-center gap-1">
             <Filter className="h-3 w-3" /> Filtrele:
           </span>
 
           {/* Publish State Filters */}
-          <div className="flex rounded-xs border border-neutral-200 bg-neutral-50 p-0.5 text-[11px]">
+          <div className="flex rounded-xs border border-line bg-paper p-0.5 text-xs">
             <button
               onClick={() => setPublishFilter('ALL')}
               className={`px-3 py-1 font-semibold rounded-xs transition-all ${
-                publishFilter === 'ALL' ? 'bg-white text-neutral-900 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                publishFilter === 'ALL' ? 'bg-white text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Tümü ({catalog.length})
@@ -358,7 +358,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             <button
               onClick={() => setPublishFilter('PUBLISHED')}
               className={`px-3 py-1 font-semibold rounded-xs transition-all ${
-                publishFilter === 'PUBLISHED' ? 'bg-wood text-white shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                publishFilter === 'PUBLISHED' ? 'bg-brand text-ink' : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Yayındakiler ({publishedCount})
@@ -366,7 +366,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             <button
               onClick={() => setPublishFilter('UNPUBLISHED')}
               className={`px-3 py-1 font-semibold rounded-xs transition-all ${
-                publishFilter === 'UNPUBLISHED' ? 'bg-white text-neutral-900 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                publishFilter === 'UNPUBLISHED' ? 'bg-white text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Kapalılar ({catalog.length - publishedCount})
@@ -377,7 +377,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold text-neutral-700 focus:outline-none focus:border-wood"
+            className="px-3 py-1.5 bg-paper border border-line rounded-xs text-xs font-semibold text-neutral-700 focus:outline-none focus:border-wood"
           >
             <option value="ALL">Tüm Ürün Tipleri</option>
             <option value="Ticari Mamül">Ticari Mamül</option>
@@ -399,7 +399,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
       </div>
 
       {/* 3. CATALOG TABLE */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
+      <div className="bg-white border border-line rounded-xs overflow-hidden">
         {isLoading ? (
           <div className="py-16 text-center space-y-3">
             <Loader2 className="h-8 w-8 text-wood animate-spin mx-auto" />
@@ -409,7 +409,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <div className="py-16 text-center space-y-2">
             <AlertCircle className="h-8 w-8 text-neutral-300 mx-auto" />
             <p className="text-sm font-bold text-neutral-700">Eşleşen Ürün Bulunamadı</p>
-            <p className="text-xs text-neutral-400">Filtre kriterlerinizi değiştirebilir veya ERP'den yenileyebilirsiniz.</p>
+            <p className="text-xs text-neutral-500">Filtre kriterlerinizi değiştirebilir veya ERP'den yenileyebilirsiniz.</p>
           </div>
         ) : (
           (() => {
@@ -421,7 +421,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
               <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-neutral-50 text-neutral-500 uppercase tracking-wider font-bold border-b border-neutral-200 text-[10px]">
+                    <thead className="bg-paper text-neutral-500 uppercase tracking-wider font-bold border-b border-line text-xs">
                       <tr>
                         <th className="py-3 px-4">Görseller (Min 1 - Max 5)</th>
                         <th className="py-3 px-4">Kod & İsim</th>
@@ -432,7 +432,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                         <th className="py-3 px-4 text-right">İşlem</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-100 font-medium">
+                    <tbody className="divide-y divide-line font-medium">
                       {paginatedCatalog.map((item) => {
                         const isPublished = Boolean(item.webProduct?.isPublished);
                         const images = item.webProduct?.images || (item.webProduct?.image ? [item.webProduct.image] : []);
@@ -441,7 +441,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                   return (
                     <tr 
                       key={item.erpId}
-                      className={`hover:bg-neutral-50/70 transition-colors ${
+                      className={`hover:bg-paper/70 transition-colors ${
                         isPublished ? 'bg-paper/40' : ''
                       }`}
                     >
@@ -453,16 +453,16 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                               <img
                                 src={resolveImageUrl(images[0])}
                                 alt={item.erpName}
-                                className="w-12 h-12 object-cover rounded-xs border border-neutral-200"
+                                className="w-12 h-12 object-cover rounded-xs border border-line"
                               />
-                              <span className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full shadow-xs">
+                              <span className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-xs font-bold px-1.5 py-0.2 rounded-full">
                                 {images.length}/5
                               </span>
                             </div>
                           ) : (
-                            <div className="w-12 h-12 rounded-xs border border-dashed border-rose-300 bg-rose-50/40 flex flex-col items-center justify-center text-rose-500 text-center p-1">
+                            <div className="w-12 h-12 rounded-xs border border-dashed border-signal/40 bg-signal/5 flex flex-col items-center justify-center text-signal text-center p-1">
                               <ImageIcon className="h-4 w-4" />
-                              <span className="text-[8px] font-bold leading-none mt-0.5">Yok</span>
+                              <span className="text-xs font-bold leading-none mt-0.5">Yok</span>
                             </div>
                           )}
                         </div>
@@ -471,14 +471,14 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                       {/* Code & Name */}
                       <td className="py-3 px-4">
                         <div>
-                          <span className="font-mono font-bold text-neutral-400 text-[10px] block">
+                          <span className="font-mono font-bold text-neutral-500 text-xs block">
                             {item.erpCode}
                           </span>
                           <span className="font-bold text-neutral-900 text-xs">
                             {item.webProduct?.name || item.erpName}
                           </span>
                           {item.webProduct?.categoryName && (
-                            <span className="text-[10px] text-[#7A6140] block font-semibold">
+                            <span className="text-xs text-wood-dark block font-semibold">
                               {item.webProduct.categoryName}
                             </span>
                           )}
@@ -487,11 +487,11 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
 
                       {/* Type Badge */}
                       <td className="py-3 px-4">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
                           item.erpType === 'Ticari Mamül'
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-paper text-wood-dark'
                             : item.erpType === 'Ara Mamül'
-                            ? 'bg-amber-100 text-amber-800'
+                            ? 'bg-paper text-wood-dark'
                             : 'bg-neutral-100 text-neutral-600'
                         }`}>
                           {item.erpType}
@@ -503,19 +503,19 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                         {item.erpSalePrice > 0 ? (
                           <span>{item.erpSalePrice.toLocaleString('tr-TR')} ₺</span>
                         ) : (
-                          <span className="text-neutral-400">Belirtilmemiş</span>
+                          <span className="text-neutral-500">Belirtilmemiş</span>
                         )}
                       </td>
 
                       {/* Stock */}
                       <td className="py-3 px-4">
                         {item.erpStock > 0 ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-xs border border-emerald-200 text-[11px]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span className="inline-flex items-center gap-1 text-ok font-bold bg-ok-soft px-2 py-0.5 rounded-xs border border-ok/25 text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-whatsapp" />
                             {item.erpStock} adet
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded-xs border border-rose-200 text-[11px]">
+                          <span className="inline-flex items-center gap-1 text-signal font-bold bg-signal/5 px-2 py-0.5 rounded-xs border border-signal/40 text-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                             Tükendi (0)
                           </span>
@@ -542,8 +542,8 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                               }`}
                             />
                           </button>
-                          <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                            isPublished ? 'text-[#7A6140]' : 'text-neutral-400'
+                          <span className={`text-xs font-bold uppercase tracking-wider ${
+                            isPublished ? 'text-wood-dark' : 'text-neutral-500'
                           }`}>
                             {isPublished ? 'Açık' : 'Kapalı'}
                           </span>
@@ -554,7 +554,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => openEditModal(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-300 hover:border-wood hover:text-[#7A6140] rounded-xs text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-line-strong hover:border-wood hover:text-wood-dark rounded-xs text-xs font-bold transition-all cursor-pointer"
                         >
                           <ImageIcon className="h-3.5 w-3.5 text-wood" />
                           <span>Görsel & Detay</span>
@@ -588,12 +588,12 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
       {/* 4. EDIT & IMAGE MANAGEMENT MODAL                            */}
       {/* ============================================================ */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white max-w-2xl w-full rounded-sm shadow-2xl border border-neutral-200 overflow-hidden animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 animate-fade-in">
+          <div className="bg-white max-w-2xl w-full rounded-xs shadow-2xl border border-line overflow-hidden animate-scale-in">
             {/* Modal Header */}
-            <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-paper">
+            <div className="p-5 border-b border-line flex items-center justify-between bg-paper">
               <div>
-                <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest block">
+                <span className="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider block">
                   ERP KOD: {selectedItem.erpCode} (ID: {selectedItem.erpId})
                 </span>
                 <h3 className="text-base font-bold text-neutral-900">
@@ -602,7 +602,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
               </div>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded-full hover:bg-neutral-200 transition-colors"
+                className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-full hover:bg-neutral-200 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -612,26 +612,26 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
               {/* Product Web Title */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Web Sitesinde Görünecek Ürün Adı
                 </label>
                 <input
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-paper border border-line rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
                 />
               </div>
 
               {/* Category Selector */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Web Kategorisi
                 </label>
                 <select
                   value={editCategoryId}
                   onChange={(e) => setEditCategoryId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-paper border border-line rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -644,18 +644,18 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
               {/* ======================================================= */}
               {/* IMAGE UPLOAD & GALLERY (MIN 1 - MAX 5 MANDATORY)        */}
               {/* ======================================================= */}
-              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xs space-y-3">
+              <div className="p-4 bg-paper border border-line rounded-xs space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-900">
+                    <label className="block text-sm font-semibold text-neutral-900">
                       Ürün Görselleri (En Az 1 - En Fazla 5 Adet)
                     </label>
-                    <p className="text-[10px] text-neutral-500 mt-0.5">
+                    <p className="text-xs text-neutral-500 mt-0.5">
                       İlk görsel kapak fotoğrafı olur ve CRM/ERP veritabanına otomatik senkronize edilir.
                     </p>
                   </div>
                   <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
-                    editImages.length >= 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    editImages.length >= 1 ? 'bg-ok-soft text-ok' : 'bg-signal/5 text-signal'
                   }`}>
                     {editImages.length} / 5 Görsel
                   </span>
@@ -664,17 +664,17 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 {/* Thumbnails Grid */}
                 <div className="grid grid-cols-5 gap-3">
                   {editImages.map((imgUrl, index) => (
-                    <div key={index} className="relative group aspect-square rounded-xs border border-neutral-200 overflow-hidden bg-white">
+                    <div key={index} className="relative group aspect-square rounded-xs border border-line overflow-hidden bg-white">
                       <img src={resolveImageUrl(imgUrl)} alt={`Görsel ${index + 1}`} className="w-full h-full object-cover" />
                       {index === 0 && (
-                        <span className="absolute bottom-0 inset-x-0 bg-neutral-900/80 text-white text-[8px] font-bold text-center py-0.5">
+                        <span className="absolute bottom-0 inset-x-0 bg-neutral-900/80 text-white text-xs font-bold text-center py-0.5">
                           KAPAK
                         </span>
                       )}
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}
-                        className="absolute top-1 right-1 p-1 bg-rose-600 hover:bg-rose-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-xs"
+                        className="absolute top-1 right-1 p-1 bg-signal hover:bg-signal-dark text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                         title="Görseli Kaldır"
                       >
                         <X className="h-3 w-3" />
@@ -684,15 +684,15 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
 
                   {/* Add Image Slot */}
                   {editImages.length < 5 && (
-                    <label className={`aspect-square rounded-xs border-2 border-dashed border-neutral-300 hover:border-wood bg-white flex flex-col items-center justify-center p-2 text-center cursor-pointer transition-colors ${
+                    <label className={`aspect-square rounded-xs border-2 border-dashed border-line-strong hover:border-wood bg-white flex flex-col items-center justify-center p-2 text-center cursor-pointer transition-colors ${
                       isUploading ? 'opacity-50 pointer-events-none' : ''
                     }`}>
                       {isUploading ? (
                         <Loader2 className="h-5 w-5 text-wood animate-spin" />
                       ) : (
                         <>
-                          <Upload className="h-5 w-5 text-neutral-400 mb-1" />
-                          <span className="text-[9px] font-bold text-neutral-500 uppercase tracking-wider">
+                          <Upload className="h-5 w-5 text-neutral-500 mb-1" />
+                          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
                             Görsel Yükle
                           </span>
                         </>
@@ -709,8 +709,8 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 </div>
 
                 {editImages.length === 0 && (
-                  <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xs flex items-center gap-2 text-amber-800 text-[11px]">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0 text-amber-600" />
+                  <div className="bg-paper border border-line p-2.5 rounded-xs flex items-center gap-2 text-wood-dark text-xs">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0 text-wood" />
                     <span>Ürünü web satışına açabilmek için en az 1 görsel yüklemeniz gerekmektedir.</span>
                   </div>
                 )}
@@ -718,20 +718,20 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
 
               {/* Description & Technical Specs */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Ürün Açıklaması
                 </label>
                 <textarea
                   rows={2}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
+                  className="w-full px-3.5 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  <label className="block text-sm font-semibold text-neutral-700 mb-1">
                     Ölçüler / Boyutlar
                   </label>
                   <input
@@ -739,11 +739,11 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     value={editDimensions}
                     onChange={(e) => setEditDimensions(e.target.value)}
                     placeholder="G: 180cm | D: 90cm | Y: 75cm"
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
+                    className="w-full px-3 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  <label className="block text-sm font-semibold text-neutral-700 mb-1">
                     Malzeme / Ağaç Türü
                   </label>
                   <input
@@ -751,18 +751,18 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     value={editMaterial}
                     onChange={(e) => setEditMaterial(e.target.value)}
                     placeholder="Doğal Meşe, Fırınlanmış Gürgen vb."
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
+                    className="w-full px-3 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                   />
                 </div>
               </div>
 
               {/* Publish Toggle in Modal */}
-              <div className="p-3 bg-neutral-50 rounded-xs border border-neutral-200 flex items-center justify-between">
+              <div className="p-3 bg-paper rounded-xs border border-line flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-neutral-900 block">
                     Web Sitesinde Yayına Al
                   </span>
-                  <span className="text-[10px] text-neutral-500">
+                  <span className="text-xs text-neutral-500">
                     Açık olduğunda ürün müşterilerin sepetine ve kataloğuna eklenir.
                   </span>
                 </div>
@@ -789,7 +789,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-neutral-100 flex items-center justify-end gap-3 bg-neutral-50">
+            <div className="p-4 border-t border-line flex items-center justify-end gap-3 bg-paper">
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
@@ -802,7 +802,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 type="button"
                 onClick={handleSaveModal}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
+                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

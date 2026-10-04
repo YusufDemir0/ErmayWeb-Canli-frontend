@@ -9,7 +9,6 @@ import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { toast } from '../stores/useToastStore';
 import { useWhatsappNumber } from '../lib/whatsapp';
 import { OptimizedImage } from './OptimizedImage';
-import DimensionLine from './DimensionLine';
 
 interface ProductCardProps {
   product: Product;
@@ -33,29 +32,14 @@ const formatPrice = (price: number | string): string => {
   return currencyFormatter.format(num).replace('TRY', 'TL');
 };
 
-interface CardProductImages {
-  main: string;
-  secondary?: string;
-}
-
-const getProductImages = (product: Product): CardProductImages => {
+const getCoverImage = (product: Product): string => {
   if (product.images && typeof product.images === 'object' && 'main' in product.images) {
-    const imgs = product.images as ProductImages;
-    return {
-      main: imgs.main || product.image || '',
-      secondary: imgs.gallery && imgs.gallery.length > 0 ? imgs.gallery[0] : undefined,
-    };
+    return (product.images as ProductImages).main || product.image || '';
   }
   if (Array.isArray(product.images) && product.images.length > 0) {
-    return {
-      main: product.images[0] || product.image || '',
-      secondary: product.images.length > 1 ? product.images[1] : undefined,
-    };
+    return product.images[0] || product.image || '';
   }
-  return {
-    main: product.image1 || product.image || '',
-    secondary: product.image2 || undefined,
-  };
+  return product.image1 || product.image || '';
 };
 
 const getCategoryLabel = (category: Product['category']): string => {
@@ -100,30 +84,20 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
   };
 
   const isDiscounted = !!product.originalPrice && Number(product.originalPrice) > Number(product.price);
-  const { main: mainImage, secondary: secondaryImage } = getProductImages(product);
+  const mainImage = getCoverImage(product);
   const categoryLabel = getCategoryLabel(product.category);
 
   return (
     <article className="group relative flex flex-col bg-white border border-line rounded-xs overflow-hidden transition-colors duration-200 hover:border-line-strong">
       {/* Görsel */}
       <Link href={`/urun/${product.slug || product.id}`} className="relative aspect-[4/5] bg-paper overflow-hidden block">
+        {/* Kapak görseli: üzerine gelince hafif yakınlaşma (ikinci görsele geçiş yok) */}
         <OptimizedImage
           src={mainImage}
           alt={product.name}
           fill
-          className={`object-cover transform-gpu transition-all duration-700 ease-out will-change-transform ${
-            secondaryImage ? 'group-hover:scale-[1.03] group-hover:opacity-0' : 'group-hover:scale-[1.03]'
-          }`}
+          className="object-cover transform-gpu transition-transform duration-500 ease-out will-change-transform group-hover:scale-[1.04]"
         />
-
-        {secondaryImage && (
-          <OptimizedImage
-            src={secondaryImage}
-            alt={`${product.name} - Detay`}
-            fill
-            className="object-cover absolute inset-0 opacity-0 transform-gpu transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-[1.03] will-change-transform"
-          />
-        )}
 
         {/* Yalnız ürüne özgü rozet (CMS'ten gelen); her karta basılan sabit rozet yok */}
         {(product.badge || isDiscounted) && (
@@ -163,8 +137,6 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
             {product.name}
           </Link>
         </div>
-
-        <DimensionLine value={product.widthCm} />
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-1">
           <div className="flex flex-col">

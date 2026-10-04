@@ -97,7 +97,7 @@ export default async function IletisimPage() {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen py-12">
+    <div className="w-full bg-canvas min-h-screen py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
@@ -111,7 +111,7 @@ export default async function IletisimPage() {
         </nav>
 
         {/* Light Hero Header */}
-        <div className="bg-white text-neutral-900 rounded-xs p-8 md:p-12 mb-12 border border-line text-center">
+        <div className="bg-paper text-ink rounded-xs p-8 md:p-12 mb-12 border border-line border-t-4 border-t-brand text-center">
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-2 text-ink">
             İletişim
           </h1>

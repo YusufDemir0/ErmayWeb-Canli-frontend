@@ -23,7 +23,7 @@ export const FloatingWhatsApp: React.FC = () => {
       href={`https://wa.me/${formattedNumber}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-4 right-4 z-40 h-12 w-12 rounded-full bg-whatsapp hover:bg-whatsapp-dark text-white flex items-center justify-center shadow-xl transition-colors print:hidden"
+      className={`fixed right-4 z-40 h-12 w-12 ${pathname.startsWith('/urun/') ? 'bottom-20 lg:bottom-4' : 'bottom-4'} rounded-full bg-whatsapp hover:bg-whatsapp-dark text-white flex items-center justify-center shadow-xl transition-colors print:hidden`}
       aria-label="WhatsApp ile yazın"
       title="WhatsApp ile yazın"
     >

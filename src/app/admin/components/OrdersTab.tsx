@@ -36,22 +36,22 @@ interface OrdersTabProps {
 }
 
 const STATUS_LABELS: Record<RequestStatusType, { label: string; bg: string; text: string; border: string }> = {
-  NEW: { label: 'Yeni Talep', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-  CONTACTED: { label: 'İletişime Geçildi', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  STORE_VISIT_SCHEDULED: { label: 'Showroom Randevusu', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  NEW: { label: 'Yeni Talep', bg: 'bg-paper', text: 'text-wood-dark', border: 'border-line' },
+  CONTACTED: { label: 'İletişime Geçildi', bg: 'bg-paper', text: 'text-wood-dark', border: 'border-line' },
+  STORE_VISIT_SCHEDULED: { label: 'Showroom Randevusu', bg: 'bg-paper', text: 'text-wood-dark', border: 'border-line' },
   AWAITING_PAYMENT: { label: 'Ödeme Bekleniyor', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  PAID_OFFLINE: { label: 'Ödeme Teyit Edildi', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  COMPLETED: { label: 'Tamamlandı', bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-neutral-300' },
-  CANCELLED: { label: 'İptal Edildi', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
-  SPAM: { label: 'Geçersiz / Spam', bg: 'bg-neutral-100', text: 'text-neutral-500', border: 'border-neutral-200' },
-  EXPIRED: { label: 'Zaman Aşımı', bg: 'bg-neutral-50', text: 'text-neutral-600', border: 'border-neutral-200' },
+  PAID_OFFLINE: { label: 'Ödeme Teyit Edildi', bg: 'bg-ok-soft', text: 'text-ok', border: 'border-ok/25' },
+  COMPLETED: { label: 'Tamamlandı', bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-line-strong' },
+  CANCELLED: { label: 'İptal Edildi', bg: 'bg-signal/5', text: 'text-signal', border: 'border-signal/40' },
+  SPAM: { label: 'Geçersiz / Spam', bg: 'bg-neutral-100', text: 'text-neutral-500', border: 'border-line' },
+  EXPIRED: { label: 'Zaman Aşımı', bg: 'bg-paper', text: 'text-neutral-600', border: 'border-line' },
 };
 
 const ERP_STATUS_LABELS: Record<ErpSyncStatusType, { label: string; bg: string }> = {
-  PENDING: { label: 'ERP Kuyruğunda', bg: 'bg-amber-100 text-amber-800' },
-  IN_PROGRESS: { label: 'ERP İşleniyor', bg: 'bg-blue-100 text-blue-800' },
-  SYNCED: { label: 'ERP Satış Oluştu', bg: 'bg-emerald-100 text-emerald-800' },
-  FAILED: { label: 'ERP Hatası', bg: 'bg-rose-100 text-rose-800' },
+  PENDING: { label: 'ERP Kuyruğunda', bg: 'bg-paper text-wood-dark' },
+  IN_PROGRESS: { label: 'ERP İşleniyor', bg: 'bg-paper text-wood-dark' },
+  SYNCED: { label: 'ERP Satış Oluştu', bg: 'bg-ok-soft text-ok' },
+  FAILED: { label: 'ERP Hatası', bg: 'bg-signal/5 text-signal' },
 };
 
 const ALLOWED_TRANSITIONS: Record<RequestStatusType, RequestStatusType[]> = {
@@ -187,18 +187,18 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Banner Card */}
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-5 mb-6">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line pb-5 mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-wood-dark bg-paper px-2.5 py-1 rounded-xs border border-line-strong">
+              <span className="text-sm font-semibold text-wood-dark bg-paper px-2.5 py-1 rounded-xs border border-line-strong">
                 Müşteri Talep Motoru
               </span>
             </div>
             <h3 className="text-base md:text-lg font-bold tracking-tight text-neutral-900 mt-1">
               Sipariş Talepleri Yönetimi
             </h3>
-            <p className="text-xs text-neutral-500 font-light mt-0.5">
+            <p className="text-xs text-neutral-500 mt-0.5">
               Müşterilerin sepetlerinden oluşturulan WhatsApp ve Mağaza randevu taleplerini yönetin, ERP durumunu takip edin.
             </p>
           </div>
@@ -207,22 +207,22 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
             <button
               onClick={() => fetchRequests()}
               disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 border border-neutral-300 hover:border-wood text-xs font-semibold rounded-xs transition-colors cursor-pointer text-neutral-700 bg-white"
+              className="flex items-center gap-2 px-4 py-2 border border-line-strong hover:border-wood text-xs font-semibold rounded-xs transition-colors cursor-pointer text-neutral-700 bg-white"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-wood' : ''}`} />
               <span>Yenile</span>
             </button>
-            <span className="text-xs bg-paper border border-line-strong px-3.5 py-2 rounded-xs font-mono font-bold text-[#7A6140]">
+            <span className="text-xs bg-paper border border-line-strong px-3.5 py-2 rounded-xs font-mono font-bold text-wood-dark">
               Toplam: {totalCount} Talep
             </span>
           </div>
         </div>
 
         {/* Filters and Search Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6 bg-neutral-50 p-4 rounded-xs border border-neutral-200/70">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6 bg-paper p-4 rounded-xs border border-line">
           {/* Search */}
           <div className="sm:col-span-1 lg:col-span-2 relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-500" />
             <input
               type="text"
               placeholder="Kod, müşteri adı veya telefon ara..."
@@ -231,7 +231,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"
             />
           </div>
 
@@ -243,7 +243,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
+              className="w-full px-3 py-2 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"
             >
               <option value="ALL">Tüm Durumlar</option>
               <option value="NEW">Yeni Talepler</option>
@@ -266,7 +266,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setPreferenceFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
+              className="w-full px-3 py-2 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"
             >
               <option value="ALL">Tüm Tercihler</option>
               <option value="WHATSAPP">WhatsApp İletişimi</option>
@@ -278,15 +278,15 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
         {/* Requests List */}
         <div className="space-y-4">
           {isLoading && requests.length === 0 ? (
-            <div className="text-center py-16 text-neutral-400 space-y-3">
+            <div className="text-center py-16 text-neutral-500 space-y-3">
               <RefreshCw className="h-8 w-8 animate-spin mx-auto text-wood" />
               <p className="text-xs">Talepler getiriliyor...</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="text-center py-16 text-neutral-400 space-y-2 border border-dashed border-neutral-200 rounded-xs">
+            <div className="text-center py-16 text-neutral-500 space-y-2 border border-dashed border-line rounded-xs">
               <Package className="h-10 w-10 text-neutral-300 mx-auto" />
               <p className="text-xs font-semibold text-neutral-600">Aranan kriterlere uygun talep bulunamadı.</p>
-              <p className="text-[11px] text-neutral-400 font-light">Filtreleri sıfırlayarak tüm talepleri görüntüleyebilirsiniz.</p>
+              <p className="text-xs text-neutral-500">Filtreleri sıfırlayarak tüm talepleri görüntüleyebilirsiniz.</p>
             </div>
           ) : (
             requests.map((req) => {
@@ -297,30 +297,30 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
               return (
                 <div
                   key={req.id}
-                  className="bg-white border border-neutral-200 hover:border-wood/60 rounded-xs transition-[border-color,box-shadow] duration-200 shadow-2xs overflow-hidden"
+                  className="bg-white border border-line hover:border-wood/60 rounded-xs transition-[border-color,box-shadow] duration-200 overflow-hidden"
                 >
                   {/* Card Header Bar */}
-                  <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/50 border-b border-neutral-100">
+                  <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-paper/50 border-b border-line">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-mono font-extrabold text-sm text-neutral-900 bg-white px-2.5 py-1 border border-neutral-200 rounded-xs">
+                      <span className="font-mono font-extrabold text-sm text-neutral-900 bg-white px-2.5 py-1 border border-line rounded-xs">
                         {req.code}
                       </span>
 
                       {/* Status Badge */}
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider border ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}
+                        className={`text-sm font-semibold px-2.5 py-1 rounded-xs border ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}
                       >
                         {statusCfg.label}
                       </span>
 
                       {/* Preference Badge */}
                       {req.preference === 'WHATSAPP' ? (
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                        <span className="text-sm font-semibold px-2.5 py-1 rounded-xs bg-ok-soft text-ok border border-ok/25 flex items-center gap-1">
                           <MessageSquare className="h-3 w-3" />
                           <span>WhatsApp</span>
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                        <span className="text-sm font-semibold px-2.5 py-1 rounded-xs bg-paper text-wood-dark border border-line flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
                           <span>Showroom Ziyareti</span>
                         </span>
@@ -328,13 +328,13 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
                       {/* ERP Status Badge */}
                       <div className="flex flex-col">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${erpCfg.bg}`}>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${erpCfg.bg}`}>
                           {erpCfg.label}
                           {req.erpSaleCode && ` (${req.erpSaleCode})`}
                         </span>
                         {req.erpStatus === 'FAILED' && (req.erpLastError || req.erpErrorMessage) && (
                           <span
-                            className="text-[9px] text-rose-600 font-mono mt-0.5 max-w-[200px] truncate"
+                            className="text-xs text-signal font-mono mt-0.5 max-w-[200px] truncate"
                             title={req.erpLastError || req.erpErrorMessage || ''}
                           >
                             {req.erpLastError || req.erpErrorMessage}
@@ -342,7 +342,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                         )}
                       </div>
 
-                      <span className="text-[11px] text-neutral-400 font-mono">
+                      <span className="text-xs text-neutral-500 font-mono">
                         {new Date(req.createdAt).toLocaleDateString('tr-TR', {
                           day: '2-digit',
                           month: 'short',
@@ -360,7 +360,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                         href={getWhatsAppUrl(req)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xs transition-colors shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-whatsapp hover:bg-whatsapp-dark text-white text-xs font-bold rounded-xs transition-colors"
                       >
                         <MessageSquare className="h-3.5 w-3.5 fill-current" />
                         <span>WhatsApp&apos;ta Aç</span>
@@ -374,7 +374,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                           setTargetStatus(nextAllowed);
                           setStaffNote(req.staffNote || '');
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer"
                       >
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                         <span>Durum Değiştir</span>
@@ -385,7 +385,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                         <button
                           onClick={() => handleRetryErp(req.id, req.code)}
                           disabled={isRetryingErp === req.id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 text-xs font-bold rounded-xs transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-signal/5 border border-signal/40 text-signal hover:bg-signal/5 text-xs font-bold rounded-xs transition-colors cursor-pointer"
                         >
                           <RefreshCw className={`h-3 w-3 ${isRetryingErp === req.id ? 'animate-spin' : ''}`} />
                           <span>ERP Tekrar Dene</span>
@@ -397,7 +397,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                         href={`/talep/${req.publicToken}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-600 text-xs font-medium rounded-xs transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-line hover:border-line-strong text-neutral-600 text-xs font-medium rounded-xs transition-colors"
                         title="Müşteri Dijital Fişi"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -418,29 +418,29 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                   {/* Customer and Summary Quick Strip */}
                   <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                      <span className="text-xs uppercase font-bold text-neutral-500 block tracking-wider">
                         Müşteri
                       </span>
                       <div className="font-semibold text-neutral-800 flex items-center gap-1.5 mt-0.5">
-                        <User className="h-3.5 w-3.5 text-neutral-400" />
+                        <User className="h-3.5 w-3.5 text-neutral-500" />
                         <span>{req.customerName}</span>
                       </div>
                       <div className="font-mono text-neutral-600 flex items-center gap-1.5 mt-1">
-                        <Phone className="h-3.5 w-3.5 text-neutral-400" />
+                        <Phone className="h-3.5 w-3.5 text-neutral-500" />
                         <span>{req.customerPhone}</span>
                       </div>
                     </div>
 
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                      <span className="text-xs uppercase font-bold text-neutral-500 block tracking-wider">
                         Bölge / Mağaza
                       </span>
                       <div className="font-semibold text-neutral-800 flex items-center gap-1.5 mt-0.5">
-                        <MapPin className="h-3.5 w-3.5 text-neutral-400" />
+                        <MapPin className="h-3.5 w-3.5 text-neutral-500" />
                         <span>{req.city} {req.district ? `/ ${req.district}` : ''}</span>
                       </div>
                       {req.preferredStore && (
-                        <div className="text-[11px] text-wood-dark font-medium flex items-center gap-1.5 mt-1">
+                        <div className="text-xs text-wood-dark font-medium flex items-center gap-1.5 mt-1">
                           <Building2 className="h-3 w-3" />
                           <span>{req.preferredStore.name}</span>
                         </div>
@@ -448,22 +448,22 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                     </div>
 
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                      <span className="text-xs uppercase font-bold text-neutral-500 block tracking-wider">
                         Talep Tutarı ({req.items?.length || 0} Kalem)
                       </span>
                       <div className="text-base font-extrabold text-signal mt-0.5">
                         {formatPrice(req.totalAmount)}
                       </div>
-                      <span className="text-[10px] text-neutral-400">
+                      <span className="text-xs text-neutral-500">
                         Liste Fiyatı Snapshot
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
+                      <span className="text-xs uppercase font-bold text-neutral-500 block tracking-wider">
                         Personel Notu
                       </span>
-                      <p className="text-[11px] text-neutral-600 italic mt-0.5 line-clamp-2">
+                      <p className="text-xs text-neutral-600 italic mt-0.5 line-clamp-2">
                         {req.staffNote ? `"${req.staffNote}"` : 'Henüz not girilmemiş.'}
                       </p>
                     </div>
@@ -471,16 +471,16 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
                   {/* Expanded Items & History Drawer */}
                   {isExpanded && (
-                    <div className="border-t border-neutral-100 bg-paper p-5 space-y-5 animate-fade-in">
+                    <div className="border-t border-line bg-paper p-5 space-y-5 animate-fade-in">
                       {/* Items Table */}
                       <div>
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-neutral-700 mb-3 flex items-center gap-2">
                           <Package className="h-4 w-4 text-wood" />
                           <span>Talep Edilen Ürün Kalemleri</span>
                         </h4>
-                        <div className="bg-white border border-neutral-200 rounded-xs overflow-hidden">
+                        <div className="bg-white border border-line rounded-xs overflow-hidden">
                           <table className="w-full text-left text-xs">
-                            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-500 font-bold uppercase text-[10px]">
+                            <thead className="bg-paper border-b border-line text-neutral-500 font-bold uppercase text-xs">
                               <tr>
                                 <th className="p-3">Ürün</th>
                                 <th className="p-3">Renk / Varyant</th>
@@ -489,9 +489,9 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                                 <th className="p-3 text-right">Toplam</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-neutral-100">
+                            <tbody className="divide-y divide-line">
                               {req.items?.map((item) => (
-                                <tr key={item.id} className="hover:bg-neutral-50/50">
+                                <tr key={item.id} className="hover:bg-paper/50">
                                   <td className="p-3 font-medium text-neutral-900">
                                     {item.productName}
                                   </td>
@@ -517,14 +517,14 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                       {/* Events and Audit Log */}
                       {req.events && req.events.length > 0 && (
                         <div>
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-2 flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-neutral-700 mb-2 flex items-center gap-2">
                             <History className="h-4 w-4 text-wood" />
                             <span>İşlem & Durum Geçmişi</span>
                           </h4>
-                          <div className="bg-white border border-neutral-200 rounded-xs p-3 space-y-2">
+                          <div className="bg-white border border-line rounded-xs p-3 space-y-2">
                             {req.events.map((evt) => (
-                              <div key={evt.id} className="text-xs flex items-start gap-2 border-b border-neutral-100 pb-2 last:border-b-0 last:pb-0">
-                                <span className="text-[10px] font-mono text-neutral-400 whitespace-nowrap pt-0.5">
+                              <div key={evt.id} className="text-xs flex items-start gap-2 border-b border-line pb-2 last:border-b-0 last:pb-0">
+                                <span className="text-xs font-mono text-neutral-500 whitespace-nowrap pt-0.5">
                                   {new Date(evt.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                                 <span className="font-semibold text-neutral-800">{evt.eventType}:</span>
@@ -544,7 +544,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
         {/* Pagination */}
         {totalCount > pageSize && (
-          <div className="mt-6 pt-4 border-t border-neutral-100 flex justify-center">
+          <div className="mt-6 pt-4 border-t border-line flex justify-center">
             <Pagination
               totalItems={totalCount}
               currentPage={currentPage}
@@ -558,9 +558,9 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
       {/* Status Update Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-xs border border-neutral-200 shadow-xl max-w-md w-full p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fade-in">
+          <div className="bg-white rounded-xs border border-line shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-line pb-3">
               <div>
                 <h4 className="text-sm font-bold text-neutral-900">
                   Talep Durumunu Güncelle
@@ -571,7 +571,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
               </div>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="text-neutral-400 hover:text-neutral-600 text-sm font-bold cursor-pointer"
+                className="text-neutral-500 hover:text-neutral-600 text-sm font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -579,13 +579,13 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
             <form onSubmit={handleUpdateStatus} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1.5">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1.5">
                   Yeni Durum
                 </label>
                 <select
                   value={targetStatus}
                   onChange={(e) => setTargetStatus(e.target.value as RequestStatusType)}
-                  className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
+                  className="w-full px-3 py-2 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"
                 >
                   {/* Mevcut durum: durumu değiştirmeden yalnızca personel notu eklemek için */}
                   <option value={selectedRequest.status}>
@@ -600,7 +600,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1.5">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1.5">
                   Personel Notu / Açıklama
                 </label>
                 <textarea
@@ -608,7 +608,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                   value={staffNote}
                   onChange={(e) => setStaffNote(e.target.value)}
                   placeholder="Müşteriyle görüşüldü, Modoko showroom randevusu teyit edildi..."
-                  className="w-full p-3 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
+                  className="w-full p-3 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"
                 />
               </div>
 
@@ -616,14 +616,14 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-xs hover:bg-neutral-50 cursor-pointer"
+                  className="px-4 py-2 border border-line-strong text-neutral-700 text-xs font-semibold rounded-xs hover:bg-paper cursor-pointer"
                 >
                   Vazgeç
                 </button>
                 <button
                   type="submit"
                   disabled={isUpdatingStatus}
-                  className="px-5 py-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   {isUpdatingStatus && <RefreshCw className="h-3 w-3 animate-spin" />}
                   <span>Kaydet</span>

@@ -295,7 +295,7 @@ export default function OrderRequestPage() {
   // If cart is completely empty
   if (!isQuoting && cartItems.length === 0) {
     return (
-      <div className="w-full bg-white min-h-screen py-20">
+      <div className="w-full bg-canvas min-h-screen py-20">
         <div className="max-w-xl mx-auto px-4 text-center">
           <div className="bg-paper border border-line rounded-xs p-10">
             <ShoppingBag className="h-16 w-16 text-neutral-300 stroke-[1.5] mx-auto mb-4" />
@@ -305,7 +305,7 @@ export default function OrderRequestPage() {
             </p>
             <Link
               href="/"
-              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
+              className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
             >
               Ürünlere göz atın
             </Link>
@@ -316,7 +316,7 @@ export default function OrderRequestPage() {
   }
 
   return (
-    <div className="w-full bg-white min-h-screen py-10 md:py-14">
+    <div className="w-full bg-canvas min-h-screen py-10 md:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Navigation Breadcrumb */}
@@ -766,7 +766,7 @@ export default function OrderRequestPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || isQuoting || isCityDisabled}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold transition-colors rounded-xs cursor-pointer disabled:bg-neutral-400 disabled:cursor-not-allowed"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer disabled:bg-neutral-300 disabled:text-neutral-600 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -833,7 +833,7 @@ export default function OrderRequestPage() {
                   clearFieldError('kvkk');
                   setShowKvkkModal(false);
                 }}
-                className="bg-ink hover:bg-wood text-white text-sm font-semibold px-5 py-2.5 rounded-xs cursor-pointer"
+                className="bg-ink hover:bg-neutral-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xs cursor-pointer"
               >
                 Okudum, onaylıyorum
               </button>

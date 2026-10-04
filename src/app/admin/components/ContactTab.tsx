@@ -99,79 +99,79 @@ export const ContactTab: React.FC<ContactTabProps> = ({
     <div className="space-y-8 animate-fade-in max-w-5xl">
       
       {/* 1. Contact & Workshop Physical Details */}
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs space-y-6">
-        <div className="border-b border-neutral-100 pb-4">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block mb-1">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-6">
+        <div className="border-b border-line pb-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
             İletişim & Konum Yönetimi
           </span>
-          <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <Phone className="h-4 w-4 text-amber-700" />
+          <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
+            <Phone className="h-4 w-4 text-wood-dark" />
             <span>Firma İletişim Bilgileri</span>
           </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1">
               Müşteri Hizmetleri / Sabit Telefon
             </label>
             <input
               type="text"
               value={localContact.phone}
               onChange={(e) => setLocalContact({ ...localContact, phone: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="0216 420 00 00"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1">
               Resmi E-Posta Adresi
             </label>
             <input
               type="email"
               value={localContact.email}
               onChange={(e) => setLocalContact({ ...localContact, email: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="info@ermaymobilya.com"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1">
               Fabrika & Üretim Merkezi Açık Adresi
             </label>
             <input
               type="text"
               value={localContact.address}
               onChange={(e) => setLocalContact({ ...localContact, address: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1">
               Showroom / Mağaza Konumu (Footer & Nav)
             </label>
             <input
               type="text"
               value={localContact.showroom || ''}
               onChange={(e) => setLocalContact({ ...localContact, showroom: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1">
               Resmi WhatsApp Sipariş / İletişim Numarası
             </label>
             <input
               type="text"
               value={localContact.whatsapp || ''}
               onChange={(e) => setLocalContact({ ...localContact, whatsapp: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
               placeholder="+90 532 419 41 51"
             />
           </div>
@@ -179,23 +179,23 @@ export const ContactTab: React.FC<ContactTabProps> = ({
       </div>
 
       {/* 2. Social Media Channels CMS */}
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs space-y-6">
-        <div className="border-b border-neutral-100 pb-4">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block mb-1">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-6">
+        <div className="border-b border-line pb-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
             Topluluk & Kanal Entegrasyonu
           </span>
-          <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <Share2 className="h-4 w-4 text-amber-700" />
+          <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
+            <Share2 className="h-4 w-4 text-wood-dark" />
             <span>Sosyal Medya & Sipariş Hatları</span>
           </h3>
-          <p className="text-xs text-neutral-500 font-light mt-0.5">
+          <p className="text-xs text-neutral-500 mt-0.5">
             Web sitesinin üst menüsünde, altbilgisinde (footer) ve ürün detaylarında gösterilecek resmi hesap bağlantıları.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1.5">
+            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
               <InstagramIcon className="h-3.5 w-3.5 text-pink-600" />
               <span>Instagram Kanalı (URL / Kullanıcı Adı)</span>
             </label>
@@ -203,49 +203,49 @@ export const ContactTab: React.FC<ContactTabProps> = ({
               type="text"
               value={localSocials.instagram}
               onChange={(e) => setLocalSocials({ ...localSocials, instagram: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://instagram.com/ermaymobilya"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <YoutubeIcon className="h-3.5 w-3.5 text-red-600" />
+            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
+              <YoutubeIcon className="h-3.5 w-3.5 text-signal" />
               <span>YouTube Kanalı (Atölye & Üretim Videoları)</span>
             </label>
             <input
               type="text"
               value={localSocials.youtube}
               onChange={(e) => setLocalSocials({ ...localSocials, youtube: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://youtube.com/@ermaymobilya"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <Send className="h-3.5 w-3.5 text-sky-600" />
+            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
+              <Send className="h-3.5 w-3.5 text-wood-dark" />
               <span>Telegram Kanalı / İletişim Grubu</span>
             </label>
             <input
               type="text"
               value={localSocials.telegram}
               onChange={(e) => setLocalSocials({ ...localSocials, telegram: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://t.me/ermaymobilya"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
+              <MessageSquare className="h-3.5 w-3.5 text-ok" />
               <span>WhatsApp Esnaf Sipariş Hattı (Numara)</span>
             </label>
             <input
               type="text"
               value={localSocials.whatsapp}
               onChange={(e) => setLocalSocials({ ...localSocials, whatsapp: e.target.value })}
-              className="w-full text-xs border border-neutral-300 p-2.5 rounded-sm focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
+              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
               placeholder="+90 532 000 00 00"
             />
           </div>
@@ -255,7 +255,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
           <button
             type="button"
             onClick={handleSaveAll}
-            className="bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-widest py-3 px-8 rounded-sm transition-colors cursor-pointer shadow-sm"
+            className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
           >
             Tüm İletişim ve Sosyal Bağlantıları Kaydet
           </button>
@@ -263,27 +263,27 @@ export const ContactTab: React.FC<ContactTabProps> = ({
       </div>
 
       {/* 3. Telegram Instant Order Notification Setup & Testing */}
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs space-y-5">
-        <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-5">
+        <div className="border-b border-line pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-sky-600 block mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
               Anlık Yönetici Bildirimleri
             </span>
-            <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-              <BellRing className="h-4 w-4 text-sky-600" />
+            <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
+              <BellRing className="h-4 w-4 text-wood-dark" />
               <span>Telegram Sipariş Bildirim Altyapısı</span>
             </h3>
           </div>
-          <span className="text-xs bg-sky-50 text-sky-800 border border-sky-200 px-3 py-1 rounded-full font-semibold">
+          <span className="text-xs bg-paper text-wood-dark border border-line px-3 py-1 rounded-full font-semibold">
             Canlı Entegrasyon Hazır
           </span>
         </div>
 
-        <div className="bg-sky-50/50 p-4 rounded border border-sky-100 text-xs space-y-2 text-neutral-700">
+        <div className="bg-paper p-4 rounded border border-line text-xs space-y-2 text-neutral-700">
           <p className="font-semibold text-sky-950">
             🔔 Web sitesinden yeni bir sipariş verildiğinde Telegram botunuz üzerinden anında:
           </p>
-          <ul className="list-disc pl-5 space-y-1 text-neutral-600 text-[11px]">
+          <ul className="list-disc pl-5 space-y-1 text-neutral-600 text-xs">
             <li>Sipariş numarası, tutarı ve müşteri adı</li>
             <li>Teslim edilecek şehir ve bölgesel lojistik kodu (Örn: <code>34-MAR</code>)</li>
             <li>Satın alımın yapıldığı cihaz türü (Mobil / Laptop / Masaüstü)</li>
@@ -296,7 +296,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             type="button"
             onClick={handleTestTelegram}
             disabled={isTestingTelegram}
-            className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-400 text-white text-xs font-bold uppercase py-2.5 px-5 rounded transition-colors cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-400 text-white text-sm font-semibold py-2.5 px-5 rounded transition-colors cursor-pointer"
           >
             {isTestingTelegram ? (
               <>
@@ -312,7 +312,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
           </button>
 
           {telegramStatusMsg && (
-            <span className={`text-xs font-semibold ${telegramStatusMsg.includes('başarıyla') ? 'text-emerald-700' : 'text-rose-700'}`}>
+            <span className={`text-xs font-semibold ${telegramStatusMsg.includes('başarıyla') ? 'text-ok' : 'text-signal'}`}>
               {telegramStatusMsg}
             </span>
           )}
@@ -320,18 +320,18 @@ export const ContactTab: React.FC<ContactTabProps> = ({
       </div>
 
       {/* 4. Daily Sales Report Bulletin */}
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs space-y-5">
-        <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-5">
+        <div className="border-b border-line pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
               Satış Muhasebe Özeti
             </span>
-            <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-amber-700" />
+            <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4 text-wood-dark" />
               <span>Günlük Satış Durum Raporu (E-Posta Bülteni)</span>
             </h3>
           </div>
-          <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full font-semibold">
+          <span className="text-xs bg-paper text-wood-dark border border-line px-3 py-1 rounded-full font-semibold">
             Her Sabah 09:00 Otomatik
           </span>
         </div>
@@ -345,7 +345,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             type="button"
             onClick={handleSendDailyReport}
             disabled={isSendingReport}
-            className="inline-flex items-center gap-2 bg-amber-700 hover:bg-amber-800 disabled:bg-amber-400 text-white text-xs font-bold uppercase py-2.5 px-5 rounded transition-colors cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-2 bg-amber-700 hover:bg-amber-800 disabled:bg-wood text-white text-sm font-semibold py-2.5 px-5 rounded transition-colors cursor-pointer"
           >
             {isSendingReport ? (
               <>
@@ -361,7 +361,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
           </button>
 
           {reportStatusMsg && (
-            <span className={`text-xs font-semibold ${reportStatusMsg.includes('gönderildi') ? 'text-emerald-700' : 'text-rose-700'}`}>
+            <span className={`text-xs font-semibold ${reportStatusMsg.includes('gönderildi') ? 'text-ok' : 'text-signal'}`}>
               {reportStatusMsg}
             </span>
           )}

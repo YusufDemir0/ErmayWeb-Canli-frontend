@@ -161,20 +161,20 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Header Card */}
-      <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-xs border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-wood" />
             <span>Blog & SEO İçerik Yönetimi</span>
           </h2>
-          <p className="text-xs text-neutral-500 font-light mt-1">
+          <p className="text-xs text-neutral-500 mt-1">
             Yapay zeka arama motorları ve Google SEO için makale, mimari rehber ve dekorasyon tüyoları yayınlayın.
           </p>
         </div>
 
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Yeni Blog Yazısı Ekle</span>
@@ -182,8 +182,8 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-4 rounded-sm border border-neutral-200 shadow-xs flex items-center gap-3">
-        <Search className="h-4 w-4 text-neutral-400" />
+      <div className="bg-white p-4 rounded-xs border border-line flex items-center gap-3">
+        <Search className="h-4 w-4 text-neutral-500" />
         <input
           type="text"
           placeholder="Blog başlığı veya kategori ara..."
@@ -194,18 +194,18 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       </div>
 
       {/* Posts Table */}
-      <div className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xs border border-line overflow-hidden">
         {isLoading ? (
-          <div className="text-center py-16 text-xs text-neutral-400">Blog yazıları yükleniyor...</div>
+          <div className="text-center py-16 text-xs text-neutral-500">Blog yazıları yükleniyor...</div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-16 text-xs text-neutral-400 space-y-2">
+          <div className="text-center py-16 text-xs text-neutral-500 space-y-2">
             <BookOpen className="h-8 w-8 text-neutral-300 mx-auto" />
             <p>Henüz blog yazısı bulunmuyor.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50 text-[10px] uppercase font-bold text-neutral-500 tracking-wider border-b border-neutral-200">
+              <thead className="bg-paper text-xs uppercase font-bold text-neutral-500 tracking-wider border-b border-line">
                 <tr>
                   <th className="py-3 px-4">Görsel</th>
                   <th className="py-3 px-4">Başlık</th>
@@ -215,11 +215,11 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   <th className="py-3 px-4 text-right">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-line">
                 {filteredPosts.map((post) => (
-                  <tr key={post.id} className="hover:bg-neutral-50/70 transition-colors">
+                  <tr key={post.id} className="hover:bg-paper/70 transition-colors">
                     <td className="py-3 px-4">
-                      <div className="w-12 h-12 bg-neutral-100 rounded-xs overflow-hidden border border-neutral-200">
+                      <div className="w-12 h-12 bg-neutral-100 rounded-xs overflow-hidden border border-line">
                         <img
                           src={post.coverImage || '/default-furniture.webp'}
                           alt={post.title}
@@ -231,22 +231,22 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                       {post.title}
                     </td>
                     <td className="py-3 px-4 text-neutral-600">
-                      <span className="px-2 py-0.5 bg-neutral-100 rounded-xs text-[10px] font-mono">
+                      <span className="px-2 py-0.5 bg-neutral-100 rounded-xs text-xs font-mono">
                         {post.category || 'Genel'}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       {post.isPublished !== false ? (
-                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xs text-[10px] font-bold">
+                        <span className="px-2 py-0.5 bg-ok-soft text-ok border border-ok/25 rounded-xs text-xs font-bold">
                           Yayında
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-xs text-[10px]">
+                        <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-xs text-xs">
                           Taslak
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-neutral-400 font-mono text-[11px]">
+                    <td className="py-3 px-4 text-neutral-500 font-mono text-xs">
                       {new Date(post.publishedAt || post.createdAt).toLocaleDateString('tr-TR')}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
@@ -268,7 +268,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                       </button>
                       <button
                         onClick={() => handleDelete(post)}
-                        className="inline-flex p-1.5 hover:bg-rose-50 text-rose-600 rounded-xs transition-colors"
+                        className="inline-flex p-1.5 hover:bg-signal/5 text-signal rounded-xs transition-colors"
                         title="Sil"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -284,17 +284,17 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
 
       {/* Blog Editor Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-3xl rounded-sm shadow-xl border border-neutral-200 max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-3xl rounded-xs shadow-xl border border-line max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+            <div className="px-6 py-4 border-b border-line flex items-center justify-between bg-paper/50">
+              <h3 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-wood" />
                 <span>{editingPostId ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı Oluştur'}</span>
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-neutral-400 hover:text-neutral-700 rounded-xs"
+                className="p-1.5 text-neutral-500 hover:text-neutral-700 rounded-xs"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -303,7 +303,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-xs">
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Blog Başlığı *
                 </label>
                 <input
@@ -312,13 +312,13 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Örn: Masif Ahşap Mobilya Bakımı ve 2026 Trendleri"
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  <label className="block text-sm font-semibold text-neutral-700 mb-1">
                     Kategori
                   </label>
                   <input
@@ -326,12 +326,12 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="Dekorasyon & Tasarım"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  <label className="block text-sm font-semibold text-neutral-700 mb-1">
                     Yazar
                   </label>
                   <input
@@ -339,14 +339,14 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.author}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                     placeholder="Ermay Mobilya Mimari Ekibi"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                 </div>
               </div>
 
               {/* Cover Image */}
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Kapak Görseli
                 </label>
                 <div className="flex items-center gap-3">
@@ -355,9 +355,9 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.coverImage}
                     onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
                     placeholder="Görsel URL veya dosya yükleyin"
-                    className="flex-1 px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                    className="flex-1 px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xs border border-neutral-300 transition-colors">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xs border border-line-strong transition-colors">
                     <ImageIcon className="h-3.5 w-3.5 text-neutral-500" />
                     <span>{uploadingImage ? 'Yükleniyor...' : 'Yükle'}</span>
                     <input
@@ -372,7 +372,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Kısa Özet (Google & AI Snippet)
                 </label>
                 <textarea
@@ -380,12 +380,12 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.summary}
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   placeholder="Arama motorlarında ve kartlarda görünecek 1-2 cümlelik özet..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Yazı İçeriği *
                 </label>
                 <textarea
@@ -394,12 +394,12 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Detaylı mimari rehber, ahşap türleri, bakım tüyoları ve dekorasyon detaylarını buraya girin..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono text-xs leading-relaxed"
+                  className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono text-xs leading-relaxed"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                <label className="block text-sm font-semibold text-neutral-700 mb-1">
                   Etiketler (Virgülle ayırın)
                 </label>
                 <input
@@ -407,7 +407,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                   placeholder="masif gürgen, modoko, makam takımı, ofis koltuğu"
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono"
+                  className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono"
                 />
               </div>
 
@@ -417,7 +417,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   id="isPublished"
                   checked={formData.isPublished}
                   onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                  className="h-4 w-4 text-wood border-neutral-300 rounded-xs focus:ring-wood"
+                  className="h-4 w-4 text-wood border-line-strong rounded-xs focus:ring-wood"
                 />
                 <label htmlFor="isPublished" className="text-xs font-semibold text-neutral-800 cursor-pointer">
                   Hemen Yayına Al (Web sitesinde ve arama motorlarında görünsün)
@@ -425,17 +425,17 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-4 border-t border-neutral-100 flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-line flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 font-bold rounded-xs transition-colors cursor-pointer"
+                  className="px-4 py-2 border border-line-strong hover:bg-neutral-100 text-neutral-700 font-bold rounded-xs transition-colors cursor-pointer"
                 >
                   İptal
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-wood hover:bg-wood-dark text-white font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-ink text-ink font-bold rounded-xs transition-colors cursor-pointer"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span>{editingPostId ? 'Güncellemeleri Kaydet' : 'Blog Yazısını Yayınla'}</span>

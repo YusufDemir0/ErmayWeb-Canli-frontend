@@ -82,15 +82,15 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="bg-white p-6 md:p-8 rounded-sm border border-neutral-200 shadow-xs">
+      <div className="bg-white p-6 md:p-8 rounded-xs border border-line">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-neutral-100 pb-4 mb-6 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-4 mb-6 gap-3">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-wood block mb-1">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-wood block mb-1">
               Vitrin & Manşet Yönetimi
             </span>
-            <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900">
+            <h3 className="text-base font-semibold text-neutral-900">
               Ana Sayfa Hero Banner & Slaytlar
             </h3>
           </div>
@@ -98,7 +98,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <button
             type="button"
             onClick={handleAddSlide}
-            className="flex items-center gap-1.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 bg-brand hover:bg-ink text-ink text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Yeni Slayt Ekle</span>
@@ -123,7 +123,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                   <button
                     type="button"
                     onClick={() => handleDeleteSlide(index)}
-                    className="flex items-center gap-1 text-xs text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-xs text-neutral-500 hover:text-signal transition-colors cursor-pointer"
                   >
                     <X className="h-4 w-4" />
                     <span>Slaytı Sil</span>
@@ -132,7 +132,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
 
                 {/* Slide Image Uploader & Preview */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                  <div className="md:col-span-4 aspect-[16/9] bg-neutral-200 rounded-xs overflow-hidden border border-neutral-300 relative">
+                  <div className="md:col-span-4 aspect-[16/9] bg-neutral-200 rounded-xs overflow-hidden border border-line-strong relative">
                     {slide.image ? (
                       <img
                         src={slide.image}
@@ -140,7 +140,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 text-xs gap-1">
+                      <div className="w-full h-full flex flex-col items-center justify-center text-neutral-500 text-xs gap-1">
                         <ImageIcon className="h-6 w-6 text-neutral-300" />
                         <span>Görsel Yükleyin</span>
                       </div>
@@ -153,7 +153,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                   </div>
 
                   <div className="md:col-span-8 space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
+                    <label className="text-sm font-semibold text-neutral-700 block">
                       Slayt Arka Plan Görseli
                     </label>
                     <input
@@ -171,7 +171,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         u[index] = { ...u[index], image: e.target.value };
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
+                      className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white"
                     />
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                 {/* Titles */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                    <label className="text-sm font-semibold text-neutral-700 block mb-1">
                       Üst Rozet / Etiket
                     </label>
                     <input
@@ -191,12 +191,12 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
                       placeholder="Örn: 2026 YENİ KOLEKSİYON"
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
+                      className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                    <label className="text-sm font-semibold text-neutral-700 block mb-1">
                       Ana Manşet Başlığı
                     </label>
                     <input
@@ -208,13 +208,13 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
                       placeholder="Örn: Prestij ve Fonksiyonelliğin Zirvesi"
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white font-serif font-bold"
+                      className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white font-display font-bold"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                  <label className="text-sm font-semibold text-neutral-700 block mb-1">
                     Alt Açıklama Metni
                   </label>
                   <textarea
@@ -226,14 +226,14 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                       setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                     }}
                     placeholder="Makam takımları, çalışma grupları ve kurumsal çalışma alanları için standart seri fabrika çözümleri."
-                    className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white leading-relaxed"
+                    className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white leading-relaxed"
                   />
                 </div>
 
                 {/* Button Text & SMART TARGET PICKER (No manual typing required!) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-line">
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                    <label className="text-sm font-semibold text-neutral-700 block mb-1">
                       Buton Üzerindeki Metin
                     </label>
                     <input
@@ -245,12 +245,12 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
                       placeholder="Örn: Koleksiyonu İncele"
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white font-bold"
+                      className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white font-bold"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1">
+                    <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1">
                       <LinkIcon className="h-3 w-3 text-wood" />
                       <span>Buton Yönlendirme Hedefi (Açılır Menüden Seçin)</span>
                     </label>
@@ -273,7 +273,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         }
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
-                      className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
+                      className="w-full text-xs border border-line-strong p-2 rounded-xs bg-white"
                     >
                       <optgroup label="Genel Sayfalar">
                         <option value="/katalog">Katalog & Tüm Koleksiyon (/katalog)</option>
@@ -315,7 +315,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                         setLocalHomeConfig({ ...localHomeConfig, heroSlides: u });
                       }}
                       placeholder="/katalog"
-                      className="w-full text-[11px] font-mono border border-neutral-300 p-1.5 rounded-xs bg-white mt-1 text-neutral-600"
+                      className="w-full text-xs font-mono border border-line-strong p-1.5 rounded-xs bg-white mt-1 text-neutral-600"
                     />
                   </div>
                 </div>
@@ -325,13 +325,13 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           </div>
 
           {/* Section Titles */}
-          <div className="border-t border-neutral-200 pt-6 space-y-4">
-            <h4 className="text-xs font-bold text-wood-dark uppercase tracking-wider">
+          <div className="border-t border-line pt-6 space-y-4">
+            <h4 className="text-sm font-semibold text-wood-dark">
               Ana Sayfa Bölüm Başlıkları
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                <label className="text-sm font-semibold text-neutral-700 block mb-1">
                   Öne Çıkan Koleksiyon Başlığı
                 </label>
                 <input
@@ -340,11 +340,11 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                   onChange={(e) =>
                     setLocalHomeConfig({ ...localHomeConfig, featuredTitle: e.target.value })
                   }
-                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white"
+                  className="w-full text-xs border border-line-strong p-2.5 rounded-xs bg-white"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+                <label className="text-sm font-semibold text-neutral-700 block mb-1">
                   Öne Çıkan Koleksiyon Alt Başlığı
                 </label>
                 <input
@@ -353,7 +353,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                   onChange={(e) =>
                     setLocalHomeConfig({ ...localHomeConfig, featuredSubtitle: e.target.value })
                   }
-                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white"
+                  className="w-full text-xs border border-line-strong p-2.5 rounded-xs bg-white"
                 />
               </div>
             </div>
@@ -363,7 +363,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
+              className="bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold py-3.5 px-8 rounded-xs transition-colors cursor-pointer"
             >
               Ana Sayfa Değişikliklerini Kaydet
             </button>

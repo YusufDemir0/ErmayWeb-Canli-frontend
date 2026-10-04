@@ -28,7 +28,7 @@ export const CartPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen py-10 md:py-12">
+    <div className="w-full bg-canvas min-h-screen py-10 md:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
@@ -58,7 +58,7 @@ export const CartPage: React.FC = () => {
             </p>
             <Link
               href="/"
-              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
+              className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
             >
               Ürünlere göz atın
             </Link>
@@ -199,7 +199,7 @@ export const CartPage: React.FC = () => {
 
                 <Link
                   href="/talep"
-                  className="w-full h-12 flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold transition-colors rounded-xs cursor-pointer"
+                  className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer"
                 >
                   <span>Sipariş talebine geç</span>
                   <ArrowRight className="h-4 w-4" />

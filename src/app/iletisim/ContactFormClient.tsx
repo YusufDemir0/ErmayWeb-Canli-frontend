@@ -87,7 +87,7 @@ export default function ContactFormClient() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value.replace(/[0-9]/g, '') })}
               placeholder="Adınız Soyadınız"
-              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
+              className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
             />
           </div>
 
@@ -102,7 +102,7 @@ export default function ContactFormClient() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="ornek@domain.com"
-                className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
+                className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
               />
             </div>
 
@@ -116,7 +116,7 @@ export default function ContactFormClient() {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="0532 000 00 00"
-                className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
+                className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function ContactFormClient() {
             <select
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
+              className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
             >
               <option value="Özel İmalat & Mobilya Talebi">Özel İmalat & Mobilya Talebi</option>
               <option value="Sipariş & Teslimat Durumu">Sipariş & Teslimat Durumu</option>
@@ -148,7 +148,7 @@ export default function ContactFormClient() {
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Mobilya talebiniz, ölçü detayları veya sorunuz..."
-              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none resize-none"
+              className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none resize-none"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function ContactFormClient() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-neutral-900 hover:bg-wood disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
+            className="bg-ink hover:bg-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>{isSubmitting ? 'GÖNDERİLİYOR...' : 'GÖNDER'}</span>
             <Send className="h-3.5 w-3.5" />

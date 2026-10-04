@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Check, AlertTriangle, Lock, User, KeyRound, AlertCircle } from 'lucide-react';
+import { User, KeyRound, AlertCircle } from 'lucide-react';
 import { useCMSStore } from '../../stores/useCMSStore';
 import apiClient from '../../services/api';
 import { isAxiosError } from 'axios';
 
 // Modular Admin Subcomponents
-import { AdminHeader, type AdminModuleMode } from './components/AdminHeader';
-import { AdminTabsNav, type AdminTabId } from './components/AdminTabsNav';
+import { AdminShell, findNavItem, type AdminTabId } from './components/AdminShell';
+import BrandLogo from '../../components/BrandLogo';
+import { requestService } from '../../services/requestService';
 import { OverviewTab } from './components/OverviewTab';
 import { OrdersTab } from './components/OrdersTab';
 import { ContactMessagesTab } from './components/ContactMessagesTab';
@@ -19,7 +20,6 @@ import { ErpSyncTab } from './components/ErpSyncTab';
 import { HomeCMSTab } from './components/HomeCMSTab';
 import { CorporateCMSTab } from './components/CorporateCMSTab';
 import { TickerTab } from './components/TickerTab';
-import { PopupTab } from './components/PopupTab';
 import { ContactTab } from './components/ContactTab';
 import { StoresTab } from './components/StoresTab';
 import { DeliveryZonesTab } from './components/DeliveryZonesTab';
@@ -38,35 +38,31 @@ export default function AdminPage() {
   const [loginPass, setLoginPass] = useState('');
   const [authError, setAuthError] = useState('');
 
-  // Active Panel Mode & Active Tab State
-  const [activeModule, setActiveModule] = useState<AdminModuleMode>('ecommerce');
-  const [activeTab, setActiveTab] = useState<AdminTabId>('overview');
+  // Aktif sekme adres çubuğunda (?sekme=) tutulur: sayfa yenilenince veya bağlantı paylaşılınca aynı ekran açılır
+  const [activeTab, setActiveTabState] = useState<AdminTabId>('overview');
   const [openMessageCount, setOpenMessageCount] = useState<number | undefined>(undefined);
+  const [newRequestCount, setNewRequestCount] = useState<number | undefined>(undefined);
 
-  const handleModuleChange = (mode: AdminModuleMode) => {
-    setActiveModule(mode);
-    if (mode === 'ecommerce') {
-      setActiveTab('overview');
-    } else {
-      setActiveTab('homeCMS');
-    }
+  const setActiveTab = (tab: AdminTabId) => {
+    setActiveTabState(tab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('sekme', tab);
+    window.history.replaceState(null, '', url.toString());
+    window.scrollTo({ top: 0 });
   };
 
-  // Global Alerts Feedback State
-  const [savedSuccessMsg, setSavedSuccessMsg] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('sekme') as AdminTabId | null;
+    if (fromUrl && findNavItem(fromUrl)) setActiveTabState(fromUrl);
+  }, []);
 
+  // Başarı/hata bildirimi yalnız toast ile (sayfa içi tekrar eden bant yok)
   const showSaveSuccess = (msg: string) => {
-    setSavedSuccessMsg(msg);
-    setErrorMessage('');
-    toast.success('İşlem Başarılı', msg);
-    setTimeout(() => setSavedSuccessMsg(''), 3500);
+    toast.success('Kaydedildi', msg);
   };
 
   const showError = (msg: string) => {
-    setErrorMessage(msg);
-    setSavedSuccessMsg('');
-    toast.error('Hata Oluştu', msg);
+    toast.error('İşlem tamamlanamadı', msg);
   };
 
   // CMS Store Selectors
@@ -74,7 +70,6 @@ export default function AdminPage() {
   const addProduct = useCMSStore((state) => state.addProduct);
   const updateProduct = useCMSStore((state) => state.updateProduct);
   const deleteProduct = useCMSStore((state) => state.deleteProduct);
-  const resetProductsToDefault = useCMSStore((state) => state.resetProductsToDefault);
 
   const categories = useCMSStore((state) => state.categories);
   const addCategory = useCMSStore((state) => state.addCategory);
@@ -93,12 +88,10 @@ export default function AdminPage() {
   const removeTickerItem = useCMSStore((state) => state.removeTickerItem);
 
   const campaignPopup = useCMSStore((state) => state.campaignPopup);
-  const updateCampaignPopup = useCMSStore((state) => state.updateCampaignPopup);
 
   const contactInfo = useCMSStore((state) => state.contactInfo);
   const updateContactInfo = useCMSStore((state) => state.updateContactInfo);
 
-  const stores = useCMSStore((state) => state.stores);
 
   // Check login session on mount via Backend JWT Verification (HttpOnly cookie via withCredentials)
   useEffect(() => {
@@ -108,7 +101,7 @@ export default function AdminPage() {
         const role = res.data?.user?.role;
         if (res.data?.success && (role === 'ADMIN' || role === 'STAFF')) {
           setUserRole(role);
-          if (role === 'STAFF') setActiveTab('orders');
+          if (role === 'STAFF') setActiveTabState('orders');
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
@@ -135,6 +128,10 @@ export default function AdminPage() {
         .get('/contact', { params: { status: 'open', limit: 1 } })
         .then((res) => setOpenMessageCount(res.data?.openCount ?? 0))
         .catch(() => {});
+      requestService
+        .getAdminRequests({ status: 'NEW', page: 1, limit: 1 })
+        .then((res) => setNewRequestCount(res?.pagination?.total ?? res?.requests?.length ?? 0))
+        .catch(() => {});
     }
   }, [isAuthenticated, userRole]);
 
@@ -160,8 +157,7 @@ export default function AdminPage() {
         if (loginRole === 'ADMIN' || loginRole === 'STAFF') {
           setUserRole(loginRole);
           if (loginRole === 'STAFF') {
-            setActiveModule('ecommerce');
-            setActiveTab('orders');
+            setActiveTabState('orders');
           }
           setIsAuthenticated(true);
           setAuthError('');
@@ -194,280 +190,180 @@ export default function AdminPage() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-[85vh] bg-neutral-50 flex items-center justify-center">
-        <div className="text-xs font-semibold text-neutral-500 animate-pulse">
-          Admin Oturumu Doğrulanıyor...
-        </div>
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <p className="text-sm text-neutral-600">Oturum doğrulanıyor…</p>
       </div>
     );
   }
 
-  // RENDER ADMIN LOGIN CARD IF NOT AUTHENTICATED
   if (!isAuthenticated) {
     return (
-      <div className="min-h-[85vh] bg-neutral-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white border border-neutral-200 shadow-md rounded-sm p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex p-3 bg-wood/10 text-wood rounded-full mb-2">
-              <Lock className="h-6 w-6" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white border border-line rounded-xs p-8 space-y-6">
+          <div className="space-y-3">
+            <BrandLogo variant="onLight" className="h-11 w-auto" priority />
+            <div>
+              <h1 className="text-xl font-display font-bold text-ink">Yönetim paneli girişi</h1>
+              <p className="text-sm text-neutral-600 mt-1">Kullanıcı adınız ve şifrenizle giriş yapın.</p>
             </div>
-            <h1 className="text-xl font-bold tracking-wide uppercase text-neutral-900">
-              Yönetici Girişi (Admin REST API)
-            </h1>
-            <p className="text-xs text-neutral-500 font-light">
-              Ermay Mobilya güvenli yönetici paneline erişmek için yetkili JWT hesabı ile giriş yapın.
-            </p>
           </div>
 
           {authError && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <div role="alert" className="border-l-4 border-signal bg-signal/5 text-ink p-3 text-sm flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-signal" />
               <span>{authError}</span>
             </div>
           )}
 
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
-                E-Posta veya Kullanıcı Adı
+              <label htmlFor="admin-user" className="text-sm font-medium text-ink block mb-1.5">
+                Kullanıcı adı veya e-posta
               </label>
               <div className="relative">
                 <input
+                  id="admin-user"
                   type="text"
                   required
+                  autoComplete="username"
                   value={loginUser}
                   onChange={(e) => setLoginUser(e.target.value)}
-                  placeholder="admin@ermaymobilya.com"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
+                  className="w-full pl-10 pr-3 h-11 text-base sm:text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
                 />
-                <User className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
+                <User className="absolute left-3 top-3.5 h-4 w-4 text-neutral-500" />
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label htmlFor="admin-pass" className="text-sm font-medium text-ink block mb-1.5">
                 Şifre
               </label>
               <div className="relative">
                 <input
+                  id="admin-pass"
                   type="password"
                   required
+                  autoComplete="current-password"
                   value={loginPass}
                   onChange={(e) => setLoginPass(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
+                  className="w-full pl-10 pr-3 h-11 text-base sm:text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
                 />
-                <KeyRound className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
+                <KeyRound className="absolute left-3 top-3.5 h-4 w-4 text-neutral-500" />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-ink hover:bg-wood text-white text-xs font-semibold uppercase tracking-widest py-3.5 rounded-xs transition-colors cursor-pointer"
+              className="w-full bg-brand hover:bg-ink text-ink text-sm font-semibold h-11 rounded-xs transition-colors cursor-pointer"
             >
-              Güvenli Giriş Yap
+              Giriş yap
             </button>
           </form>
 
-          <div className="pt-4 border-t border-neutral-100 text-center">
-            <Link
-              href="/"
-              className="text-xs text-neutral-500 hover:text-wood transition-colors"
-            >
-              ← Ana Sayfaya Dön
-            </Link>
-          </div>
+          <Link href="/" className="block text-sm text-neutral-600 hover:text-ink">
+            ← Siteye dön
+          </Link>
         </div>
       </div>
     );
   }
 
-  // RENDER ADMIN DASHBOARD IF AUTHENTICATED
+  const staffBlocked = isStaffOnly && activeTab !== 'orders' && activeTab !== 'messages';
+
   return (
-    <div className="w-full bg-neutral-50 min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AdminHeader
-          activeModule={activeModule}
-          setActiveModule={handleModuleChange}
-          onLogout={handleLogout}
-          isStaffOnly={isStaffOnly}
-        />
+    <AdminShell
+      activeTab={staffBlocked ? 'orders' : activeTab}
+      onSelectTab={setActiveTab}
+      onLogout={handleLogout}
+      isStaffOnly={isStaffOnly}
+      counts={{
+        orders: newRequestCount,
+        messages: openMessageCount,
+      }}
+    >
+      {(staffBlocked || activeTab === 'orders') && <OrdersTab onShowSuccess={showSaveSuccess} />}
 
-        {savedSuccessMsg && (
-          <div className="bg-emerald-50 text-emerald-900 p-4 rounded-xs mb-6 flex items-center justify-between border border-emerald-300 animate-fade-in shadow-xs">
-            <div className="flex items-center gap-2 text-xs font-semibold">
-              <Check className="h-4 w-4 text-emerald-600" />
-              <span>{savedSuccessMsg}</span>
-            </div>
-          </div>
-        )}
+      {!staffBlocked && activeTab === 'messages' && <ContactMessagesTab onOpenCountChange={setOpenMessageCount} />}
 
-        {errorMessage && (
-          <div className="bg-rose-50 text-rose-900 p-4 rounded-xs mb-6 flex items-center justify-between border border-rose-300 animate-fade-in shadow-xs">
-            <div className="flex items-center gap-2 text-xs font-semibold">
-              <AlertTriangle className="h-4 w-4 text-rose-600 flex-shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-            <button
-              onClick={() => setErrorMessage('')}
-              className="text-xs text-rose-600 hover:underline cursor-pointer"
-            >
-              Kapat
-            </button>
-          </div>
-        )}
+      {!isStaffOnly && (
+        <>
+          {activeTab === 'overview' && (
+            <OverviewTab
+              products={products}
+              categoriesCount={categories.length}
+              campaignEnabled={campaignPopup.enabled}
+              discountCode={campaignPopup.discountCode}
+              setActiveTab={setActiveTab}
+            />
+          )}
 
-        <AdminTabsNav
-          activeModule={activeModule}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          isStaffOnly={isStaffOnly}
-          counts={{
-            orders: 0,
-            messages: openMessageCount,
-            categories: categories.length,
-            products: products.length,
-            tickerItems: tickerItems.length,
-            stores: stores.length,
-          }}
-        />
+          {activeTab === 'categories' && (
+            <CategoriesTab
+              categories={categories}
+              products={products}
+              onAddCategory={addCategory}
+              onUpdateCategory={updateCategory}
+              onDeleteCategory={deleteCategory}
+              onReorderCategories={reorderCategories}
+              onShowSuccess={showSaveSuccess}
+              onShowError={showError}
+            />
+          )}
 
-        {isStaffOnly && activeTab !== 'orders' && activeTab !== 'messages' && (
-          <OrdersTab onShowSuccess={showSaveSuccess} />
-        )}
+          {activeTab === 'products' && (
+            <ProductsTab
+              products={products}
+              categories={categories}
+              onAddProduct={addProduct}
+              onUpdateProduct={updateProduct}
+              onDeleteProduct={deleteProduct}
+              onShowSuccess={showSaveSuccess}
+            />
+          )}
 
-        {activeModule === 'ecommerce' && (!isStaffOnly || activeTab === 'orders' || activeTab === 'messages') && (
-          <>
-            {activeTab === 'overview' && (
-              <OverviewTab
-                orders={[]}
-                products={products}
-                categoriesCount={categories.length}
-                campaignEnabled={campaignPopup.enabled}
-                discountCode={campaignPopup.discountCode}
-                setActiveTab={setActiveTab}
-                onResetDefault={() => {
-                  resetProductsToDefault();
-                  showSaveSuccess('Tüm veriler varsayılana sıfırlandı.');
-                }}
-              />
-            )}
+          {activeTab === 'erpSync' && (
+            <ErpSyncTab categories={categories} onShowSuccess={showSaveSuccess} onShowError={showError} />
+          )}
 
-            {activeTab === 'orders' && (
-              <OrdersTab onShowSuccess={showSaveSuccess} />
-            )}
+          {activeTab === 'deliveryZones' && <DeliveryZonesTab onShowSuccess={showSaveSuccess} onShowError={showError} />}
 
-            {activeTab === 'messages' && (
-              <ContactMessagesTab onOpenCountChange={setOpenMessageCount} />
-            )}
+          {activeTab === 'landingPage' && <LandingPageTab onShowSuccess={showSaveSuccess} onShowError={showError} />}
 
-            {activeTab === 'categories' && (
-              <CategoriesTab
-                categories={categories}
-                products={products}
-                onAddCategory={addCategory}
-                onUpdateCategory={updateCategory}
-                onDeleteCategory={deleteCategory}
-                onReorderCategories={reorderCategories}
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
+          {activeTab === 'blog' && <BlogTab onShowSuccess={showSaveSuccess} onShowError={showError} />}
 
-            {activeTab === 'products' && (
-              <ProductsTab
-                products={products}
-                categories={categories}
-                onAddProduct={addProduct}
-                onUpdateProduct={updateProduct}
-                onDeleteProduct={deleteProduct}
-                onShowSuccess={showSaveSuccess}
-              />
-            )}
+          {activeTab === 'homeCMS' && (
+            <HomeCMSTab
+              homeConfig={homeConfig}
+              onUpdateHomeConfig={updateHomeConfig}
+              onShowSuccess={showSaveSuccess}
+              onShowError={showError}
+            />
+          )}
 
-            {activeTab === 'erpSync' && (
-              <ErpSyncTab
-                categories={categories}
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
+          {activeTab === 'corporateCMS' && (
+            <CorporateCMSTab
+              corporateConfig={corporateConfig}
+              onUpdateCorporateConfig={updateCorporateConfig}
+              onShowSuccess={showSaveSuccess}
+            />
+          )}
 
+          {activeTab === 'stores' && <StoresTab onShowSuccess={showSaveSuccess} />}
 
+          {activeTab === 'ticker' && (
+            <TickerTab
+              tickerItems={tickerItems}
+              onAddTickerItem={addTickerItem}
+              onRemoveTickerItem={removeTickerItem}
+              onShowSuccess={showSaveSuccess}
+            />
+          )}
 
-            {activeTab === 'deliveryZones' && (
-              <DeliveryZonesTab
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
-          </>
-        )}
-
-        {activeModule === 'cms' && !isStaffOnly && (
-          <>
-            {activeTab === 'landingPage' && (
-              <LandingPageTab
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
-
-            {activeTab === 'blog' && (
-              <BlogTab
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
-
-            {activeTab === 'homeCMS' && (
-              <HomeCMSTab
-                homeConfig={homeConfig}
-                onUpdateHomeConfig={updateHomeConfig}
-                onShowSuccess={showSaveSuccess}
-                onShowError={showError}
-              />
-            )}
-
-            {activeTab === 'corporateCMS' && (
-              <CorporateCMSTab
-                corporateConfig={corporateConfig}
-                onUpdateCorporateConfig={updateCorporateConfig}
-                onShowSuccess={showSaveSuccess}
-              />
-            )}
-
-            {activeTab === 'stores' && (
-              <StoresTab onShowSuccess={showSaveSuccess} />
-            )}
-
-            {activeTab === 'ticker' && (
-              <TickerTab
-                tickerItems={tickerItems}
-                onAddTickerItem={addTickerItem}
-                onRemoveTickerItem={removeTickerItem}
-                onShowSuccess={showSaveSuccess}
-              />
-            )}
-
-            {activeTab === 'popup' && (
-              <PopupTab
-                campaignPopup={campaignPopup}
-                onUpdateCampaignPopup={updateCampaignPopup}
-                onShowSuccess={showSaveSuccess}
-              />
-            )}
-
-            {activeTab === 'contact' && (
-              <ContactTab
-                contactInfo={contactInfo}
-                onUpdateContactInfo={updateContactInfo}
-                onShowSuccess={showSaveSuccess}
-              />
-            )}
-          </>
-        )}
-      </div>
-    </div>
+          {activeTab === 'contact' && (
+            <ContactTab contactInfo={contactInfo} onUpdateContactInfo={updateContactInfo} onShowSuccess={showSaveSuccess} />
+          )}
+        </>
+      )}
+    </AdminShell>
   );
 }

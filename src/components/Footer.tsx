@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
+import BrandLogo from './BrandLogo';
+import { usePathname } from 'next/navigation';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useWhatsappNumber } from '../lib/whatsapp';
 
@@ -18,6 +20,9 @@ export const Footer: React.FC = () => {
   const contactInfo = useCMSStore((state) => state.contactInfo);
   const socialLinks = useCMSStore((state) => state.socialLinks);
   const categories = useCMSStore((state) => state.categories);
+
+  const pathname = usePathname() || '';
+  if (pathname.startsWith('/admin')) return null;
 
   const assurances = [
     { title: 'Teslimat ve montaj', text: 'Kata taşıma ve kurulum kendi ustalarımız tarafından yapılır.' },
@@ -46,11 +51,9 @@ export const Footer: React.FC = () => {
       {/* Bağlantılar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
         <div className="lg:col-span-2 space-y-4">
-          <div>
-            <h3 className="text-white text-xl font-display font-extrabold tracking-tight">
-              ERMAY <span className="font-medium text-neutral-400 text-base">Mobilya</span>
-            </h3>
-            <p className="text-wood-light text-xs mt-1">Modoko · Ümraniye atölyesi</p>
+          <div className="space-y-2">
+            <BrandLogo variant="onDark" className="h-12 w-auto" />
+            <p className="text-wood-light text-xs">Modoko · Ümraniye atölyesi</p>
           </div>
           <p className="text-neutral-400 text-sm leading-relaxed max-w-sm">
             Atölyemizde ürettiğimiz ofis mobilyalarını aracısız, doğrudan size ulaştırıyoruz.

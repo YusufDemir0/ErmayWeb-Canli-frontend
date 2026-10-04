@@ -144,11 +144,11 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
     <div className="space-y-6 animate-fade-in">
       
       {/* Header Banner & Save CTA */}
-      <div className="bg-white border border-neutral-200 rounded-sm p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white border border-line rounded-xs p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-wood">
             <Truck className="h-5 w-5 text-wood" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-neutral-500">
               Lojistik & Teslimat Yönetimi
             </span>
           </div>
@@ -166,7 +166,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             type="button"
             onClick={fetchDeliveryZones}
             disabled={isLoading}
-            className="p-3 border border-neutral-200 hover:bg-neutral-50 rounded-xs text-neutral-600 transition-colors cursor-pointer"
+            className="p-3 border border-line hover:bg-paper rounded-xs text-neutral-600 transition-colors cursor-pointer"
             title="Yenile"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -176,7 +176,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-neutral-900 hover:bg-wood text-white px-6 py-3 rounded-xs text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-neutral-900 hover:bg-brand text-ink px-6 py-3 rounded-xs text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             <span>{isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
@@ -186,30 +186,30 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-neutral-200 rounded-sm p-4 space-y-1 shadow-2xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Toplam İl Sayısı</span>
-          <p className="text-2xl font-black text-neutral-900">81 İl</p>
-          <span className="text-[11px] text-neutral-500">Tüm resmi Türkiye illeri ve ilçeleri</span>
+        <div className="bg-white border border-line rounded-xs p-4 space-y-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Toplam İl Sayısı</span>
+          <p className="text-2xl font-extrabold text-neutral-900">81 İl</p>
+          <span className="text-xs text-neutral-500">Tüm resmi Türkiye illeri ve ilçeleri</span>
         </div>
 
-        <div className="bg-white border border-neutral-200 rounded-sm p-4 space-y-1 shadow-2xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Aktif Hizmet Verilen İller</span>
-          <p className="text-2xl font-black text-emerald-700">{activeCount} İl</p>
-          <span className="text-[11px] text-emerald-600 font-medium">Müşteriler doğrudan sipariş verebilir</span>
+        <div className="bg-white border border-line rounded-xs p-4 space-y-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-ok">Aktif Hizmet Verilen İller</span>
+          <p className="text-2xl font-extrabold text-ok">{activeCount} İl</p>
+          <span className="text-xs text-ok font-medium">Müşteriler doğrudan sipariş verebilir</span>
         </div>
 
-        <div className="bg-white border border-neutral-200 rounded-sm p-4 space-y-1 shadow-2xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Geçici Olarak Hizmet Dışı</span>
-          <p className="text-2xl font-black text-rose-700">{disabledCount} İl</p>
-          <span className="text-[11px] text-rose-600 font-medium">Sipariş alımı geçici olarak durduruldu</span>
+        <div className="bg-white border border-line rounded-xs p-4 space-y-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-signal">Geçici Olarak Hizmet Dışı</span>
+          <p className="text-2xl font-extrabold text-signal">{disabledCount} İl</p>
+          <span className="text-xs text-signal font-medium">Sipariş alımı geçici olarak durduruldu</span>
         </div>
       </div>
 
       {/* Checkout Alert Notice Config */}
-      <div className="bg-paper border border-line rounded-sm p-5 space-y-3">
-        <div className="flex items-center gap-2 text-[#7A6140]">
+      <div className="bg-paper border border-line rounded-xs p-5 space-y-3">
+        <div className="flex items-center gap-2 text-wood-dark">
           <Info className="h-4 w-4" />
-          <h3 className="text-xs font-bold uppercase tracking-wider">
+          <h3 className="text-sm font-semibold">
             Müşteri Ödeme Ekranı Teslimat Bilgilendirme Metni (Opsiyonel)
           </h3>
         </div>
@@ -222,7 +222,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             value={noticeMessage}
             onChange={(e) => setNoticeMessage(e.target.value)}
             placeholder="Örn: Kış mevsimi hava şartları ve lojistik yoğunluğu sebebiyle Doğu Anadolu ve bazı illerimize teslimat geçici olarak yapılamamaktadır."
-            className="flex-1 text-xs border border-neutral-300 rounded-xs px-3.5 py-2.5 bg-white focus:outline-none focus:border-wood"
+            className="flex-1 text-xs border border-line-strong rounded-xs px-3.5 py-2.5 bg-white focus:outline-none focus:border-wood"
           />
           <button
             type="button"
@@ -235,23 +235,23 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
       </div>
 
       {/* Bulk Quick Action Buttons & Search */}
-      <div className="bg-white border border-neutral-200 rounded-sm p-5 space-y-4 shadow-xs">
+      <div className="bg-white border border-line rounded-xs p-5 space-y-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           
           {/* Search */}
           <div className="relative w-full lg:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
             <input
               type="text"
               placeholder="Şehir adı veya plaka ara (örn: İzmir, 35)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-neutral-300 rounded-xs focus:outline-none focus:border-wood"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-line-strong rounded-xs focus:outline-none focus:border-wood"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-600"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -262,7 +262,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
           <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1.5 text-xs font-bold uppercase rounded-xs transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-sm font-semibold rounded-xs transition-colors cursor-pointer ${
                 statusFilter === 'ALL'
                   ? 'bg-neutral-900 text-white'
                   : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
@@ -272,20 +272,20 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('ACTIVE')}
-              className={`px-3 py-1.5 text-xs font-bold uppercase rounded-xs transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-sm font-semibold rounded-xs transition-colors cursor-pointer ${
                 statusFilter === 'ACTIVE'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                  ? 'bg-whatsapp text-white'
+                  : 'bg-ok-soft text-ok hover:bg-ok-soft'
               }`}
             >
               Hizmet Açık ({activeCount})
             </button>
             <button
               onClick={() => setStatusFilter('DISABLED')}
-              className={`px-3 py-1.5 text-xs font-bold uppercase rounded-xs transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-sm font-semibold rounded-xs transition-colors cursor-pointer ${
                 statusFilter === 'DISABLED'
-                  ? 'bg-rose-600 text-white'
-                  : 'bg-rose-50 text-rose-800 hover:bg-rose-100'
+                  ? 'bg-signal text-white'
+                  : 'bg-signal/5 text-signal hover:bg-signal/5'
               }`}
             >
               Hizmet Kapalı ({disabledCount})
@@ -294,8 +294,8 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
         </div>
 
         {/* Fast presets */}
-        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-neutral-100 text-xs">
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mr-1">
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-line text-xs">
+          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider mr-1">
             Hızlı Şablonlar:
           </span>
           <button
@@ -322,7 +322,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
           <button
             type="button"
             onClick={handleDisableAll}
-            className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xs font-medium cursor-pointer transition-colors ml-auto"
+            className="px-2.5 py-1 bg-signal/5 hover:bg-signal/5 text-signal rounded-xs font-medium cursor-pointer transition-colors ml-auto"
           >
             ✕ Tümünü Kapat
           </button>
@@ -330,17 +330,17 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
       </div>
 
       {/* Cities Grid Table */}
-      <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
-        <div className="p-4 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between text-xs">
+      <div className="bg-white border border-line rounded-xs overflow-hidden">
+        <div className="p-4 bg-paper border-b border-line flex items-center justify-between text-xs">
           <span className="font-bold text-neutral-700 uppercase tracking-wider">
             Listelenen Şehirler ({filteredCities.length})
           </span>
-          <span className="text-neutral-500 text-[11px]">
+          <span className="text-neutral-500 text-xs">
             Switch&apos;i kapatılan iller müşteriye teslimat dışı olarak gösterilir
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-line">
           {filteredCities.map((city) => {
             const isCityDisabled = disabledCityIds.includes(city.id);
             const isCityActive = !isCityDisabled;
@@ -348,19 +348,19 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             return (
               <div
                 key={city.id}
-                className={`p-4 flex items-center justify-between transition-colors border-b border-neutral-100 ${
-                  isCityDisabled ? 'bg-neutral-50/70 opacity-75' : 'bg-white hover:bg-[#FDFBF7]'
+                className={`p-4 flex items-center justify-between transition-colors border-b border-line ${
+                  isCityDisabled ? 'bg-paper/70 opacity-75' : 'bg-white hover:bg-[#FDFBF7]'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-xs bg-neutral-100 text-neutral-700 font-mono text-xs font-bold flex items-center justify-center border border-neutral-200">
+                  <span className="w-8 h-8 rounded-xs bg-neutral-100 text-neutral-700 font-mono text-xs font-bold flex items-center justify-center border border-line">
                     {String(city.id).padStart(2, '0')}
                   </span>
                   <div>
                     <span className="font-bold text-sm text-neutral-900 block">
                       {city.name}
                     </span>
-                    <span className="text-[11px] text-neutral-400">
+                    <span className="text-xs text-neutral-500">
                       {city.districts.length} İlçe (Örn: {city.districts.slice(0, 2).join(', ')}...)
                     </span>
                   </div>
@@ -371,20 +371,20 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
                     type="button"
                     onClick={() => handleToggleCity(city.id)}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      isCityActive ? 'bg-emerald-600' : 'bg-neutral-300'
+                      isCityActive ? 'bg-whatsapp' : 'bg-neutral-300'
                     }`}
                     role="switch"
                     aria-checked={isCityActive}
                     aria-label={`${city.name} hizmet durumu`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition duration-200 ease-in-out ${
                         isCityActive ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
                   </button>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider w-16 text-right ${
-                    isCityActive ? 'text-emerald-700' : 'text-neutral-400'
+                  <span className={`text-xs font-bold uppercase tracking-wider w-16 text-right ${
+                    isCityActive ? 'text-ok' : 'text-neutral-500'
                   }`}>
                     {isCityActive ? 'Açık' : 'Kapalı'}
                   </span>
@@ -395,7 +395,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
         </div>
 
         {filteredCities.length === 0 && (
-          <div className="p-12 text-center text-neutral-400 text-xs">
+          <div className="p-12 text-center text-neutral-500 text-xs">
             Arama kriterine uygun şehir bulunamadı.
           </div>
         )}

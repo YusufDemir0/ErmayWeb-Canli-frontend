@@ -174,7 +174,7 @@ export const SalePage: React.FC<SalePageProps> = ({
   };
 
   return (
-    <div className="w-full bg-white min-h-screen">
+    <div className="w-full bg-canvas min-h-screen">
       {/* SHOWROOM & WORKSHOP CAMPAIGN TICKER */}
       <div className="bg-ink text-white py-4 px-4 border-b-4 border-signal">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -251,7 +251,7 @@ export const SalePage: React.FC<SalePageProps> = ({
               </div>
               <button
                 type="submit"
-                className="w-full bg-neutral-100 hover:bg-wood hover:text-white text-neutral-800 text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
+                className="w-full bg-neutral-100 hover:bg-brand hover:text-ink text-neutral-800 text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
               >
                 Uygula
               </button>
@@ -362,7 +362,7 @@ export const SalePage: React.FC<SalePageProps> = ({
               <p className="text-neutral-500 text-sm mb-4">Aradığınız kriterlere uygun indirimli ürün bulunamadı.</p>
               <button
                 onClick={handleResetFilters}
-                className="bg-ink hover:bg-wood text-white text-sm font-semibold py-3.5 px-8 transition-colors rounded-xs cursor-pointer"
+                className="bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3.5 px-8 transition-colors rounded-xs cursor-pointer"
               >
                 Filtreleri Temizle
               </button>
@@ -429,7 +429,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                             e.stopPropagation();
                             addToCart(product, 1);
                           }}
-                          className="flex items-center gap-1.5 text-white text-sm font-medium h-10 px-3 rounded-xs transition-colors cursor-pointer bg-ink hover:bg-wood"
+                          className="flex items-center gap-1.5 text-white text-sm font-medium h-10 px-3 rounded-xs transition-colors cursor-pointer bg-ink hover:bg-neutral-800"
                         >
                           <ShoppingBag className="h-3.5 w-3.5" />
                           <span>Sepete ekle</span>
@@ -467,7 +467,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                             e.stopPropagation();
                             addToCart(product, 1);
                           }}
-                          className="hidden sm:flex items-center gap-1 border text-sm font-semibold py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-line text-neutral-700 hover:border-wood hover:bg-wood hover:text-white"
+                          className="hidden sm:flex items-center gap-1 border text-sm font-semibold py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-line text-neutral-700 hover:border-wood hover:bg-brand hover:text-ink"
                         >
                           <ShoppingBag className="h-3 w-3" />
                           <span>Ekle</span>
@@ -593,7 +593,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                             disabled={!product.inStock}
                             className={`flex items-center gap-1.5 text-white text-sm font-semibold py-2.5 px-5 transition-all duration-300 rounded-xs cursor-pointer ${
                               product.inStock 
-                                ? 'bg-ink hover:bg-wood' 
+                                ? 'bg-ink hover:bg-neutral-800' 
                                 : 'bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none'
                             }`}
                           >
@@ -634,7 +634,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                     onClick={() => setCurrentPage(pageNum)}
                     className={`h-9 w-9 rounded-xs border text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
                       isCurrent 
-                        ? 'bg-wood border-wood text-white' 
+                        ? 'bg-ink border-wood text-white' 
                         : 'border-line bg-white text-neutral-600 hover:bg-neutral-100 hover:text-ink'
                     }`}
                   >

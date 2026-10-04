@@ -11,7 +11,6 @@ import {
   Copy,
   Check,
   Compass,
-  Store,
   Layers,
 } from 'lucide-react';
 import type { StoreItem } from '../../types';
@@ -65,129 +64,53 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
       .sort((a, b) => b.count - a.count);
   }, [activeStores]);
 
-  // Initial state: Harita ilk açılışta tam olarak tüm Türkiye olarak gelmeli (null)
-  const [activeRegionId, setActiveRegionId] = useState<string | null>(null);
+  // Harita her zaman bir bölgeye odaklı açılır; sayfa kaydırması haritayı değiştirmez.
+  // Açılış bölgesi: ziyaretçinin bölgesi (orada mağaza varsa) → yoksa en çok mağazası olan bölge.
+  const mostStoresRegion = regionStats[0]?.regionId || 'marmara';
+  const [activeRegionId, setActiveRegionId] = useState<string | null>(mostStoresRegion);
   const [selectedCityName, setSelectedCityName] = useState<string | null>(null);
   const [activeBubbleCity, setActiveBubbleCity] = useState<string | null>(null);
   const [selectedStoreId, setSelectedStoreId] = useState<string>(activeStores[0]?.id || '');
   const [copiedStoreId, setCopiedStoreId] = useState<string | null>(null);
-
-  // Target primary region (IP detection or region with most stores fallback)
-  const [targetPrimaryRegion, setTargetPrimaryRegion] = useState<string>(
-    regionStats[0]?.regionId || 'marmara'
-  );
   const [userDetectedCity, setUserDetectedCity] = useState<string | null>(null);
+  const userPickedRegionRef = useRef(false);
 
-  // Refs for tracking sections and RAF scroll
   const storeCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const regionSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
-  const isAutoScrollingRef = useRef<boolean>(false);
 
-  // 1. LOCAL STORE REGION FOCUS (KVKK compliant, no 3rd-party IP tracking)
+  // Mağaza listesi sonradan gelirse varsayılan bölgeyi güncelle (kullanıcı seçim yapmadıysa)
   useEffect(() => {
-    if (regionStats.length > 0) {
-      const sorted = [...regionStats].sort((a, b) => b.count - a.count);
-      if (sorted[0]?.regionId) {
-        setTargetPrimaryRegion(sorted[0].regionId);
-      }
-    }
+    if (!userPickedRegionRef.current) setActiveRegionId(mostStoresRegion);
+  }, [mostStoresRegion]);
+
+  // Ziyaretçi bölgesi: CDN/proxy konum başlığından (bkz. app/api/region-hint). Üçüncü taraf IP servisi kullanılmaz.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/region-hint', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((hint: { region: string | null; city: string | null } | null) => {
+        if (cancelled || !hint?.region || userPickedRegionRef.current) return;
+        if (regionStats.some((r) => r.regionId === hint.region)) {
+          setActiveRegionId(hint.region);
+          if (hint.city) setUserDetectedCity(hint.city);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [regionStats]);
 
-  // Lock timestamp when user explicitly clicks on a region or bubble
-  const manualLockUntilRef = useRef<number>(0);
-
-  // 2. HARDWARE-OPTIMIZED RAF SCROLL LISTENER WITH HYSTERESIS
-  // - Starts full view (activeRegionId = null)
-  // - When scroll begins (scrollY > 90): zooms smoothly into targetPrimaryRegion (IP region or highest density region)
-  // - As scroll continues: focuses on subsequent active store regions
-  // - When scrolled back to top (< 30px): resets to full Turkey view
-  // - Deadzone (30px-90px) prevents threshold flipping and jitter!
-  useEffect(() => {
-    let ticking = false;
-    let lastMeasurementTime = 0;
-    let trailingTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const handleScroll = () => {
-      if (isAutoScrollingRef.current) return;
-      if (Date.now() < manualLockUntilRef.current) return;
-
-      const scrollY = window.scrollY;
-
-      // Top of page: Reset to Full Turkey Map
-      if (scrollY < 35) {
-        setActiveRegionId(null);
-        return;
-      }
-
-      // Throttle heavy DOM layout queries (getBoundingClientRect) to 80ms intervals
-      const now = Date.now();
-      if (now - lastMeasurementTime < 80) {
-        // Trailing ölçüm: kaydırma bu 80ms penceresinde biterse son konum yine ölçülsün (yoksa harita yanlış bölgede kalır)
-        if (!trailingTimer) {
-          trailingTimer = setTimeout(() => {
-            trailingTimer = null;
-            handleScroll();
-          }, 80 - (now - lastMeasurementTime) + 5);
-        }
-        return;
-      }
-      lastMeasurementTime = now;
-
-      // Check which region section is currently in viewport
-      let matchedRegion: string | null = null;
-      for (const reg of regionStats) {
-        const el = regionSectionRefs.current[reg.regionId];
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          // Region section is currently being viewed
-          if (rect.top <= 360 && rect.bottom >= 140) {
-            matchedRegion = reg.regionId;
-            break;
-          }
-        }
-      }
-
-      if (matchedRegion) {
-        setActiveRegionId(matchedRegion);
-      } else if (scrollY >= 90) {
-        // Only zoom in after passing 90px threshold (prevents jitter)
-        setActiveRegionId((prev) => prev || targetPrimaryRegion);
-      }
-
-      // Store card active border tracking
-      for (const st of activeStores) {
-        const el = storeCardRefs.current[st.id];
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 280 && rect.bottom >= 100) {
-            setSelectedStoreId(st.id);
-            break;
-          }
-        }
-      }
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (trailingTimer) clearTimeout(trailingTimer);
-    };
-  }, [regionStats, activeStores, targetPrimaryRegion]);
+  const selectRegion = useCallback((regionId: string | null) => {
+    userPickedRegionRef.current = true;
+    setActiveRegionId(regionId);
+    setActiveBubbleCity(null);
+  }, []);
 
   // Click handler on map city / province
   const handleSelectCity = useCallback((cityName: string) => {
-    manualLockUntilRef.current = Date.now() + 3000;
+    userPickedRegionRef.current = true;
     setSelectedCityName(cityName);
     setActiveBubbleCity(cityName);
 
@@ -203,15 +126,10 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
   // Scroll to store card smoothly
   const handleScrollToStore = useCallback((storeId: string) => {
-    manualLockUntilRef.current = Date.now() + 3000;
     const cardEl = storeCardRefs.current[storeId];
     if (cardEl) {
-      isAutoScrollingRef.current = true;
       cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setSelectedStoreId(storeId);
-      setTimeout(() => {
-        isAutoScrollingRef.current = false;
-      }, 800);
     }
   }, []);
 
@@ -225,7 +143,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
   };
 
   return (
-    <div className="w-full bg-[#FAF9F6] min-h-screen py-8 sm:py-14 overflow-x-clip">
+    <div className="w-full bg-canvas min-h-screen py-8 sm:py-14 overflow-x-clip">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Navigation Breadcrumb */}
@@ -253,8 +171,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           {/* User Location Badge if detected */}
           {userDetectedCity && (
             <div className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xs border border-line text-xs text-neutral-600 shrink-0">
-              <span className="w-2 h-2 rounded-full bg-whatsapp animate-ping" />
-              <span>Tespit Edilen Bölgeniz: <strong>{userDetectedCity}</strong></span>
+              <MapPin className="w-3.5 h-3.5 text-wood" />
+              <span>Size en yakın showroomlar: <strong>{userDetectedCity}</strong> bölgesi</span>
             </div>
           )}
         </div>
@@ -264,10 +182,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           <button
             type="button"
             onClick={() => {
-              manualLockUntilRef.current = Date.now() + 3000;
-              setActiveRegionId(null);
+              selectRegion(null);
               setSelectedCityName(null);
-              setActiveBubbleCity(null);
             }}
             className={`px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
               activeRegionId === null
@@ -284,8 +200,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
               key={reg.regionId}
               type="button"
               onClick={() => {
-                manualLockUntilRef.current = Date.now() + 3000;
-                setActiveRegionId(reg.regionId);
+                selectRegion(reg.regionId);
                 const firstStoreInReg = reg.stores[0];
                 if (firstStoreInReg) {
                   setSelectedCityName(firstStoreInReg.city);
@@ -293,14 +208,14 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
               }}
               className={`px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeRegionId === reg.regionId
-                  ? 'bg-wood text-white'
+                  ? 'bg-brand text-ink'
                   : 'bg-white hover:bg-neutral-100 text-neutral-700 border border-line'
               }`}
             >
               <span>{reg.name}</span>
               <span className={`text-xs px-1.5 py-0.2 rounded-full ${
                 activeRegionId === reg.regionId
-                  ? 'bg-white/30 text-white'
+                  ? 'bg-ink/10 text-ink'
                   : 'bg-neutral-100 text-neutral-600'
               }`}>
                 {reg.count} Mağaza
@@ -312,7 +227,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         {/* STICKY MAP CONTAINER (OPTIMIZED FOR ALL SCREENS) */}
         <div
           ref={mapSectionRef}
-          className="sticky top-16 sm:top-20 z-20 mb-12 sm:mb-16 bg-[#FAF9F6]/95 pt-1 pb-3"
+          className="sticky top-[104px] z-20 mb-12 sm:mb-16 bg-canvas/95 pt-1 pb-3"
         >
           <TurkeyMap
             stores={activeStores}
@@ -320,7 +235,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
             selectedCityName={selectedCityName}
             activeBubbleCity={activeBubbleCity}
             onSelectCity={handleSelectCity}
-            onSelectRegion={(reg) => setActiveRegionId(reg)}
+            onSelectRegion={selectRegion}
             onCloseBubble={() => setActiveBubbleCity(null)}
             onScrollToStore={handleScrollToStore}
           />
@@ -515,7 +430,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
             href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 bg-wood hover:bg-[#b3956e] text-neutral-900 font-medium text-xs rounded-full transition-colors shrink-0 flex items-center gap-2"
+            className="px-6 py-3.5 bg-brand hover:bg-ink text-ink font-semibold text-sm rounded-xs transition-colors shrink-0 flex items-center gap-2"
           >
             <MessageCircle className="w-4 h-4 text-neutral-900" />
             <span>Teslimat danışmanı</span>

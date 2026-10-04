@@ -237,7 +237,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
           <Link
             href="/katalog"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors"
           >
             <span>Koleksiyonu Keşfet</span>
             <ChevronRight className="h-4 w-4" />

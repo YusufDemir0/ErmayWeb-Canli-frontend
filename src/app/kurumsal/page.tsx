@@ -95,7 +95,7 @@ export default async function KurumsalPage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col bg-wood text-white p-6 rounded-xs shadow-xl font-bold max-w-xs">
+            <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col bg-brand text-ink p-6 rounded-xs shadow-xl font-bold max-w-xs">
               <span className="text-3xl font-extrabold">{corporateConfig.experienceYears}</span>
               <span className="text-xs uppercase tracking-wider font-semibold mt-1">
                 {corporateConfig.experienceSubtitle}

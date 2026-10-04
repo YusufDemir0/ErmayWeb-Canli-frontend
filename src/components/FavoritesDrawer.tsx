@@ -108,7 +108,7 @@ export const FavoritesDrawer: React.FC = () => {
                             addToCart(product, 1);
                             removeFavorite(product.id);
                           }}
-                          className="flex items-center gap-1 bg-neutral-100 hover:bg-wood hover:text-white text-neutral-700 text-sm font-semibold py-1.5 px-3 transition-colors duration-300 rounded-xs cursor-pointer"
+                          className="flex items-center gap-1 bg-neutral-100 hover:bg-brand hover:text-ink text-neutral-700 text-sm font-semibold py-1.5 px-3 transition-colors duration-300 rounded-xs cursor-pointer"
                         >
                           <ShoppingBag className="h-3 w-3" />
                           <span>Sepete Ekle</span>

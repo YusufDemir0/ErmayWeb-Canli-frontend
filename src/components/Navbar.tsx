@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   Search, Heart, ShoppingBag, Phone, Mail,
-  MessageSquare, Menu, X, ChevronRight, ChevronDown 
+  MessageSquare, Menu, X, ChevronRight 
 } from 'lucide-react';
 import UpperNavbar from './UpperNavbar';
+import BrandLogo from './BrandLogo';
+import CategoryBar from './CategoryBar';
 import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
@@ -91,6 +93,10 @@ export const Navbar: React.FC = () => {
   // Açılış tercihi "home" değilse kök URL ürün listesini gösterir; vitrin /anasayfa'dadır (FAZ 15)
   const isCustomLanding = landingPageConfig?.type === 'category' || landingPageConfig?.type === 'catalog';
   const homeHref = isCustomLanding ? '/anasayfa' : '/';
+  const showCategoryBar =
+    pathname.startsWith('/kategori') ||
+    pathname.startsWith('/urun/') ||
+    (pathname === '/' && landingPageConfig?.type === 'category');
 
   const navLinks = [
     { name: 'ANASAYFA', href: homeHref },
@@ -102,12 +108,14 @@ export const Navbar: React.FC = () => {
     { name: 'İLETİŞİM', href: '/iletisim' },
   ];
 
+  // Yönetim paneli kendi tam ekran düzenini kullanır
+  if (pathname.startsWith('/admin')) return null;
+
   return (
     <>
-      {/* 1. DUYURU SATIRI: sayfayla birlikte kayar, yapışkan değil */}
-      <UpperNavbar />
-
       <header className="w-full z-40 bg-white sticky top-0 border-b border-line transition-all duration-300">
+        {/* 1. DUYURU BANDI: başlıkla birlikte yapışkan, sonsuz kayar */}
+        <UpperNavbar />
 
         {/* 2. MAIN HEADER ROW (Compact on Scroll) */}
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-all duration-300 ${isScrolled ? 'py-2.5' : 'py-3.5'}`}>
@@ -122,13 +130,8 @@ export const Navbar: React.FC = () => {
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link href="/" className="flex items-center gap-2 group cursor-pointer" title="Ermay Mobilya - Doğrudan Fabrika Satış">
-              <span className="font-display font-extrabold text-xl md:text-2xl tracking-tighter text-neutral-900 group-hover:text-wood transition-colors">
-                ERMAY
-              </span>
-              <span className="hidden sm:inline-block text-xs md:text-xs font-semibold tracking-wider text-neutral-500 uppercase border-l border-line-strong pl-2">
-                MOBİLYA
-              </span>
+            <Link href="/" className="flex items-center shrink-0" title="Ermay Mobilya - Ana sayfa">
+              <BrandLogo variant="onLight" priority className="h-9 md:h-11 w-auto" />
             </Link>
           </div>
 
@@ -184,7 +187,7 @@ export const Navbar: React.FC = () => {
                   />
                   <button
                     type="submit"
-                    className="bg-neutral-900 text-white px-3 py-1.5 text-xs font-semibold rounded-xs hover:bg-wood transition-colors"
+                    className="bg-neutral-900 text-white px-3 py-1.5 text-xs font-semibold rounded-xs hover:bg-neutral-800 transition-colors"
                   >
                     Ara
                   </button>
@@ -225,7 +228,7 @@ export const Navbar: React.FC = () => {
             >
               <ShoppingBag className="h-4 w-4" />
               {mounted && cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-wood text-white text-xs font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-brand text-ink text-xs font-bold h-4 w-4 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -235,64 +238,9 @@ export const Navbar: React.FC = () => {
 
       </header>
 
-        {/* 3. KATEGORİ ÇUBUĞU: yalnız ürün/kategori sayfalarında, yapışkan değil (ekran alanını yemesin) */}
-        {(pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/')) && (
-          <div className="relative z-30 bg-paper border-b border-line py-2 px-4">
-            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-7 overflow-x-visible no-scrollbar text-xs font-bold uppercase tracking-wider text-neutral-600">
-              {rootCategories.map((cat, idx) => {
-                const isActive = pathname === `/kategori/${cat.slug}`;
-                const children = sortedCategories.filter((c) => c.parentId === cat.id);
-                const hasChildren = children.length > 0;
-
-                return (
-                  <React.Fragment key={cat.id}>
-                    <div className="relative group py-1">
-                      <Link
-                        href={`/kategori/${cat.slug}`}
-                        className={`transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
-                          isActive ? 'text-wood font-extrabold' : 'hover:text-wood'
-                        }`}
-                      >
-                        <span>{cat.name}</span>
-                        {hasChildren && (
-                          <ChevronDown className="h-3 w-3 text-neutral-500 group-hover:text-wood transition-transform group-hover:rotate-180" />
-                        )}
-                      </Link>
-
-                      {/* Dropdown for Subcategories */}
-                      {hasChildren && (
-                        <div className="absolute top-full left-0 mt-0.5 min-w-[200px] bg-white border border-line shadow-xl rounded-xs py-2 hidden group-hover:block z-50 animate-fade-in">
-                          <div className="px-3 py-1 text-sm font-mono text-neutral-500 border-b border-line mb-1">
-                            {cat.name} Alt Kategorileri
-                          </div>
-                          {children.map((subCat) => {
-                            const isSubActive = pathname === `/kategori/${subCat.slug}`;
-                            return (
-                              <Link
-                                key={subCat.id}
-                                href={`/kategori/${subCat.slug}`}
-                                className={`block px-3 py-1.5 text-sm font-semibold transition-colors ${
-                                  isSubActive
-                                    ? 'bg-paper text-wood font-semibold'
-                                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-wood'
-                                }`}
-                              >
-                                ↳ {subCat.name}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    {idx < rootCategories.length - 1 && (
-                      <span className="text-neutral-300 text-xs select-none">/</span>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
+        {/* 3. KATEGORİ ÇUBUĞU: yalnız ürün listesi ve ürün detay sayfalarında (kök URL kategori açılışıysa orada da) */}
+        {showCategoryBar && (
+          <CategoryBar rootCategories={rootCategories} sortedCategories={sortedCategories} pathname={pathname} />
         )}
 
       {/* ============================================================ */}
@@ -311,13 +259,8 @@ export const Navbar: React.FC = () => {
             {/* Header */}
             <div>
               <div className="p-5 border-b border-line flex items-center justify-between bg-paper">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <span className="font-display font-extrabold text-xl tracking-tight text-neutral-900">
-                    ERMAY MOBİLYA
-                  </span>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Modoko atölyesinde üretim
-                  </p>
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} aria-label="Ana sayfa">
+                  <BrandLogo variant="onLight" className="h-10 w-auto" />
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}

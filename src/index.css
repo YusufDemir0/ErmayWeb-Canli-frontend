@@ -1,20 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* Atölye paleti: malzemeden türetilmiş anlamsal token'lar. Renk değişikliği yalnız buradan yapılır. */
-  --color-ink: #1E1D1B;          /* grafit: ana metin, birincil buton */
-  --color-paper: #F4F2ED;        /* tek ikincil zemin */
-  --color-line: #E3DFD7;         /* ayırıcı çizgi */
-  --color-line-strong: #CFC9BE;  /* kontrol kenarı */
-  --color-wood: #6B4A33;         /* ceviz: marka vurgusu (beyaz üzerinde AA) */
-  --color-wood-dark: #523826;
-  --color-wood-light: #C9A27E;   /* yalnız koyu zemin üzerinde */
-  --color-steel: #8B9094;        /* DKP çelik: ölçü çizgisi, dekoratif çizgi */
-  --color-signal: #B8431A;       /* ölçü turuncusu: indirim ve uyarı */
+  /* Marka paleti: logo sarısı + siyah, mobilya sıcaklığı için sepya krem zeminler. Renkler yalnız buradan değişir. */
+  --color-brand: #FECC00;        /* logo sarısı: birincil CTA zemini, vurgu (üstünde yalnız ink metin) */
+  --color-brand-dark: #E8B900;
+  --color-brand-soft: #FFF3BF;
+  --color-ink: #161514;          /* logo siyahı: ana metin, koyu yüzeyler */
+  --color-canvas: #FBF8F1;       /* sayfa zemini (açık sepya krem) */
+  --color-paper: #F3ECDE;        /* panel / ikincil zemin (sepya krem) */
+  --color-paper-deep: #E9DFCB;
+  --color-line: #E4DAC6;         /* ayırıcı çizgi */
+  --color-line-strong: #CDBFA4;  /* kontrol kenarı */
+  --color-wood: #6E5231;         /* sepya kahve: bağlantı ve vurgu metni (beyaz/krem üzerinde AA) */
+  --color-wood-dark: #523C22;
+  --color-wood-light: #FECC00;   /* koyu zemin üzerindeki vurgu = marka sarısı */
+  --color-steel: #8E8778;        /* ölçü çizgisi, dekoratif çizgi */
+  --color-signal: #B8431A;       /* indirim ve uyarı */
   --color-signal-dark: #96350F;
-  --color-ok: #3D6B4C;           /* stok / tamamlandı */
+  --color-ok: #3D6B4C;
   --color-ok-soft: #EDF2EE;
-  --color-whatsapp: #128C4A;     /* WhatsApp; beyaz metinle AA */
+  --color-whatsapp: #128C4A;
   --color-whatsapp-dark: #0E6F3B;
 
   --font-sans: var(--font-plex-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -24,7 +29,7 @@
 
 @layer base {
   body {
-    @apply bg-white text-ink font-sans antialiased selection:bg-wood selection:text-white overflow-x-clip;
+    @apply bg-canvas text-ink font-sans antialiased selection:bg-brand selection:text-ink overflow-x-clip;
   }
 
   /* Custom Smooth Scrollbar */
@@ -73,6 +78,23 @@
 @keyframes slideInLeft {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
+}
+
+/* Sonsuz kayan şeritler (duyuru bandı, kategori balonları): içerik iki kez basılır, -50% kayınca dikiş görünmez */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+.marquee-pause:hover .animate-marquee,
+.marquee-pause:focus-within .animate-marquee {
+  animation-play-state: paused;
 }
 
 .animate-fade-in {

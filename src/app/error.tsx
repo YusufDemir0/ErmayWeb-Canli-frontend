@@ -41,7 +41,7 @@ export default function ErrorBoundary({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <button
             onClick={() => reset()}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
           >
             <RefreshCw className="h-4 w-4" />
             <span>Tekrar Deneyin</span>

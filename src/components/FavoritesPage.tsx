@@ -28,7 +28,7 @@ export const FavoritesPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen py-12">
+    <div className="w-full bg-canvas min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
@@ -57,7 +57,7 @@ export const FavoritesPage: React.FC = () => {
             </p>
             <Link
               href="/"
-              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-4 px-8 rounded-xs transition-colors duration-300 cursor-pointer"
+              className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-4 px-8 rounded-xs transition-colors duration-300 cursor-pointer"
             >
               Koleksiyonları Keşfet
             </Link>
@@ -133,7 +133,7 @@ export const FavoritesPage: React.FC = () => {
                           addToCart(product, 1);
                           removeFavorite(product.id);
                         }}
-                        className="flex items-center gap-1.5 text-white text-sm font-medium h-10 px-3 rounded-xs transition-colors cursor-pointer bg-ink hover:bg-wood"
+                        className="flex items-center gap-1.5 text-white text-sm font-medium h-10 px-3 rounded-xs transition-colors cursor-pointer bg-ink hover:bg-neutral-800"
                       >
                         <ShoppingBag className="h-3.5 w-3.5" />
                         <span>Sepete ekle</span>
@@ -179,7 +179,7 @@ export const FavoritesPage: React.FC = () => {
                           addToCart(product, 1);
                           removeFavorite(product.id);
                         }}
-                        className="hidden sm:flex items-center gap-1 border text-sm font-semibold py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-line text-neutral-700 hover:border-wood hover:bg-wood hover:text-white"
+                        className="hidden sm:flex items-center gap-1 border text-sm font-semibold py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-line text-neutral-700 hover:border-wood hover:bg-brand hover:text-ink"
                       >
                         <ShoppingBag className="h-3 w-3" />
                         <span>Ekle</span>

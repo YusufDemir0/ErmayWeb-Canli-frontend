@@ -6,7 +6,6 @@ import { ArrowRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import { getProductImage } from '../lib/productImages';
 import OptimizedImage from './OptimizedImage';
-import DimensionLine from './DimensionLine';
 import type { Product } from '../types';
 
 const currencyFormatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 });
@@ -79,8 +78,6 @@ export const CuratedSets: React.FC = () => {
                     ))}
                   </ol>
 
-                  <DimensionLine value={product.widthCm} />
-
                   <div className="mt-auto flex items-end justify-between gap-4">
                     <div>
                       {originalPrice && originalPrice > price && (
@@ -92,7 +89,7 @@ export const CuratedSets: React.FC = () => {
                     </div>
                     <Link
                       href={href}
-                      className="inline-flex items-center gap-1.5 bg-ink hover:bg-wood text-white text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors"
                     >
                       <span>Takımı incele</span>
                       <ArrowRight className="h-4 w-4" />

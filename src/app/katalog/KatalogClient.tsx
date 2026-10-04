@@ -94,7 +94,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
             {/* Print CTA */}
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 bg-neutral-900 hover:bg-wood text-white hover:text-neutral-950 px-4 py-2 rounded-xs text-sm font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-2 bg-neutral-900 hover:bg-brand text-ink hover:text-neutral-950 px-4 py-2 rounded-xs text-sm font-semibold transition-colors cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
               <span>PDF İndir / Yazdır (A4 Yatay)</span>

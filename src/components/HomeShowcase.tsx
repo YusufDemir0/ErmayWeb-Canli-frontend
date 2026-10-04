@@ -27,7 +27,7 @@ export default async function HomeShowcase() {
     name: 'Ermay Mobilya',
     description: 'Doğrudan üreticiden standart seri ofis mobilyaları ve fabrika satış mağazası. Makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları.',
     url: 'https://ermaymobilya.com',
-    logo: 'https://ermaymobilya.com/favicon.svg',
+    logo: 'https://ermaymobilya.com/brand/logo-dark-text-960.png',
     telephone: '+905324194151',
     priceRange: '₺₺₺',
     address: {
@@ -97,7 +97,7 @@ export default async function HomeShowcase() {
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
                 href="/katalog"
-                className="bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-5 rounded-xs transition-colors"
+                className="bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-5 rounded-xs transition-colors"
               >
                 Fiyatlı katalog
               </Link>

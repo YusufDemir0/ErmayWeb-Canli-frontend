@@ -94,7 +94,7 @@ export default async function BlogIndexPage() {
             </p>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors"
             >
               <span>Admin Paneline Git</span>
               <ArrowRight className="h-3.5 w-3.5" />

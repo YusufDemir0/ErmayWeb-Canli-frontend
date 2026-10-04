@@ -182,6 +182,19 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
   });
   const [quantity, setQuantity] = useState(1);
   const [addedToCartSuccess, setAddedToCartSuccess] = useState(false);
+  // Mobilde ana butonlar ekrandan çıkınca alttaki sabit satın alma çubuğu görünür
+  // Callback ref: ürün sonradan yüklendiğinde de gözlemci bağlansın
+  const [actionsEl, setActionsEl] = useState<HTMLDivElement | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  useEffect(() => {
+    const el = actionsEl;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setShowStickyBar(!entry.isIntersecting && entry.boundingClientRect.top < 0), {
+      threshold: 0,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [actionsEl]);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'delivery'>('desc');
   const [activeFabricCategory, setActiveFabricCategory] = useState<'all' | 'deri' | 'nubuk' | 'keten' | 'boucle' | 'ahsap'>('all');
   const [selectedComplementaryIds, setSelectedComplementaryIds] = useState<string[]>([]);
@@ -311,7 +324,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
           </p>
           <Link
             href="/katalog"
-            className="inline-block bg-neutral-900 hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
+            className="inline-block bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
           >
             2026 Kataloğuna Dön
           </Link>
@@ -651,7 +664,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     onClick={() => setActiveFabricCategory(cat.id)}
                     className={`text-xs font-bold px-2 py-0.5 rounded-xs transition-colors cursor-pointer ${
                       activeFabricCategory === cat.id
-                        ? 'bg-wood-dark text-white'
+                        ? 'bg-ink-dark text-white'
                         : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600'
                     }`}
                   >
@@ -739,7 +752,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
             </div>
 
             {/* Quantity Selector & Action Buttons */}
-            <div className="space-y-3 pt-1">
+            <div ref={setActionsEl} className="space-y-3 pt-1">
               {/* Action Buttons Row */}
               <div className="space-y-2.5">
                 <div className="flex flex-wrap sm:flex-nowrap items-stretch gap-2 sm:gap-2.5">
@@ -764,7 +777,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Add to Cart Button */}
                   <button
                     onClick={handleAddToCartClick}
-                    className="flex-1 min-w-[130px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-ink hover:bg-wood text-white transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 min-w-[130px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-ink hover:bg-neutral-800 text-white transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <ShoppingBag className="h-4 w-4 shrink-0" />
                     <span>Sepete Ekle</span>
@@ -773,7 +786,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Buy Now Button (UNTOUCHABLE: Hemen Al) */}
                   <button
                     onClick={handleBuyNowClick}
-                    className="flex-1 min-w-[120px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-wood hover:bg-wood-dark text-white transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 min-w-[120px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-brand hover:bg-ink text-ink transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <span>Hemen Al</span>
                   </button>
@@ -1151,7 +1164,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Main Product Card */}
                 <div className="relative bg-white border-2 border-wood rounded-xs p-3 flex flex-col justify-between">
-                  <div className="absolute -top-2.5 left-3 bg-wood text-white text-sm font-semibold px-2 py-0.5 rounded-xs">
+                  <div className="absolute -top-2.5 left-3 bg-brand text-ink text-sm font-semibold px-2 py-0.5 rounded-xs">
                     Ana Parça
                   </div>
                   <div>
@@ -1279,7 +1292,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 <button
                   type="button"
                   onClick={handleAddBundleToCart}
-                  className="w-full bg-neutral-900 hover:bg-wood text-white py-3 px-4 rounded-xs text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-neutral-900 hover:bg-brand text-ink py-3 px-4 rounded-xs text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>
@@ -1316,6 +1329,36 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
           </div>
         )}
 
+      
+      </div>
+
+      {/* Mobil sabit satın alma çubuğu: yukarıdaki butonlarla aynı işlevler */}
+      <div
+        className={`lg:hidden fixed inset-x-0 bottom-0 z-40 bg-white border-t border-line px-4 py-3 flex items-center gap-3 transition-transform duration-300 print:hidden ${
+          showStickyBar ? 'translate-y-0' : 'translate-y-full'
+        }`}
+        aria-hidden={!showStickyBar}
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-neutral-600 truncate">{product.name}</p>
+          <p className="font-mono text-base font-semibold text-ink tabular-nums-all">{formatPrice(product.price)}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddToCartClick}
+          tabIndex={showStickyBar ? 0 : -1}
+          className="h-11 px-3 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold rounded-xs cursor-pointer"
+        >
+          Sepete ekle
+        </button>
+        <button
+          type="button"
+          onClick={handleBuyNowClick}
+          tabIndex={showStickyBar ? 0 : -1}
+          className="h-11 px-3 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold rounded-xs cursor-pointer"
+        >
+          Hemen Al
+        </button>
       </div>
     </div>
   );

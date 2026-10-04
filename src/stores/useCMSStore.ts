@@ -73,6 +73,20 @@ export interface CorporateConfig {
   qualityText: string;
 }
 
+/** Duyuru bandı görünümü (CMS anahtarı: ticker_style) */
+export interface TickerStyleConfig {
+  backgroundColor: string;
+  textColor: string;
+  /** Bir tam turun süresi (sn); küçük değer daha hızlı kayar */
+  speedSeconds: number;
+}
+
+export const DEFAULT_TICKER_STYLE: TickerStyleConfig = {
+  backgroundColor: '#FECC00', // logo sarısı
+  textColor: '#161514',
+  speedSeconds: 35,
+};
+
 export interface LandingPageConfig {
   type: 'home' | 'category' | 'catalog';
   targetSlug?: string;
@@ -81,6 +95,7 @@ export interface LandingPageConfig {
 
 interface CMSState {
   tickerItems: string[];
+  tickerStyle: TickerStyleConfig;
   campaignPopup: CampaignPopupConfig;
   contactInfo: ContactInfoConfig;
   landingPageConfig: LandingPageConfig;
@@ -98,6 +113,7 @@ interface CMSState {
   updateLandingPageConfig: (config: LandingPageConfig) => Promise<void>;
 
   setTickerItems: (items: string[]) => void;
+  updateTickerStyle: (style: Partial<TickerStyleConfig>) => Promise<void>;
   addTickerItem: (item: string) => void;
   removeTickerItem: (index: number) => void;
 
@@ -254,6 +270,7 @@ let adminStoresMode = false;
 
 export const useCMSStore = create<CMSState>()((set, get) => ({
       tickerItems: DEFAULT_TICKER,
+      tickerStyle: DEFAULT_TICKER_STYLE,
       campaignPopup: DEFAULT_POPUP,
       contactInfo: DEFAULT_CONTACT,
       // Sunucu tarafı varsayılanıyla aynı (services/landingService.ts): tercih kaydedilmemişse FAZ 15 kararı
@@ -274,6 +291,9 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
             const cms = res.data.cms;
             set({
               tickerItems: cms.ticker_items || get().tickerItems,
+              tickerStyle: cms.ticker_style
+                ? { ...DEFAULT_TICKER_STYLE, ...(cms.ticker_style as Partial<TickerStyleConfig>) }
+                : get().tickerStyle,
               campaignPopup: cms.campaign_popup || get().campaignPopup,
               contactInfo: cms.contact_info || get().contactInfo,
               landingPageConfig: (cms.landing_page_config as LandingPageConfig) || get().landingPageConfig,
@@ -290,7 +310,10 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
                       : [cms.home_hero],
                   }
                 : get().homeConfig,
-              corporateConfig: cms.corporate_config || get().corporateConfig,
+              // Kayıtlı blok eksik alan içerebilir; varsayılanların üzerine birleştirilir
+              corporateConfig: cms.corporate_config
+                ? { ...DEFAULT_CORPORATE_CONFIG, ...(cms.corporate_config as Partial<CorporateConfig>) }
+                : get().corporateConfig,
             });
           }
         } catch (err) {
@@ -337,6 +360,12 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         } catch (err) {
           console.warn('REST API ürün/kategori çekme uyarısı:', err);
         }
+      },
+
+      updateTickerStyle: async (style) => {
+        const updated = { ...get().tickerStyle, ...style };
+        set({ tickerStyle: updated });
+        await apiClient.put('/cms/ticker_style', { content: updated }).catch(reportCmsSaveError('Duyuru bandı rengi'));
       },
 
       setTickerItems: (items) => {

@@ -79,7 +79,7 @@ export const Hero: React.FC = () => {
 
       {/* Content Overlay: düz, opak panel (cam efekti yok) */}
       <div className="absolute inset-0 z-20 flex items-end md:items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-0">
-        <div key={currentSlide} className="max-w-xl bg-white p-6 md:p-10 border-l-4 border-wood animate-fade-in">
+        <div key={currentSlide} className="max-w-xl bg-white p-6 md:p-10 border-l-4 border-brand animate-fade-in">
           {activeSlide.badge && (
             <span className="text-xs font-semibold text-wood uppercase tracking-wider block mb-3">
               {activeSlide.badge}
@@ -95,7 +95,7 @@ export const Hero: React.FC = () => {
           )}
           <Link
             href={resolveButtonLink(activeSlide.buttonLink)}
-            className="group inline-flex items-center gap-2.5 bg-ink hover:bg-wood text-white text-sm font-semibold py-3.5 px-6 transition-colors duration-200 rounded-xs"
+            className="group inline-flex items-center gap-2.5 bg-brand hover:bg-ink text-ink text-sm font-semibold py-3.5 px-6 transition-colors duration-200 rounded-xs"
           >
             <span>{activeSlide.buttonText || 'Ürünleri incele'}</span>
             <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />

@@ -251,8 +251,8 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Kategori Ekleme / Düzenleme Formu */}
-      <div className="bg-white p-8 rounded-sm border border-neutral-200 shadow-xs">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 border-b border-neutral-100 pb-4 mb-6 flex items-center justify-between">
+      <div className="bg-white p-8 rounded-xs border border-line">
+        <h3 className="text-sm font-semibold text-neutral-900 border-b border-line pb-4 mb-6 flex items-center justify-between">
           <span className="flex items-center gap-2">
             <FolderPlus className="h-4 w-4 text-wood" />
             {editingCatId ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur'}
@@ -264,7 +264,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 setEditingCatId(null);
                 setCatForm({ name: '', slug: '', image: '', parentId: null });
               }}
-              className="text-xs text-rose-600 hover:underline cursor-pointer font-normal"
+              className="text-xs text-signal hover:underline cursor-pointer font-normal"
             >
               Vazgeç
             </button>
@@ -274,7 +274,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-semibold text-neutral-700 block mb-1">
                 Kategori Adı *
               </label>
               <input
@@ -283,12 +283,12 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 value={catForm.name}
                 onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
                 placeholder="Örn: Çalışma Koltukları"
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
+                className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-semibold text-neutral-700 block mb-1">
                 Kategori Slug (URL Yolu)
               </label>
               <input
@@ -296,12 +296,12 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 value={catForm.slug || ''}
                 onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
                 placeholder="calisma-koltuklari"
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
+                className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-semibold text-neutral-700 block mb-1">
                 Üst Kategori (Hiyerarşi)
               </label>
               <select
@@ -309,7 +309,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 onChange={(e) =>
                   setCatForm({ ...catForm, parentId: e.target.value ? e.target.value : null })
                 }
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white text-neutral-800"
+                className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white text-neutral-800"
               >
                 <option value="">-- Ana Kategori (Kök Seviye) --</option>
                 {availableParents.map((parent) => (
@@ -321,22 +321,22 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-semibold text-neutral-700 block mb-1">
                 Görsel Yükle (Firebase Storage)
               </label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
-                className="w-full text-xs border border-neutral-300 p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white"
+                className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white"
               />
             </div>
           </div>
 
           {catForm.image && (
-            <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xs border border-neutral-200">
+            <div className="flex items-center gap-3 p-2 bg-paper rounded-xs border border-line">
               <img src={catForm.image} alt="" className="h-12 w-12 object-cover rounded-xs" />
-              <span className="text-[11px] text-neutral-500 font-mono truncate flex-1">
+              <span className="text-xs text-neutral-500 font-mono truncate flex-1">
                 {catForm.image}
               </span>
             </div>
@@ -346,7 +346,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
             <button
               type="submit"
               disabled={uploadingImage}
-              className="bg-wood hover:bg-wood-dark text-white text-xs font-semibold uppercase tracking-widest py-3 px-8 rounded-xs transition-colors cursor-pointer"
+              className="bg-brand hover:bg-ink text-ink text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
             >
               {uploadingImage
                 ? 'Görsel Yükleniyor...'
@@ -359,15 +359,15 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
       </div>
 
       {/* Sürükle Bırak ve Sıralama Yönetim Çubuğu */}
-      <div className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden">
-        <div className="p-4 bg-neutral-50 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white rounded-xs border border-line overflow-hidden">
+        <div className="p-4 bg-paper border-b border-line flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <FolderTree className="h-5 w-5 text-wood" />
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
+              <h4 className="text-sm font-semibold text-neutral-800">
                 Kategori Hiyerarşisi ve Sıralama Yönetimi ({localCategories.length})
               </h4>
-              <p className="text-[11px] text-neutral-500">
+              <p className="text-xs text-neutral-500">
                 Kategorileri sürükleyip başka birinin üzerine bırakarak alt kategorisi yapabilir veya aralarında sıralayabilirsiniz.
               </p>
             </div>
@@ -375,7 +375,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
 
           <div className="flex items-center gap-2">
             {hasUnsavedOrder && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-xs border border-amber-200">
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-wood-dark bg-paper px-2.5 py-1 rounded-xs border border-line">
                 <RotateCcw className="h-3 w-3 animate-spin" /> Kaydedilmemiş Değişiklikler Var
               </span>
             )}
@@ -383,9 +383,9 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
               type="button"
               disabled={isSavingOrder}
               onClick={() => persistOrder()}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xs cursor-pointer transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-xs cursor-pointer transition-colors ${
                 hasUnsavedOrder
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                  ? 'bg-whatsapp hover:bg-whatsapp-dark text-white'
                   : 'bg-neutral-800 hover:bg-neutral-900 text-white'
               }`}
             >
@@ -402,17 +402,17 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
         </div>
 
         {/* Bilgilendirme Bannerı */}
-        <div className="bg-neutral-50/70 px-4 py-2.5 border-b border-neutral-100 flex items-center gap-2 text-[11px] text-neutral-600">
-          <Layers className="h-3.5 w-3.5 text-neutral-400" />
+        <div className="bg-paper/70 px-4 py-2.5 border-b border-line flex items-center gap-2 text-xs text-neutral-600">
+          <Layers className="h-3.5 w-3.5 text-neutral-500" />
           <span>
             <strong>İpucu:</strong> Bir kategoriyi alt kategori yapmak için diğerinin <em>"Üzerine Bırakın"</em>. Ana kategoriye çevirmek için <em>"Ana Seviyeye Çıkar"</em> butonuna basın.
           </span>
         </div>
 
         {/* Kategori Ağacı ve Listesi */}
-        <div className="divide-y divide-neutral-100">
+        <div className="divide-y divide-line">
           {rootCategories.length === 0 ? (
-            <div className="p-8 text-center text-xs text-neutral-400">
+            <div className="p-8 text-center text-xs text-neutral-500">
               Henüz tanımlı kategori bulunmamaktadır.
             </div>
           ) : (
@@ -438,21 +438,21 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                         ? 'opacity-40 bg-neutral-100'
                         : isDragTarget
                         ? 'bg-wood/15 border-2 border-dashed border-wood'
-                        : 'hover:bg-neutral-50/70 bg-white'
+                        : 'hover:bg-paper/70 bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Drag Handle */}
                       <button
                         type="button"
-                        className="cursor-grab active:cursor-grabbing text-neutral-400 hover:text-neutral-700 p-1"
+                        className="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-neutral-700 p-1"
                         title="Sürükleyip Taşıyın"
                       >
                         <GripVertical className="h-4 w-4" />
                       </button>
 
                       {/* Sıra Numarası */}
-                      <span className="w-5 text-[11px] font-mono font-bold text-neutral-400 text-center">
+                      <span className="w-5 text-xs font-mono font-bold text-neutral-500 text-center">
                         {rootIdx + 1}
                       </span>
 
@@ -460,7 +460,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                       <img
                         src={rootCat.image || '/default-furniture.webp'}
                         alt={rootCat.name}
-                        className="h-10 w-10 object-cover rounded-xs border border-neutral-200"
+                        className="h-10 w-10 object-cover rounded-xs border border-line"
                       />
 
                       {/* İsim ve Bilgiler */}
@@ -469,16 +469,16 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                           <span className="font-bold text-xs text-neutral-900 truncate">
                             {rootCat.name}
                           </span>
-                          <span className="text-[10px] font-mono text-neutral-400 bg-neutral-100 px-1.5 py-0.5 rounded-xs">
+                          <span className="text-xs font-mono text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded-xs">
                             /{rootCat.slug}
                           </span>
                           {children.length > 0 && (
-                            <span className="text-[10px] font-semibold text-wood bg-wood/10 px-2 py-0.5 rounded-full">
+                            <span className="text-xs font-semibold text-wood bg-wood/10 px-2 py-0.5 rounded-full">
                               {children.length} Alt Kategori
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-neutral-500">
+                        <p className="text-xs text-neutral-500">
                           Ana Kategori
                         </p>
                       </div>
@@ -487,17 +487,17 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                     {/* Sağ Taraf: Ürün Sayısı & Eylemler */}
                     <div className="flex items-center gap-2">
                       <span
-                        className={`px-2.5 py-0.5 text-[10px] font-bold rounded-xs ${
+                        className={`px-2.5 py-0.5 text-xs font-bold rounded-xs ${
                           rootProdCount > 0
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-paper text-wood-dark'
+                            : 'bg-ok-soft text-ok'
                         }`}
                       >
                         {rootProdCount} Ürün
                       </span>
 
                       {/* Sıra Butonları */}
-                      <div className="flex items-center border border-neutral-200 rounded-xs overflow-hidden">
+                      <div className="flex items-center border border-line rounded-xs overflow-hidden">
                         <button
                           type="button"
                           onClick={() => handleMoveStep(rootCat.id, 'up')}
@@ -539,8 +539,8 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                         onClick={() => handleDelete(rootCat.id)}
                         className={`p-1.5 transition-colors cursor-pointer ${
                           rootProdCount > 0 || children.length > 0
-                            ? 'text-neutral-300 hover:text-rose-500'
-                            : 'text-neutral-500 hover:text-rose-600'
+                            ? 'text-neutral-300 hover:text-signal'
+                            : 'text-neutral-500 hover:text-signal'
                         }`}
                         title={
                           rootProdCount > 0
@@ -557,7 +557,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
 
                   {/* Alt Kategoriler (Varsa) */}
                   {children.length > 0 && (
-                    <div className="bg-neutral-50/50 pl-10 pr-3 py-1 space-y-1 border-t border-neutral-100">
+                    <div className="bg-paper/50 pl-10 pr-3 py-1 space-y-1 border-t border-line">
                       {children.map((childCat, childIdx) => {
                         const childProdCount = products.filter(
                           (p) => p.category === childCat.id || p.category === childCat.slug
@@ -572,13 +572,13 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                             className={`flex items-center justify-between p-2.5 rounded-xs transition-all ${
                               isChildBeingDragged
                                 ? 'opacity-40 bg-neutral-200'
-                                : 'bg-white hover:bg-neutral-50 border border-neutral-200/80 shadow-2xs'
+                                : 'bg-white hover:bg-paper border border-line'
                             }`}
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1">
                               <button
                                 type="button"
-                                className="cursor-grab active:cursor-grabbing text-neutral-400 hover:text-neutral-700 p-1"
+                                className="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-neutral-700 p-1"
                                 title="Sürükleyip Taşıyın"
                               >
                                 <GripVertical className="h-3.5 w-3.5" />
@@ -589,7 +589,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                               <img
                                 src={childCat.image || '/default-furniture.webp'}
                                 alt={childCat.name}
-                                className="h-8 w-8 object-cover rounded-xs border border-neutral-200"
+                                className="h-8 w-8 object-cover rounded-xs border border-line"
                               />
 
                               <div className="min-w-0">
@@ -597,11 +597,11 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                                   <span className="font-semibold text-xs text-neutral-800 truncate">
                                     {childCat.name}
                                   </span>
-                                  <span className="text-[10px] font-mono text-neutral-400 bg-neutral-100 px-1 py-0.5 rounded-xs">
+                                  <span className="text-xs font-mono text-neutral-500 bg-neutral-100 px-1 py-0.5 rounded-xs">
                                     /{childCat.slug}
                                   </span>
                                 </div>
-                                <span className="text-[10px] text-neutral-400">
+                                <span className="text-xs text-neutral-500">
                                   ↳ {rootCat.name} alt kategorisi
                                 </span>
                               </div>
@@ -609,10 +609,10 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
 
                             <div className="flex items-center gap-2">
                               <span
-                                className={`px-2 py-0.5 text-[9px] font-bold rounded-xs ${
+                                className={`px-2 py-0.5 text-xs font-bold rounded-xs ${
                                   childProdCount > 0
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-emerald-100 text-emerald-800'
+                                    ? 'bg-paper text-wood-dark'
+                                    : 'bg-ok-soft text-ok'
                                 }`}
                               >
                                 {childProdCount} Ürün
@@ -622,7 +622,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleMakeRoot(childCat.id)}
-                                className="inline-flex items-center gap-1 text-[10px] text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-1 rounded-xs cursor-pointer font-medium"
+                                className="inline-flex items-center gap-1 text-xs text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-1 rounded-xs cursor-pointer font-medium"
                                 title="Alt kategorilikten çıkarıp bağımsız ana kategori yap"
                               >
                                 <Unlink className="h-3 w-3" />
@@ -648,7 +648,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                               </button>
                               <button
                                 onClick={() => handleDelete(childCat.id)}
-                                className="p-1 text-neutral-500 hover:text-rose-600 transition-colors cursor-pointer"
+                                className="p-1 text-neutral-500 hover:text-signal transition-colors cursor-pointer"
                                 title="Sil"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />

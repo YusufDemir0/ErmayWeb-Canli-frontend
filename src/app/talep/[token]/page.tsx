@@ -161,7 +161,7 @@ export default function PublicReceiptPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-white min-h-screen py-24 flex items-center justify-center">
+      <div className="w-full bg-canvas min-h-screen py-24 flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="h-8 w-8 animate-spin text-wood mx-auto" />
           <p className="text-xs text-neutral-500">Dijital talep fişiniz yükleniyor...</p>
@@ -172,7 +172,7 @@ export default function PublicReceiptPage() {
 
   if (error || !receipt) {
     return (
-      <div className="w-full bg-white min-h-screen py-20">
+      <div className="w-full bg-canvas min-h-screen py-20">
         <div className="max-w-md mx-auto px-4 text-center">
           <div className="bg-white border border-line rounded-xs p-8">
             <AlertCircle className="h-12 w-12 text-signal mx-auto mb-4" />
@@ -182,7 +182,7 @@ export default function PublicReceiptPage() {
             </p>
             <Link
               href="/"
-              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold px-6 py-3 rounded-xs transition-colors"
+              className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold px-6 py-3 rounded-xs transition-colors"
             >
               Ana Sayfaya Dön
             </Link>
@@ -200,7 +200,7 @@ export default function PublicReceiptPage() {
 
 
   return (
-    <div className="w-full bg-white min-h-screen py-10 md:py-14 print:py-0">
+    <div className="w-full bg-canvas min-h-screen py-10 md:py-14 print:py-0">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
         {/* Top Navigation & Print Button */}
@@ -365,7 +365,7 @@ export default function PublicReceiptPage() {
                           href={receipt.preferredStore.mapUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 bg-ink hover:bg-wood text-white text-sm font-semibold px-4 h-11 rounded-xs transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold px-4 h-11 rounded-xs transition-colors"
                         >
                           <MapPin className="h-3.5 w-3.5" />
                           <span>Haritada aç</span>

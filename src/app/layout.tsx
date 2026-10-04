@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   description: 'Ermay Mobilya - Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları. Aracısız doğrudan fabrika satışı, İstanbul içi kendi personelimizle teslimat & montaj.',
   keywords: 'ermay mobilya, ofis mobilyası, makam takımı, toplantı masası, çalışma masası, ofis koltukları, banko modelleri, doğrudan fabrikadan satış, toptan ofis mobilyası',
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: [{ url: '/brand/favicon-64.png', type: 'image/png', sizes: '64x64' }],
+    shortcut: '/brand/favicon-64.png',
+    apple: '/brand/apple-touch-icon.png',
   },
 };
 

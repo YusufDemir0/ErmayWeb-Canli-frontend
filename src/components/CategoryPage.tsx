@@ -367,7 +367,7 @@ const MATERIAL_GROUPS = [
                     href={`/kategori/${sub.slug}`}
                     className={`px-3 py-1 text-xs rounded-full font-semibold transition-all ${
                       isSubActive
-                        ? 'bg-wood text-white'
+                        ? 'bg-brand text-ink'
                         : 'bg-neutral-100 hover:bg-paper text-neutral-700 hover:text-wood border border-line'
                     }`}
                   >
@@ -412,7 +412,7 @@ const MATERIAL_GROUPS = [
                 href="/kategori"
                 className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
                   categorySlug === 'hepsi' || categorySlug === 'all'
-                    ? 'bg-wood text-white font-bold'
+                    ? 'bg-brand text-ink font-bold'
                     : 'text-neutral-700 hover:bg-paper'
                 }`}
               >
@@ -430,7 +430,7 @@ const MATERIAL_GROUPS = [
                       href={`/kategori/${rootCat.slug}`}
                       className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? 'bg-wood text-white font-bold'
+                          ? 'bg-brand text-ink font-bold'
                           : hasSelectedChild
                           ? 'text-wood font-semibold bg-paper'
                           : 'text-neutral-700 hover:bg-paper'
@@ -450,7 +450,7 @@ const MATERIAL_GROUPS = [
                               href={`/kategori/${subCat.slug}`}
                               className={`w-full text-left py-1 px-2 rounded-xs transition-colors flex items-center justify-between text-xs cursor-pointer ${
                                 isSubSelected
-                                  ? 'bg-wood text-white font-bold'
+                                  ? 'bg-brand text-ink font-bold'
                                   : 'text-neutral-600 hover:text-wood hover:bg-paper'
                               }`}
                             >
@@ -603,7 +603,7 @@ const MATERIAL_GROUPS = [
               </div>
               <button
                 type="submit"
-                className="w-full bg-wood hover:bg-wood-dark text-white text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
+                className="w-full bg-brand hover:bg-ink text-ink text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
               >
                 Fiyat Uygula
               </button>
@@ -714,7 +714,7 @@ const MATERIAL_GROUPS = [
                         href="/kategori"
                         onClick={() => setIsMobileFilterOpen(false)}
                         className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
-                          categorySlug === 'hepsi' || categorySlug === 'all' ? 'bg-wood text-white font-bold' : 'text-neutral-700'
+                          categorySlug === 'hepsi' || categorySlug === 'all' ? 'bg-brand text-ink font-bold' : 'text-neutral-700'
                         }`}
                       >
                         <span>Tüm Kategoriler</span>
@@ -733,7 +733,7 @@ const MATERIAL_GROUPS = [
                               onClick={() => setIsMobileFilterOpen(false)}
                               className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
                                 isSelected 
-                                  ? 'bg-wood text-white font-bold' 
+                                  ? 'bg-brand text-ink font-bold' 
                                   : hasSelectedChild
                                   ? 'text-wood font-semibold bg-paper'
                                   : 'text-neutral-700'
@@ -754,7 +754,7 @@ const MATERIAL_GROUPS = [
                                       onClick={() => setIsMobileFilterOpen(false)}
                                       className={`w-full text-left py-1 px-2 rounded transition-colors flex items-center justify-between text-xs ${
                                         isSubSelected
-                                          ? 'bg-wood text-white font-bold'
+                                          ? 'bg-brand text-ink font-bold'
                                           : 'text-neutral-600 hover:text-wood'
                                       }`}
                                     >
@@ -816,7 +816,7 @@ const MATERIAL_GROUPS = [
                 <div className="pt-4 border-t border-line mt-4">
                   <button
                     onClick={() => setIsMobileFilterOpen(false)}
-                    className="w-full py-3 bg-neutral-900 hover:bg-wood text-white font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
+                    className="w-full py-3 bg-neutral-900 hover:bg-brand text-ink font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
                   >
                     Sonuçları Göster ({totalItems} Ürün)
                   </button>
@@ -965,7 +965,7 @@ const MATERIAL_GROUPS = [
               </p>
               <button
                 onClick={handleResetFilters}
-                className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-5 rounded-xs transition-colors cursor-pointer"
+                className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-5 rounded-xs transition-colors cursor-pointer"
               >
                 Filtreleri temizle
               </button>
@@ -987,7 +987,7 @@ const MATERIAL_GROUPS = [
                   onClick={() => updateFilters({ page: page > 1 ? page : null })}
                   className={`w-9 h-9 rounded-xs text-xs font-bold transition-all cursor-pointer ${
                     currentPage === page
-                      ? 'bg-wood text-white'
+                      ? 'bg-brand text-ink'
                       : 'bg-white text-neutral-700 border border-line-strong hover:bg-paper'
                   }`}
                 >

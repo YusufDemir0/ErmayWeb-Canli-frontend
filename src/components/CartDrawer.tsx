@@ -65,7 +65,7 @@ export const CartDrawer: React.FC = () => {
                 </p>
                 <button
                   onClick={onClose}
-                  className="bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
+                  className="bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
                 >
                   Ürünlere dön
                 </button>
@@ -183,7 +183,7 @@ export const CartDrawer: React.FC = () => {
                 id="checkout-btn"
                 href="/talep"
                 onClick={onClose}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold transition-colors rounded-xs cursor-pointer"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer"
               >
                 <span>Sipariş talebine geç</span>
                 <ArrowRight className="h-4 w-4" />
