@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: '/default-furniture.webp',
         width: 1200,
         height: 800,
-        alt: 'Ermay Mobilya Seçkin Koleksiyonu',
+        alt: 'Ermay Mobilya ofis mobilyaları',
       },
     ],
     locale: 'tr_TR',

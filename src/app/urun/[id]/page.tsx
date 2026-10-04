@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    keywords: `${product.name}, ${categoryName}, ermay mobilya, lüks mobilya, ofis mobilyası, makam takımı`,
+    keywords: `${product.name}, ${categoryName}, ermay mobilya, ofis mobilyası, makam takımı`,
     openGraph: {
       title,
       description,

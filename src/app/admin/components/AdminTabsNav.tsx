@@ -86,15 +86,15 @@ export const AdminTabsNav: React.FC<AdminTabsNavProps> = ({
             onClick={() => setActiveTab(tab.id as AdminTabId)}
             className={`flex items-center gap-2.5 px-6 py-4 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap relative border-b-2 ${
               isActive
-                ? 'border-[#C5A880] text-[#7A6140] bg-[#FBF9F5]'
+                ? 'border-wood text-[#7A6140] bg-paper'
                 : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
             }`}
           >
-            <Icon className={`h-4 w-4 ${isActive ? 'text-[#C5A880]' : 'text-neutral-400'}`} />
+            <Icon className={`h-4 w-4 ${isActive ? 'text-wood' : 'text-neutral-400'}`} />
             <span>{tab.label}</span>
             {tab.count !== undefined && (
               <span className={`px-2 py-0.5 text-[10px] rounded-full font-mono font-bold ${
-                isActive ? 'bg-[#C5A880] text-white' : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
+                isActive ? 'bg-wood text-white' : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
               }`}>
                 {tab.count}
               </span>

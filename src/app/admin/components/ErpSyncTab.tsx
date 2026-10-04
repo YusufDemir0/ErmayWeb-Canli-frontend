@@ -292,12 +292,12 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-[#C5A880]/30 rounded-sm p-4 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-[#FBF9F5]">
+        <div className="bg-white border border-wood/30 rounded-sm p-4 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-paper">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#7A6140]">Web Satışına Açık</p>
             <p className="text-2xl font-black text-[#7A6140] mt-1">{publishedCount}</p>
           </div>
-          <div className="p-3 bg-[#C5A880]/20 rounded-sm text-[#7A6140]">
+          <div className="p-3 bg-wood/20 rounded-sm text-[#7A6140]">
             <Sparkles className="h-6 w-6" />
           </div>
         </div>
@@ -324,7 +324,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Ürün adı veya koduna göre ara (örn: MBL-334, İmaj Dolap)..."
-              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs text-neutral-800 focus:outline-none focus:border-[#C5A880] focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs text-neutral-800 focus:outline-none focus:border-wood focus:bg-white transition-all"
             />
           </div>
 
@@ -332,7 +332,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <button
             onClick={() => fetchCatalog()}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span>ERP'den Güncelle</span>
@@ -358,7 +358,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             <button
               onClick={() => setPublishFilter('PUBLISHED')}
               className={`px-3 py-1 font-semibold rounded-xs transition-all ${
-                publishFilter === 'PUBLISHED' ? 'bg-[#C5A880] text-white shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                publishFilter === 'PUBLISHED' ? 'bg-wood text-white shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Yayındakiler ({publishedCount})
@@ -377,7 +377,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold text-neutral-700 focus:outline-none focus:border-[#C5A880]"
+            className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold text-neutral-700 focus:outline-none focus:border-wood"
           >
             <option value="ALL">Tüm Ürün Tipleri</option>
             <option value="Ticari Mamül">Ticari Mamül</option>
@@ -391,7 +391,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
               type="checkbox"
               checked={stockOnlyFilter}
               onChange={(e) => setStockOnlyFilter(e.target.checked)}
-              className="accent-[#C5A880] rounded"
+              className="accent-wood rounded"
             />
             <span>Sadece Stoktakiler</span>
           </label>
@@ -402,7 +402,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
       <div className="bg-white border border-neutral-200 rounded-sm shadow-xs overflow-hidden">
         {isLoading ? (
           <div className="py-16 text-center space-y-3">
-            <Loader2 className="h-8 w-8 text-[#C5A880] animate-spin mx-auto" />
+            <Loader2 className="h-8 w-8 text-wood animate-spin mx-auto" />
             <p className="text-xs text-neutral-500 font-medium">CRM/ERP MariaDB Kataloğu Taranıyor...</p>
           </div>
         ) : filteredCatalog.length === 0 ? (
@@ -442,7 +442,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     <tr 
                       key={item.erpId}
                       className={`hover:bg-neutral-50/70 transition-colors ${
-                        isPublished ? 'bg-[#FBF9F5]/40' : ''
+                        isPublished ? 'bg-paper/40' : ''
                       }`}
                     >
                       {/* Image Preview / Count */}
@@ -529,7 +529,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                             type="button"
                             onClick={() => handleTogglePublish(item, isPublished)}
                             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                              isPublished ? 'bg-[#C5A880]' : 'bg-neutral-200'
+                              isPublished ? 'bg-wood' : 'bg-neutral-200'
                             }`}
                             role="switch"
                             aria-checked={isPublished}
@@ -554,9 +554,9 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => openEditModal(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-300 hover:border-[#C5A880] hover:text-[#7A6140] rounded-xs text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-300 hover:border-wood hover:text-[#7A6140] rounded-xs text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
                         >
-                          <ImageIcon className="h-3.5 w-3.5 text-[#C5A880]" />
+                          <ImageIcon className="h-3.5 w-3.5 text-wood" />
                           <span>Görsel & Detay</span>
                         </button>
                       </td>
@@ -591,7 +591,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-fade-in">
           <div className="bg-white max-w-2xl w-full rounded-sm shadow-2xl border border-neutral-200 overflow-hidden animate-scale-in">
             {/* Modal Header */}
-            <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-[#FAF8F5]">
+            <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-paper">
               <div>
                 <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-widest block">
                   ERP KOD: {selectedItem.erpCode} (ID: {selectedItem.erpId})
@@ -619,7 +619,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-[#C5A880] focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
                 />
               </div>
 
@@ -631,7 +631,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 <select
                   value={editCategoryId}
                   onChange={(e) => setEditCategoryId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-[#C5A880] focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -684,11 +684,11 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
 
                   {/* Add Image Slot */}
                   {editImages.length < 5 && (
-                    <label className={`aspect-square rounded-xs border-2 border-dashed border-neutral-300 hover:border-[#C5A880] bg-white flex flex-col items-center justify-center p-2 text-center cursor-pointer transition-colors ${
+                    <label className={`aspect-square rounded-xs border-2 border-dashed border-neutral-300 hover:border-wood bg-white flex flex-col items-center justify-center p-2 text-center cursor-pointer transition-colors ${
                       isUploading ? 'opacity-50 pointer-events-none' : ''
                     }`}>
                       {isUploading ? (
-                        <Loader2 className="h-5 w-5 text-[#C5A880] animate-spin" />
+                        <Loader2 className="h-5 w-5 text-wood animate-spin" />
                       ) : (
                         <>
                           <Upload className="h-5 w-5 text-neutral-400 mb-1" />
@@ -725,7 +725,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                   rows={2}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-[#C5A880] focus:bg-white"
+                  className="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                 />
               </div>
 
@@ -739,7 +739,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     value={editDimensions}
                     onChange={(e) => setEditDimensions(e.target.value)}
                     placeholder="G: 180cm | D: 90cm | Y: 75cm"
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-[#C5A880] focus:bg-white"
+                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                   />
                 </div>
                 <div>
@@ -751,7 +751,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     value={editMaterial}
                     onChange={(e) => setEditMaterial(e.target.value)}
                     placeholder="Doğal Meşe, Fırınlanmış Gürgen vb."
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-[#C5A880] focus:bg-white"
+                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                   />
                 </div>
               </div>
@@ -776,7 +776,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                     setEditIsPublished(!editIsPublished);
                   }}
                   className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    editIsPublished ? 'bg-[#C5A880]' : 'bg-neutral-200'
+                    editIsPublished ? 'bg-wood' : 'bg-neutral-200'
                   }`}
                 >
                   <span
@@ -802,7 +802,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 type="button"
                 onClick={handleSaveModal}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
+                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

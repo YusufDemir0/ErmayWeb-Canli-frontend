@@ -154,7 +154,7 @@ export const cmsService = {
       phone: '+90 216 365 41 51',
       whatsapp: '+90 532 419 41 51',
       email: 'bilgi@ermaymobilya.com',
-      address: 'Modoko Mobilyacılar Sitesi 3. Cadde No: 126 Ümraniye / İstanbul',
+      address: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42 Ümraniye / İstanbul',
     };
   },
 };

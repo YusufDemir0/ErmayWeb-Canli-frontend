@@ -5,17 +5,18 @@ import { useToastStore, type ToastType } from '../stores/useToastStore';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
 const icons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />,
-  error: <AlertCircle className="h-5 w-5 text-rose-600 flex-shrink-0" />,
-  info: <Info className="h-5 w-5 text-[#C5A880] flex-shrink-0" />,
-  warning: <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0" />,
+  success: <CheckCircle2 className="h-5 w-5 text-ok flex-shrink-0" />,
+  error: <AlertCircle className="h-5 w-5 text-signal flex-shrink-0" />,
+  info: <Info className="h-5 w-5 text-wood flex-shrink-0" />,
+  warning: <AlertTriangle className="h-5 w-5 text-wood flex-shrink-0" />,
 };
 
+// Beyaz zemin + soldaki renk çizgisi; tür, ikon ve çizgi rengiyle ayrılır
 const borderStyles: Record<ToastType, string> = {
-  success: 'border-emerald-500/30 bg-emerald-50/95 text-emerald-950 shadow-emerald-900/10',
-  error: 'border-rose-500/30 bg-rose-50/95 text-rose-950 shadow-rose-900/10',
-  info: 'border-[#C5A880]/40 bg-[#FAF8F5]/95 text-neutral-900 shadow-neutral-900/10',
-  warning: 'border-amber-500/30 bg-amber-50/95 text-amber-950 shadow-amber-900/10',
+  success: 'border-l-ok',
+  error: 'border-l-signal',
+  info: 'border-l-wood',
+  warning: 'border-l-wood',
 };
 
 export const ToastContainer: React.FC = () => {
@@ -32,7 +33,7 @@ export const ToastContainer: React.FC = () => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-sm border shadow-lg backdrop-blur-md transition-all duration-300 transform translate-y-0 opacity-100 animate-in fade-in slide-in-from-top-3 ${
+          className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-xs bg-white text-ink border border-line border-l-4 shadow-xl animate-fade-in ${
             borderStyles[toast.type]
           }`}
           role="alert"
@@ -40,11 +41,11 @@ export const ToastContainer: React.FC = () => {
           <div className="pt-0.5">{icons[toast.type]}</div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold leading-tight tracking-tight">
+            <p className="text-sm font-semibold leading-snug">
               {toast.title}
             </p>
             {toast.message && (
-              <p className="text-[11px] opacity-85 mt-0.5 leading-relaxed break-words">
+              <p className="text-sm text-neutral-600 mt-0.5 leading-relaxed break-words">
                 {toast.message}
               </p>
             )}
@@ -52,10 +53,10 @@ export const ToastContainer: React.FC = () => {
 
           <button
             onClick={() => removeToast(toast.id)}
-            className="p-1 -mr-1 -mt-1 rounded hover:bg-black/5 transition-colors cursor-pointer text-neutral-400 hover:text-neutral-700"
+            className="h-8 w-8 -mr-1 -mt-1 flex items-center justify-center rounded-xs hover:bg-paper transition-colors cursor-pointer text-neutral-500 hover:text-ink"
             aria-label="Kapat"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       ))}

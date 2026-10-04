@@ -467,13 +467,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-neutral-200 flex flex-col max-h-[94vh] overflow-hidden">
         
         {/* Header */}
-        <div className="bg-[#FAF8F5] px-6 py-3.5 border-b border-[#EAE3D2] flex items-center justify-between">
+        <div className="bg-paper px-6 py-3.5 border-b border-line flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#C5A880]/20 flex items-center justify-center text-[#8A4B20]">
+            <div className="w-8 h-8 rounded-full bg-wood/20 flex items-center justify-center text-wood-dark">
               <Box className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880] block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-wood block">
                 {editingProduct ? 'Ürün Düzenleme Paneli' : 'Parçalı & Modüler Ürün Formu'}
               </span>
               <h3 className="text-base font-bold text-neutral-900 leading-tight">
@@ -498,7 +498,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onClick={() => setActiveFormTab('general')}
             className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeFormTab === 'general'
-                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                ? 'border-wood text-wood-dark bg-white font-bold'
                 : 'border-transparent text-neutral-500 hover:text-neutral-900'
             }`}
           >
@@ -511,7 +511,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onClick={() => setActiveFormTab('specs')}
             className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeFormTab === 'specs'
-                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                ? 'border-wood text-wood-dark bg-white font-bold'
                 : 'border-transparent text-neutral-500 hover:text-neutral-900'
             }`}
           >
@@ -524,7 +524,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onClick={() => setActiveFormTab('features')}
             className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeFormTab === 'features'
-                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                ? 'border-wood text-wood-dark bg-white font-bold'
                 : 'border-transparent text-neutral-500 hover:text-neutral-900'
             }`}
           >
@@ -537,7 +537,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onClick={() => setActiveFormTab('preview')}
             className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeFormTab === 'preview'
-                ? 'border-[#C5A880] text-[#8A4B20] bg-white font-bold'
+                ? 'border-wood text-wood-dark bg-white font-bold'
                 : 'border-transparent text-neutral-500 hover:text-neutral-900'
             }`}
           >
@@ -581,7 +581,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {/* Product Name & Category */}
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                  <span className="w-5 h-5 rounded-full bg-wood text-white flex items-center justify-center text-[10px] font-bold">1</span>
                   <span>Temel Ürün Bilgileri</span>
                 </h4>
 
@@ -594,7 +594,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       <button
                         type="button"
                         onClick={handleUppercaseName}
-                        className="text-[10px] text-[#C5A880] hover:text-[#8A4B20] font-bold flex items-center gap-0.5 cursor-pointer"
+                        className="text-[10px] text-wood hover:text-wood-dark font-bold flex items-center gap-0.5 cursor-pointer"
                         title="Tüm harfleri Türkçe büyük harfe çevir"
                       >
                         <span>[Aa → BÜYÜK HARF]</span>
@@ -606,7 +606,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       placeholder="Örn: Viyana Yönetici Makam Masası"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
+                      className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-wood bg-white"
                     />
                   </div>
 
@@ -618,7 +618,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       required
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
+                      className="w-full text-xs font-medium px-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-wood bg-white"
                     >
                       <option value="" disabled>-- Kategori Seçin --</option>
                       {categories.map((c) => (
@@ -656,7 +656,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       setShowErpList(true);
                     }}
                     onFocus={() => setShowErpList(true)}
-                    className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#C5A880] bg-white"
+                    className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-wood bg-white"
                   />
                 </div>
 
@@ -666,7 +666,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       <div
                         key={erp.erpId}
                         onClick={() => handleSelectErp(erp)}
-                        className="p-2 text-xs hover:bg-[#FAF8F5] cursor-pointer flex items-center justify-between"
+                        className="p-2 text-xs hover:bg-paper cursor-pointer flex items-center justify-between"
                       >
                         <div className="space-x-2">
                           <span className="font-mono text-[10px] bg-neutral-100 px-1.5 py-0.5 rounded font-bold text-neutral-700">
@@ -686,13 +686,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {/* Images Grid */}
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                  <span className="w-5 h-5 rounded-full bg-wood text-white flex items-center justify-center text-[10px] font-bold">2</span>
                   <span>Ürün Görselleri (Kapak & Galeri)</span>
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Image 1 */}
-                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-wood rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
                     {image1 ? (
                       <>
                         <img src={image1} alt="Kapak" className="w-full h-full object-cover" />
@@ -715,7 +715,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   </div>
 
                   {/* Image 2 */}
-                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-wood rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
                     {image2 ? (
                       <>
                         <img src={image2} alt="Görsel 2" className="w-full h-full object-cover" />
@@ -738,7 +738,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   </div>
 
                   {/* Image 3 */}
-                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-[#C5A880] rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
+                  <div className="relative aspect-[4/3] bg-white border-2 border-dashed border-neutral-300 hover:border-wood rounded-xl flex flex-col items-center justify-center overflow-hidden transition-colors">
                     {image3 ? (
                       <>
                         <img src={image3} alt="Görsel 3" className="w-full h-full object-cover" />
@@ -765,7 +765,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {/* Pricing & Stock Parameters */}
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880] text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                  <span className="w-5 h-5 rounded-full bg-wood text-white flex items-center justify-center text-[10px] font-bold">3</span>
                   <span>Fiyat, KDV ve Stok Koşulları</span>
                 </h4>
 
@@ -780,7 +780,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       placeholder="Örn: 24500"
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
-                      className="w-full text-sm font-bold text-[#8A4B20] px-3 py-2 border border-neutral-300 rounded-lg bg-white"
+                      className="w-full text-sm font-bold text-wood-dark px-3 py-2 border border-neutral-300 rounded-lg bg-white"
                     />
                   </div>
 
@@ -829,7 +829,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         onClick={() => setVatRate(v.val)}
                         className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           vatRate === v.val
-                            ? 'bg-[#C5A880] text-white shadow-xs'
+                            ? 'bg-wood text-white shadow-xs'
                             : 'bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-100'
                         }`}
                       >
@@ -839,7 +839,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   </div>
 
                   {numericPrice > 0 && (
-                    <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#EAE3D2] flex flex-wrap items-center justify-between text-[11px] text-neutral-700 gap-2">
+                    <div className="bg-paper p-3 rounded-lg border border-line flex flex-wrap items-center justify-between text-[11px] text-neutral-700 gap-2">
                       <div>
                         <span className="text-neutral-500 block text-[9.5px] uppercase font-bold">KDV Hariç Net:</span>
                         <strong className="font-mono text-neutral-900 text-xs">{Math.round(netPrice).toLocaleString('tr-TR')} TL</strong>
@@ -850,7 +850,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       </div>
                       <div>
                         <span className="text-neutral-500 block text-[9.5px] uppercase font-bold">KDV Dahil Satış:</span>
-                        <strong className="font-mono text-[#8A4B20] text-sm font-black">{Math.round(numericPrice).toLocaleString('tr-TR')} TL</strong>
+                        <strong className="font-mono text-wood-dark text-sm font-black">{Math.round(numericPrice).toLocaleString('tr-TR')} TL</strong>
                       </div>
                     </div>
                   )}
@@ -862,7 +862,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     id="stockCheck"
                     checked={inStock}
                     onChange={(e) => setInStock(e.target.checked)}
-                    className="h-4 w-4 text-[#C5A880] border-neutral-300 rounded"
+                    className="h-4 w-4 text-wood border-neutral-300 rounded"
                   />
                   <label htmlFor="stockCheck" className="text-xs font-semibold text-neutral-800 cursor-pointer">
                     Stokta Var (Katalogda Hemen Teslim Rozeti Göster)
@@ -879,7 +879,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                    <Ruler className="w-4 h-4 text-[#C5A880]" />
+                    <Ruler className="w-4 h-4 text-wood" />
                     <span>Ölçü & Ebat Parçaları</span>
                   </h4>
                   <span className="font-mono text-[11px] font-bold text-neutral-700 bg-white px-2.5 py-0.5 rounded border border-neutral-200 shadow-2xs">
@@ -898,7 +898,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         key={p.label}
                         type="button"
                         onClick={() => handleApplyDimensionPreset(p)}
-                        className="px-2.5 py-1 bg-white hover:bg-[#FAF8F5] border border-neutral-200 hover:border-[#C5A880] text-neutral-700 rounded-lg text-[10px] font-medium transition-colors cursor-pointer"
+                        className="px-2.5 py-1 bg-white hover:bg-paper border border-neutral-200 hover:border-wood text-neutral-700 rounded-lg text-[10px] font-medium transition-colors cursor-pointer"
                       >
                         {p.label} ({p.w}×{p.d}×{p.h})
                       </button>
@@ -1000,7 +1000,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {/* CHUNK 2: MALZEME & İSKELET YAPISI */}
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-[#C5A880]" />
+                  <Layers className="w-4 h-4 text-wood" />
                   <span>Malzeme & İskelet Yapısı</span>
                 </h4>
 
@@ -1017,7 +1017,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         onClick={() => setMaterial(m)}
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors border cursor-pointer ${
                           material === m
-                            ? 'bg-[#8A4B20] text-white border-[#8A4B20]'
+                            ? 'bg-wood-dark text-white border-wood-dark'
                             : 'bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-200'
                         }`}
                       >
@@ -1036,7 +1036,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Örn: E1 Melamin Tabla & Masif Gürgen İskelet"
-                    className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg bg-white focus:ring-1 focus:ring-[#C5A880]"
+                    className="w-full text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg bg-white focus:ring-1 focus:ring-wood"
                   />
                 </div>
               </div>
@@ -1049,7 +1049,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {/* CHUNK 3: STANDART TEKNİK DONANIMLAR */}
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#C5A880]" />
+                  <ShieldCheck className="w-4 h-4 text-wood" />
                   <span>Standart Teknik Parametreler</span>
                 </h4>
 
@@ -1122,7 +1122,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <div className="bg-neutral-50/80 p-4 rounded-xl border border-neutral-200/80 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#C5A880]" />
+                    <Sparkles className="w-4 h-4 text-wood" />
                     <span>Dinamik Özellik Maddeleri (Bullet Points)</span>
                   </h4>
                   <span className="text-[10px] text-neutral-400 font-medium">
@@ -1167,7 +1167,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   <button
                     type="button"
                     onClick={handleAddFeature}
-                    className="px-4 py-2 bg-neutral-900 hover:bg-[#8A4B20] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-neutral-900 hover:bg-wood-dark text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
                   >
                     + Madde Ekle
                   </button>
@@ -1241,7 +1241,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-5 space-y-4">
                 <div className="flex items-start justify-between border-b border-neutral-100 pb-3">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A4B20] bg-[#C5A880]/20 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-wood-dark bg-wood/20 px-2 py-0.5 rounded">
                       {badge || 'Standart Seri'}
                     </span>
                     <h3 className="text-base font-bold text-neutral-900 mt-1">
@@ -1249,7 +1249,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     </h3>
                   </div>
                   <div className="text-right">
-                    <span className="text-base font-bold text-[#8A4B20]">
+                    <span className="text-base font-bold text-wood-dark">
                       {price ? `${Number(price).toLocaleString('tr-TR')} TL` : '0 TL'}
                     </span>
                     <span className="text-[10px] text-neutral-400 block">%20 KDV Dahil Fabrika Satışı</span>
@@ -1337,7 +1337,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-[#8A4B20] hover:bg-[#723c17] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+                className="px-6 py-2 bg-wood-dark hover:bg-[#723c17] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>Kaydediliyor...</span>

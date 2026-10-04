@@ -25,7 +25,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       
       {/* Brand & Title */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-sm bg-[#C5A880] text-white flex items-center justify-center font-bold text-xl shadow-xs tracking-wider">
+        <div className="w-12 h-12 rounded-sm bg-wood text-white flex items-center justify-center font-bold text-xl shadow-xs tracking-wider">
           E
         </div>
         <div>
@@ -33,7 +33,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">
               Yönetim Paneli
             </h1>
-            <span className="text-[10px] bg-[#C5A880]/15 text-[#9A7B54] border border-[#C5A880]/30 px-2.5 py-0.5 rounded-full font-mono font-bold">
+            <span className="text-[10px] bg-wood/15 text-[#9A7B54] border border-wood/30 px-2.5 py-0.5 rounded-full font-mono font-bold">
               v2.0
             </span>
           </div>
@@ -49,7 +49,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           onClick={() => setActiveModule('ecommerce')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xs text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
             activeModule === 'ecommerce'
-              ? 'bg-[#C5A880] text-white shadow-xs'
+              ? 'bg-wood text-white shadow-xs'
               : 'text-neutral-600 hover:text-neutral-900'
           }`}
         >
@@ -61,7 +61,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           onClick={() => setActiveModule('cms')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xs text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
             activeModule === 'cms'
-              ? 'bg-[#C5A880] text-white shadow-xs'
+              ? 'bg-wood text-white shadow-xs'
               : 'text-neutral-600 hover:text-neutral-900'
           }`}
         >
@@ -76,7 +76,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           href="/"
           className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors border border-neutral-200"
         >
-          <Home className="h-4 w-4 text-[#C5A880]" />
+          <Home className="h-4 w-4 text-wood" />
           <span>Mağazaya Git</span>
         </Link>
 

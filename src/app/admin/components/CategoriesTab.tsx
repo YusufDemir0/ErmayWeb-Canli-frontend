@@ -254,7 +254,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
       <div className="bg-white p-8 rounded-sm border border-neutral-200 shadow-xs">
         <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 border-b border-neutral-100 pb-4 mb-6 flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <FolderPlus className="h-4 w-4 text-brand-camel" />
+            <FolderPlus className="h-4 w-4 text-wood" />
             {editingCatId ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur'}
           </span>
           {editingCatId && (
@@ -283,7 +283,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 value={catForm.name}
                 onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
                 placeholder="Örn: Çalışma Koltukları"
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
               />
             </div>
 
@@ -296,7 +296,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 value={catForm.slug || ''}
                 onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
                 placeholder="calisma-koltuklari"
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
               />
             </div>
 
@@ -309,7 +309,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 onChange={(e) =>
                   setCatForm({ ...catForm, parentId: e.target.value ? e.target.value : null })
                 }
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none bg-white text-neutral-800"
+                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white text-neutral-800"
               >
                 <option value="">-- Ana Kategori (Kök Seviye) --</option>
                 {availableParents.map((parent) => (
@@ -328,7 +328,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
-                className="w-full text-xs border border-neutral-300 p-2 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none bg-white"
+                className="w-full text-xs border border-neutral-300 p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white"
               />
             </div>
           </div>
@@ -346,7 +346,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
             <button
               type="submit"
               disabled={uploadingImage}
-              className="bg-brand-camel hover:bg-brand-camel-dark text-white text-xs font-semibold uppercase tracking-widest py-3 px-8 rounded-xs transition-colors cursor-pointer"
+              className="bg-wood hover:bg-wood-dark text-white text-xs font-semibold uppercase tracking-widest py-3 px-8 rounded-xs transition-colors cursor-pointer"
             >
               {uploadingImage
                 ? 'Görsel Yükleniyor...'
@@ -362,7 +362,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
       <div className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden">
         <div className="p-4 bg-neutral-50 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <FolderTree className="h-5 w-5 text-brand-camel" />
+            <FolderTree className="h-5 w-5 text-wood" />
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
                 Kategori Hiyerarşisi ve Sıralama Yönetimi ({localCategories.length})
@@ -437,7 +437,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                       isBeingDragged
                         ? 'opacity-40 bg-neutral-100'
                         : isDragTarget
-                        ? 'bg-brand-camel/15 border-2 border-dashed border-brand-camel'
+                        ? 'bg-wood/15 border-2 border-dashed border-wood'
                         : 'hover:bg-neutral-50/70 bg-white'
                     }`}
                   >
@@ -473,7 +473,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                             /{rootCat.slug}
                           </span>
                           {children.length > 0 && (
-                            <span className="text-[10px] font-semibold text-brand-camel bg-brand-camel/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-semibold text-wood bg-wood/10 px-2 py-0.5 rounded-full">
                               {children.length} Alt Kategori
                             </span>
                           )}
@@ -530,7 +530,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                           });
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="p-1.5 text-neutral-500 hover:text-brand-camel transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-500 hover:text-wood transition-colors cursor-pointer"
                         title="Düzenle"
                       >
                         <Edit3 className="h-4 w-4" />
@@ -584,7 +584,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                                 <GripVertical className="h-3.5 w-3.5" />
                               </button>
 
-                              <CornerDownRight className="h-4 w-4 text-brand-camel flex-shrink-0" />
+                              <CornerDownRight className="h-4 w-4 text-wood flex-shrink-0" />
 
                               <img
                                 src={childCat.image || '/default-furniture.webp'}
@@ -641,7 +641,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                                   });
                                   window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                className="p-1 text-neutral-500 hover:text-brand-camel transition-colors cursor-pointer"
+                                className="p-1 text-neutral-500 hover:text-wood transition-colors cursor-pointer"
                                 title="Düzenle"
                               >
                                 <Edit3 className="h-3.5 w-3.5" />

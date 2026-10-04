@@ -146,8 +146,8 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
       {/* Header Banner & Save CTA */}
       <div className="bg-white border border-neutral-200 rounded-sm p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-brand-camel">
-            <Truck className="h-5 w-5 text-[#C5A880]" />
+          <div className="flex items-center gap-2 text-wood">
+            <Truck className="h-5 w-5 text-wood" />
             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
               Lojistik & Teslimat Yönetimi
             </span>
@@ -176,7 +176,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-neutral-900 hover:bg-[#C5A880] text-white px-6 py-3 rounded-xs text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-neutral-900 hover:bg-wood text-white px-6 py-3 rounded-xs text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             <span>{isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
@@ -206,7 +206,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
       </div>
 
       {/* Checkout Alert Notice Config */}
-      <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-sm p-5 space-y-3">
+      <div className="bg-paper border border-line rounded-sm p-5 space-y-3">
         <div className="flex items-center gap-2 text-[#7A6140]">
           <Info className="h-4 w-4" />
           <h3 className="text-xs font-bold uppercase tracking-wider">
@@ -222,7 +222,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             value={noticeMessage}
             onChange={(e) => setNoticeMessage(e.target.value)}
             placeholder="Örn: Kış mevsimi hava şartları ve lojistik yoğunluğu sebebiyle Doğu Anadolu ve bazı illerimize teslimat geçici olarak yapılamamaktadır."
-            className="flex-1 text-xs border border-neutral-300 rounded-xs px-3.5 py-2.5 bg-white focus:outline-none focus:border-[#C5A880]"
+            className="flex-1 text-xs border border-neutral-300 rounded-xs px-3.5 py-2.5 bg-white focus:outline-none focus:border-wood"
           />
           <button
             type="button"
@@ -246,7 +246,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
               placeholder="Şehir adı veya plaka ara (örn: İzmir, 35)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-neutral-300 rounded-xs focus:outline-none focus:border-[#C5A880]"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-neutral-300 rounded-xs focus:outline-none focus:border-wood"
             />
             {searchQuery && (
               <button

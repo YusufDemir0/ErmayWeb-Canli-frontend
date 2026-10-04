@@ -56,29 +56,29 @@ export default function ContactFormClient() {
   };
 
   return (
-    <div className="bg-white text-neutral-800 p-6 md:p-8 rounded-sm shadow-sm border border-neutral-200">
-      <h2 className="text-sm font-bold uppercase tracking-widest text-neutral-900 mb-6 border-b border-neutral-100 pb-3">
+    <div className="bg-white text-neutral-800 p-6 md:p-8 rounded-xs border border-line">
+      <h2 className="text-sm font-bold text-neutral-900 mb-6 border-b border-line pb-3">
         Bize Ulaşın / Mesaj Gönderin
       </h2>
 
       {submitted ? (
-        <div className="bg-emerald-50 border border-emerald-300 p-6 rounded-xs text-center space-y-2 animate-fade-in">
-          <CheckCircle2 className="h-10 w-10 text-emerald-600 mx-auto" />
-          <h3 className="text-sm font-bold text-emerald-900 uppercase">Mesajınız Alındı</h3>
-          <p className="text-xs text-emerald-700 font-light">
+        <div className="bg-ok-soft border border-ok/25 p-6 rounded-xs text-center space-y-2 animate-fade-in">
+          <CheckCircle2 className="h-10 w-10 text-ok mx-auto" />
+          <h3 className="text-sm font-bold text-ok">Mesajınız Alındı</h3>
+          <p className="text-xs text-ok">
             Müşteri temsilcilerimiz en kısa sürede sizinle iletişime geçecektir.
           </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4 relative">
           {errorMsg && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
+            <div className="bg-signal/5 border border-signal/40 text-signal p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-medium text-neutral-700 block mb-1">
               Adınız / Soyadınız
             </label>
             <input
@@ -87,13 +87,13 @@ export default function ContactFormClient() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value.replace(/[0-9]/g, '') })}
               placeholder="Adınız Soyadınız"
-              className="w-full bg-neutral-50 border border-neutral-300 text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none"
+              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-medium text-neutral-700 block mb-1">
                 E-Posta Adresiniz
               </label>
               <input
@@ -102,12 +102,12 @@ export default function ContactFormClient() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="ornek@domain.com"
-                className="w-full bg-neutral-50 border border-neutral-300 text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none"
+                className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+              <label className="text-sm font-medium text-neutral-700 block mb-1">
                 Telefon Numaranız
               </label>
               <input
@@ -116,19 +116,19 @@ export default function ContactFormClient() {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="0532 000 00 00"
-                className="w-full bg-neutral-50 border border-neutral-300 text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none"
+                className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-medium text-neutral-700 block mb-1">
               İletişim / Talep Konusu
             </label>
             <select
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="w-full bg-neutral-50 border border-neutral-300 text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none"
+              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none"
             >
               <option value="Özel İmalat & Mobilya Talebi">Özel İmalat & Mobilya Talebi</option>
               <option value="Sipariş & Teslimat Durumu">Sipariş & Teslimat Durumu</option>
@@ -139,7 +139,7 @@ export default function ContactFormClient() {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
+            <label className="text-sm font-medium text-neutral-700 block mb-1">
               Mesajınız
             </label>
             <textarea
@@ -148,7 +148,7 @@ export default function ContactFormClient() {
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Mobilya talebiniz, ölçü detayları veya sorunuz..."
-              className="w-full bg-neutral-50 border border-neutral-300 text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-[#C5A880] focus:border-[#C5A880] focus:outline-none resize-none"
+              className="w-full bg-neutral-50 border border-line-strong text-neutral-800 text-xs p-3 rounded-xs focus:bg-white focus:ring-1 focus:ring-wood focus:border-wood focus:outline-none resize-none"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function ContactFormClient() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-neutral-900 hover:bg-[#C5A880] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
+            className="bg-neutral-900 hover:bg-wood disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm py-3.5 px-8 rounded-xs transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>{isSubmitting ? 'GÖNDERİLİYOR...' : 'GÖNDER'}</span>
             <Send className="h-3.5 w-3.5" />

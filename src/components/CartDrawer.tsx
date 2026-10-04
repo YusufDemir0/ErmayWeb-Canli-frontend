@@ -7,6 +7,7 @@ import { useUIStore } from '../stores/useUIStore';
 import { useCartStore } from '../stores/useCartStore';
 import { OptimizedImage } from './OptimizedImage';
 import { useWhatsappNumber } from '../lib/whatsapp';
+import LeadTimeBadge from './LeadTimeBadge';
 
 export const CartDrawer: React.FC = () => {
   const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
@@ -32,24 +33,22 @@ export const CartDrawer: React.FC = () => {
     <div id="cart-drawer-overlay" className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true">
       {/* Dark Overlay */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-500" 
+        className="absolute inset-0 bg-ink/50 animate-fade-in" 
         onClick={onClose} 
       />
 
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
         {/* Drawer Panel */}
-        <div className="w-screen max-w-md bg-white flex flex-col shadow-2xl animate-fade-in-up duration-300">
+        <div className="w-screen max-w-md bg-white flex flex-col shadow-2xl animate-drawer-right">
           {/* Header */}
-          <div className="px-4 sm:px-6 py-6 border-b border-neutral-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5 text-brand-dark" />
-              <h2 className="text-lg font-medium text-neutral-900 tracking-wide uppercase">
-                Alışveriş Sepetim
-              </h2>
+          <div className="px-4 sm:px-6 py-6 border-b border-line flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-bold text-ink">Talep sepeti</h2>
+              <p className="text-xs text-neutral-500 mt-0.5">Online ödeme alınmaz; talebinizi temsilcimiz netleştirir.</p>
             </div>
             <button
               onClick={onClose}
-              className="p-1 text-neutral-400 hover:text-neutral-900 hover:scale-105 duration-200 cursor-pointer"
+              className="h-11 w-11 -mr-2 flex items-center justify-center text-neutral-500 hover:text-ink cursor-pointer"
               aria-label="Kapat"
             >
               <X className="h-5 w-5" />
@@ -61,14 +60,14 @@ export const CartDrawer: React.FC = () => {
             {cartItems.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center">
                 <ShoppingBag className="h-12 w-12 text-neutral-300 stroke-[1.5] mb-4" />
-                <p className="text-neutral-500 font-light text-sm mb-6">
-                  Sepetiniz şu anda boş.
+                <p className="text-neutral-600 text-sm mb-6">
+                  Talep sepetiniz boş.
                 </p>
                 <button
                   onClick={onClose}
-                  className="bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 rounded-sm transition-colors duration-300 cursor-pointer"
+                  className="bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
                 >
-                  Alışverişe Başla
+                  Ürünlere dön
                 </button>
               </div>
             ) : (
@@ -78,10 +77,10 @@ export const CartDrawer: React.FC = () => {
                   return (
                     <div 
                       key={itemKey} 
-                      className="flex gap-4 border-b border-neutral-100 pb-5 items-start"
+                      className="flex gap-4 border-b border-line pb-5 items-start"
                     >
                       {/* Item Image */}
-                      <div className="h-20 w-16 flex-shrink-0 overflow-hidden rounded-sm bg-neutral-50 border border-neutral-100">
+                      <div className="h-20 w-16 flex-shrink-0 overflow-hidden rounded-xs bg-neutral-50 border border-line">
                         <OptimizedImage
                           src={item.product.image}
                           alt={item.product.name}
@@ -93,72 +92,61 @@ export const CartDrawer: React.FC = () => {
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between text-sm font-medium text-neutral-900">
-                            <h3 className="line-clamp-1 font-normal tracking-wide text-neutral-800">
+                            <h3 className="line-clamp-2 font-medium text-ink">
                               {item.product.name}
                             </h3>
-                            <p className="ml-4 font-semibold tracking-wider">
+                            <p className="ml-4 font-mono font-semibold tabular-nums-all whitespace-nowrap">
                               {formatPrice(item.product.price * item.quantity)}
                             </p>
                           </div>
                           {item.product.selectedColor && (
                             <div className="mt-1">
-                              <span className="text-[11px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-xs">
+                              <span className="text-xs font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-xs">
                                 Renk: {item.product.selectedColor}
                               </span>
                             </div>
                           )}
                           {item.product.selectedPieces && item.product.selectedPieces.length > 0 && (
                             <div className="mt-1">
-                              <span className="text-[10px] text-neutral-700 bg-amber-50/80 border border-amber-200/80 px-2 py-0.5 rounded-xs font-mono block line-clamp-1">
+                              <span className="text-xs text-neutral-700 bg-paper border border-line px-2 py-0.5 rounded-xs block line-clamp-2">
                                 Parçalar: {item.product.selectedPieces.join(', ')}
                               </span>
                             </div>
                           )}
-                          <p className="mt-1 text-xs text-neutral-400 font-light capitalize">
+                          <p className="mt-1 text-xs text-neutral-500 capitalize">
                             {item.product.material}
                           </p>
 
-                          {/* Dynamic Manufacturing Lead Time / Stock Status */}
-                          <div className="mt-1.5 flex items-center gap-1.5">
-                            {item.product.stock && item.product.stock > 0 ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200/60">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Stokta Hazır (1-2 İş Günü Fabrika Sevkiyatı)
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded-xs border border-amber-200/60">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                Fabrika Seri Üretimi (3-5 İş Günü)
-                              </span>
-                            )}
+                          <div className="mt-1.5">
+                            <LeadTimeBadge product={item.product} />
                           </div>
                         </div>
 
                         {/* Quantity Controls and Trash Button */}
                         <div className="flex items-center justify-between mt-3">
-                          <div className="flex items-center border border-neutral-200 rounded-sm">
+                          <div className="flex items-center border border-line-strong rounded-xs">
                             <button
                               onClick={() => updateQuantity(itemKey, item.quantity - 1)}
-                              className="p-1 hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
-                              aria-label="Miktarı azalt"
+                              className="h-11 w-11 flex items-center justify-center hover:bg-paper text-neutral-700 transition-colors cursor-pointer"
+                              aria-label="Adedi azalt"
                             >
-                              <Minus className="h-3 w-3" />
+                              <Minus className="h-4 w-4" />
                             </button>
-                            <span className="px-2 text-xs font-medium text-neutral-700 w-8 text-center">
+                            <span className="text-sm font-mono text-ink w-8 text-center tabular-nums-all" aria-live="polite">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => updateQuantity(itemKey, item.quantity + 1)}
-                              className="p-1 hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
-                              aria-label="Miktarı arttır"
+                              className="h-11 w-11 flex items-center justify-center hover:bg-paper text-neutral-700 transition-colors cursor-pointer"
+                              aria-label="Adedi artır"
                             >
-                              <Plus className="h-3 w-3" />
+                              <Plus className="h-4 w-4" />
                             </button>
                           </div>
 
                           <button
                             onClick={() => removeItem(itemKey)}
-                            className="text-neutral-400 hover:text-brand-terracotta transition-colors p-1 cursor-pointer"
+                            className="h-11 w-11 flex items-center justify-center text-neutral-500 hover:text-signal transition-colors cursor-pointer"
                             aria-label="Ürünü çıkar"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -174,36 +162,20 @@ export const CartDrawer: React.FC = () => {
 
           {/* Footer Calculations */}
           {cartItems.length > 0 && (
-            <div className="border-t border-neutral-100 py-6 px-4 sm:px-6 bg-neutral-50/50">
+            <div className="border-t border-line py-5 px-4 sm:px-6 bg-paper">
               <div className="space-y-1.5 mb-6">
-                <div className="flex justify-between text-xs text-neutral-500 font-light">
-                  <span>Ara Toplam</span>
-                  <span>{formatPrice(subtotal)}</span>
+                <div className="flex justify-between text-sm text-neutral-600">
+                  <span>Ara toplam</span>
+                  <span className="font-mono tabular-nums-all">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-500 font-light">
+                <div className="flex justify-between text-sm text-neutral-600">
                   <span>KDV (%20)</span>
                   <span>Dahil</span>
                 </div>
-                <div className="flex justify-between text-sm font-semibold text-neutral-900 pt-2 border-t border-neutral-200/60">
-                  <span>Tahmini Tutar</span>
-                  <span className="text-brand-terracotta">{formatPrice(subtotal)}</span>
+                <div className="flex justify-between text-base font-semibold text-ink pt-2 border-t border-line">
+                  <span>Tahmini tutar</span>
+                  <span className="font-mono tabular-nums-all">{formatPrice(subtotal)}</span>
                 </div>
-              </div>
-
-              {/* B2B Wholesale Notice */}
-              <div className="mb-4 p-2.5 bg-amber-50/90 border border-amber-200/80 rounded-xs flex items-center justify-between text-[11px] text-amber-900">
-                <span className="flex items-center gap-1.5 font-medium">
-                  <span>🏢</span>
-                  <span>Çoklu Alım / Ofis Kurulumu</span>
-                </span>
-                <a
-                  href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-[#8A4B20] hover:underline shrink-0 ml-2"
-                >
-                  Toptan İskonto İste &rarr;
-                </a>
               </div>
 
               {/* Checkout CTA */}
@@ -211,24 +183,29 @@ export const CartDrawer: React.FC = () => {
                 id="checkout-btn"
                 href="/talep"
                 onClick={onClose}
-                className="w-full flex items-center justify-center gap-2 bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold tracking-widest uppercase py-4 transition-colors duration-300 rounded-sm shadow-md cursor-pointer"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold transition-colors rounded-xs cursor-pointer"
               >
-                <span>Sipariş Talebi Oluştur</span>
+                <span>Sipariş talebine geç</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
 
 
-              <div className="mt-4 flex justify-center text-center text-xs text-neutral-400 font-light">
-                <p>
-                  veya{' '}
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="text-brand-camel font-medium hover:text-brand-camel-dark transition-colors cursor-pointer"
-                  >
-                    Alışverişe Devam Et<span aria-hidden="true"> &rarr;</span>
-                  </button>
-                </p>
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="text-neutral-600 hover:text-ink transition-colors cursor-pointer py-2"
+                >
+                  Ürünlere dön
+                </button>
+                <a
+                  href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-wood underline underline-offset-2 hover:text-wood-dark py-2"
+                >
+                  Adetli alım fiyatı isteyin
+                </a>
               </div>
             </div>
           )}

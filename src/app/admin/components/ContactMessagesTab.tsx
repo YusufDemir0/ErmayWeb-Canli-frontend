@@ -77,7 +77,7 @@ export const ContactMessagesTab: React.FC<ContactMessagesTabProps> = ({ onOpenCo
     <div className="bg-white border border-neutral-200 rounded-sm shadow-xs">
       <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-neutral-100">
         <h2 className="text-sm font-bold uppercase tracking-widest text-neutral-900 flex items-center gap-2">
-          <Inbox className="h-4 w-4 text-[#C5A880]" />
+          <Inbox className="h-4 w-4 text-wood" />
           İletişim Formu Mesajları ({total})
         </h2>
         <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export const ContactMessagesTab: React.FC<ContactMessagesTabProps> = ({ onOpenCo
               }}
               className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-xs border cursor-pointer ${
                 status === f.id
-                  ? 'bg-[#C5A880] text-white border-[#C5A880]'
+                  ? 'bg-wood text-white border-wood'
                   : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
               }`}
             >

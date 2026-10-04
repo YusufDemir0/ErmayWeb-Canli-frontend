@@ -104,12 +104,10 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="w-full z-40 bg-white sticky top-0 shadow-xs border-b border-neutral-200/70 transition-all duration-300">
-        
-        {/* 1. CONTINUOUS TICKER MARQUEE (Always Visible) */}
-        <div className="w-full overflow-hidden bg-neutral-900 border-b border-neutral-800">
-          <UpperNavbar />
-        </div>
+      {/* 1. DUYURU SATIRI: sayfayla birlikte kayar, yapışkan değil */}
+      <UpperNavbar />
+
+      <header className="w-full z-40 bg-white sticky top-0 border-b border-line transition-all duration-300">
 
         {/* 2. MAIN HEADER ROW (Compact on Scroll) */}
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-all duration-300 ${isScrolled ? 'py-2.5' : 'py-3.5'}`}>
@@ -118,17 +116,17 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-1.5 text-neutral-800 hover:text-[#C5A880] rounded-xs transition-colors cursor-pointer"
+              className="lg:hidden p-1.5 text-neutral-800 hover:text-wood rounded-xs transition-colors cursor-pointer"
               aria-label="Menüyü Aç"
             >
               <Menu className="h-5 w-5" />
             </button>
 
             <Link href="/" className="flex items-center gap-2 group cursor-pointer" title="Ermay Mobilya - Doğrudan Fabrika Satış">
-              <span className="font-serif font-black text-xl md:text-2xl tracking-tighter text-neutral-900 group-hover:text-[#C5A880] transition-colors">
+              <span className="font-display font-extrabold text-xl md:text-2xl tracking-tighter text-neutral-900 group-hover:text-wood transition-colors">
                 ERMAY
               </span>
-              <span className="hidden sm:inline-block text-[10px] md:text-xs font-semibold tracking-[0.25em] text-neutral-500 uppercase border-l border-neutral-300 pl-2">
+              <span className="hidden sm:inline-block text-xs md:text-xs font-semibold tracking-wider text-neutral-500 uppercase border-l border-line-strong pl-2">
                 MOBİLYA
               </span>
             </Link>
@@ -147,10 +145,10 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[11px] font-bold tracking-[0.15em] transition-colors duration-200 py-1 border-b-2 uppercase ${
+                  className={`text-xs font-bold tracking-wider transition-colors duration-200 py-1 border-b-2 uppercase ${
                     isActive
-                      ? 'text-[#C5A880] border-[#C5A880]'
-                      : 'text-neutral-700 hover:text-[#C5A880] border-transparent'
+                      ? 'text-wood border-wood'
+                      : 'text-neutral-700 hover:text-wood border-transparent'
                   }`}
                 >
                   {link.name}
@@ -165,7 +163,7 @@ export const Navbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowSearchInput(!showSearchInput)}
-                className="p-2 text-neutral-700 hover:text-[#C5A880] hover:bg-neutral-100/80 rounded-full transition-colors cursor-pointer"
+                className="p-2 text-neutral-700 hover:text-wood hover:bg-neutral-100/80 rounded-full transition-colors cursor-pointer"
                 aria-label="Arama Yap"
               >
                 <Search className="h-4 w-4" />
@@ -174,7 +172,7 @@ export const Navbar: React.FC = () => {
               {showSearchInput && (
                 <form
                   onSubmit={handleSearchSubmit}
-                  className="absolute right-0 top-12 z-50 w-72 bg-white text-neutral-900 p-2 rounded-xs shadow-xl border border-neutral-200 flex items-center gap-2 animate-fade-in"
+                  className="absolute right-0 top-12 z-50 w-72 bg-white text-neutral-900 p-2 rounded-xs shadow-xl border border-line flex items-center gap-2 animate-fade-in"
                 >
                   <input
                     type="text"
@@ -186,7 +184,7 @@ export const Navbar: React.FC = () => {
                   />
                   <button
                     type="submit"
-                    className="bg-neutral-900 text-white px-3 py-1.5 text-xs font-semibold rounded-xs hover:bg-[#C5A880] transition-colors"
+                    className="bg-neutral-900 text-white px-3 py-1.5 text-xs font-semibold rounded-xs hover:bg-wood transition-colors"
                   >
                     Ara
                   </button>
@@ -197,8 +195,8 @@ export const Navbar: React.FC = () => {
             {/* Quick Contact Form Icon Link */}
             <Link
               href="/iletisim"
-              className="p-2 text-neutral-700 hover:text-[#C5A880] hover:bg-neutral-100/80 rounded-full transition-colors hidden sm:flex cursor-pointer"
-              title="İletişim & Fabrika Satış Hattı"
+              className="p-2 text-neutral-700 hover:text-wood hover:bg-neutral-100/80 rounded-full transition-colors hidden sm:flex cursor-pointer"
+              title="İletişim"
             >
               <Mail className="h-4 w-4" />
             </Link>
@@ -208,12 +206,12 @@ export const Navbar: React.FC = () => {
             {/* Favorites Trigger */}
             <button
               onClick={openFavorites}
-              className="p-2 text-neutral-700 hover:text-[#C5A880] hover:bg-neutral-100/80 rounded-full transition-colors relative cursor-pointer"
+              className="p-2 text-neutral-700 hover:text-wood hover:bg-neutral-100/80 rounded-full transition-colors relative cursor-pointer"
               aria-label="Favoriler"
             >
               <Heart className="h-4 w-4" />
               {mounted && favoritesCount > 0 && (
-                <span className="absolute top-0 right-0 bg-neutral-900 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-neutral-900 text-white text-xs font-bold h-4 w-4 rounded-full flex items-center justify-center">
                   {favoritesCount}
                 </span>
               )}
@@ -222,12 +220,12 @@ export const Navbar: React.FC = () => {
             {/* Cart Trigger */}
             <button
               onClick={openCart}
-              className="p-2 text-neutral-700 hover:text-[#C5A880] hover:bg-neutral-100/80 rounded-full transition-colors relative cursor-pointer"
+              className="p-2 text-neutral-700 hover:text-wood hover:bg-neutral-100/80 rounded-full transition-colors relative cursor-pointer"
               aria-label="Sepet"
             >
               <ShoppingBag className="h-4 w-4" />
               {mounted && cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-[#C5A880] text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-wood text-white text-xs font-bold h-4 w-4 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -235,10 +233,12 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. SECONDARY CATEGORY SUB-BAR (Only on product/category pages) */}
+      </header>
+
+        {/* 3. KATEGORİ ÇUBUĞU: yalnız ürün/kategori sayfalarında, yapışkan değil (ekran alanını yemesin) */}
         {(pathname === '/' || pathname.startsWith('/kategori') || pathname.startsWith('/urun/')) && (
-          <div className="bg-[#FAF8F5] border-t border-neutral-200/60 py-2 px-4 animate-fade-in">
-            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-7 overflow-x-visible no-scrollbar text-[10.5px] font-bold uppercase tracking-wider text-neutral-600">
+          <div className="relative z-30 bg-paper border-b border-line py-2 px-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-start md:justify-center gap-4 md:gap-7 overflow-x-visible no-scrollbar text-xs font-bold uppercase tracking-wider text-neutral-600">
               {rootCategories.map((cat, idx) => {
                 const isActive = pathname === `/kategori/${cat.slug}`;
                 const children = sortedCategories.filter((c) => c.parentId === cat.id);
@@ -250,19 +250,19 @@ export const Navbar: React.FC = () => {
                       <Link
                         href={`/kategori/${cat.slug}`}
                         className={`transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
-                          isActive ? 'text-[#C5A880] font-extrabold' : 'hover:text-[#C5A880]'
+                          isActive ? 'text-wood font-extrabold' : 'hover:text-wood'
                         }`}
                       >
                         <span>{cat.name}</span>
                         {hasChildren && (
-                          <ChevronDown className="h-3 w-3 text-neutral-400 group-hover:text-[#C5A880] transition-transform group-hover:rotate-180" />
+                          <ChevronDown className="h-3 w-3 text-neutral-500 group-hover:text-wood transition-transform group-hover:rotate-180" />
                         )}
                       </Link>
 
                       {/* Dropdown for Subcategories */}
                       {hasChildren && (
-                        <div className="absolute top-full left-0 mt-0.5 min-w-[200px] bg-white border border-neutral-200/90 shadow-xl rounded-xs py-2 hidden group-hover:block z-50 animate-fade-in">
-                          <div className="px-3 py-1 text-[9px] font-mono text-neutral-400 uppercase tracking-widest border-b border-neutral-100 mb-1">
+                        <div className="absolute top-full left-0 mt-0.5 min-w-[200px] bg-white border border-line shadow-xl rounded-xs py-2 hidden group-hover:block z-50 animate-fade-in">
+                          <div className="px-3 py-1 text-sm font-mono text-neutral-500 border-b border-line mb-1">
                             {cat.name} Alt Kategorileri
                           </div>
                           {children.map((subCat) => {
@@ -271,10 +271,10 @@ export const Navbar: React.FC = () => {
                               <Link
                                 key={subCat.id}
                                 href={`/kategori/${subCat.slug}`}
-                                className={`block px-3 py-1.5 text-[10px] uppercase font-semibold transition-colors ${
+                                className={`block px-3 py-1.5 text-sm font-semibold transition-colors ${
                                   isSubActive
-                                    ? 'bg-[#FAF8F5] text-[#C5A880] font-bold'
-                                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-[#C5A880]'
+                                    ? 'bg-paper text-wood font-semibold'
+                                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-wood'
                                 }`}
                               >
                                 ↳ {subCat.name}
@@ -286,7 +286,7 @@ export const Navbar: React.FC = () => {
                     </div>
 
                     {idx < rootCategories.length - 1 && (
-                      <span className="text-neutral-300 text-[8px] select-none">/</span>
+                      <span className="text-neutral-300 text-xs select-none">/</span>
                     )}
                   </React.Fragment>
                 );
@@ -294,7 +294,6 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
         )}
-      </header>
 
       {/* ============================================================ */}
       {/* 5. MOBILE HAMBURGER MENU DRAWER (Full Slide-In Sheet)         */}
@@ -303,7 +302,7 @@ export const Navbar: React.FC = () => {
         <div className="fixed inset-0 z-50 flex lg:hidden">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-neutral-950/60 backdrop-blur-xs animate-fade-in"
+            className="fixed inset-0 bg-neutral-950/60 animate-fade-in"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
@@ -311,13 +310,13 @@ export const Navbar: React.FC = () => {
           <div className="relative w-4/5 max-w-sm bg-white h-full shadow-2xl z-10 flex flex-col justify-between overflow-y-auto animate-slide-in">
             {/* Header */}
             <div>
-              <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-[#FAF8F5]">
+              <div className="p-5 border-b border-line flex items-center justify-between bg-paper">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <span className="font-serif font-black text-xl tracking-tight text-neutral-900">
+                  <span className="font-display font-extrabold text-xl tracking-tight text-neutral-900">
                     ERMAY MOBİLYA
                   </span>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">
-                    Doğrudan Fabrikadan Satış
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Modoko atölyesinde üretim
                   </p>
                 </Link>
                 <button
@@ -330,7 +329,7 @@ export const Navbar: React.FC = () => {
 
               {/* Main Nav Links */}
               <div className="p-4 space-y-1">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-3 block mb-2">
+                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider px-3 block mb-2">
                   Menü
                 </span>
                 {navLinks.map((link) => {
@@ -344,21 +343,21 @@ export const Navbar: React.FC = () => {
                     <Link
                       key={link.name}
                       href={link.href}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-xs text-xs font-bold uppercase tracking-wider transition-colors ${
-                        isActive ? 'bg-[#FAF8F5] text-[#C5A880]' : 'text-neutral-800 hover:bg-neutral-50'
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-xs text-sm font-semibold transition-colors ${
+                        isActive ? 'bg-paper text-wood' : 'text-neutral-800 hover:bg-neutral-50'
                       }`}
                     >
                       <span>{link.name}</span>
-                      <ChevronRight className="h-3.5 w-3.5 text-neutral-400" />
+                      <ChevronRight className="h-3.5 w-3.5 text-neutral-500" />
                     </Link>
                   );
                 })}
               </div>
 
               {/* Categories Section */}
-              <div className="p-4 border-t border-neutral-100 space-y-1">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-3 block mb-2">
-                  Koleksiyonlar & Kategoriler
+              <div className="p-4 border-t border-line space-y-1">
+                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider px-3 block mb-2">
+                  Kategoriler
                 </span>
                 {rootCategories.map((cat) => {
                   const children = sortedCategories.filter((c) => c.parentId === cat.id);
@@ -371,8 +370,8 @@ export const Navbar: React.FC = () => {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`flex items-center justify-between px-3 py-2 text-xs transition-colors rounded-xs ${
                           isCatActive
-                            ? 'bg-[#FAF8F5] text-[#C5A880] font-bold'
-                            : 'text-neutral-800 hover:text-[#C5A880] hover:bg-neutral-50'
+                            ? 'bg-paper text-wood font-bold'
+                            : 'text-neutral-800 hover:text-wood hover:bg-neutral-50'
                         }`}
                       >
                         <span className="font-semibold">{cat.name}</span>
@@ -380,7 +379,7 @@ export const Navbar: React.FC = () => {
                       </Link>
 
                       {children.length > 0 && (
-                        <div className="pl-5 space-y-0.5 border-l-2 border-neutral-100 ml-3 py-1">
+                        <div className="pl-5 space-y-0.5 border-l-2 border-line ml-3 py-1">
                           {children.map((subCat) => {
                             const isSubActive = pathname === `/kategori/${subCat.slug}`;
                             return (
@@ -388,10 +387,10 @@ export const Navbar: React.FC = () => {
                                 key={subCat.id}
                                 href={`/kategori/${subCat.slug}`}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className={`flex items-center justify-between px-2 py-1.5 text-[11px] rounded-xs transition-colors ${
+                                className={`flex items-center justify-between px-2 py-1.5 text-xs rounded-xs transition-colors ${
                                   isSubActive
-                                    ? 'text-[#C5A880] font-bold bg-[#FAF8F5]'
-                                    : 'text-neutral-600 hover:text-[#C5A880]'
+                                    ? 'text-wood font-bold bg-paper'
+                                    : 'text-neutral-600 hover:text-wood'
                                 }`}
                               >
                                 <span>↳ {subCat.name}</span>
@@ -407,42 +406,42 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Footer Contact & Account */}
-            <div className="p-5 border-t border-neutral-100 bg-[#FAF8F5] space-y-3">
+            <div className="p-5 border-t border-line bg-paper space-y-3">
               <a
                 href={`https://wa.me/${waNumber}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobil sitenizden ulaşıyorum. Bilgi almak istiyorum.')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-4 rounded flex items-center justify-center gap-2 shadow-xs transition-colors"
+                className="w-full bg-whatsapp hover:bg-whatsapp-dark text-white text-xs font-semibold py-3 px-4 rounded-xs flex items-center justify-center gap-2 transition-colors"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>WhatsApp İle Hızlı Sipariş / Danış</span>
+                <span>WhatsApp ile yazın</span>
               </a>
 
               {/* Social Channels Mini Bar */}
               <div className="flex items-center justify-center gap-4 pt-1">
                 {socialLinks?.instagram && (
-                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-pink-600 text-xs font-semibold">
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-wood text-xs font-semibold">
                     Instagram
                   </a>
                 )}
                 {socialLinks?.youtube && (
-                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-red-600 text-xs font-semibold">
+                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-wood text-xs font-semibold">
                     YouTube
                   </a>
                 )}
                 {socialLinks?.telegram && (
-                  <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-sky-600 text-xs font-semibold">
+                  <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-wood text-xs font-semibold">
                     Telegram
                   </a>
                 )}
               </div>
 
-              <div className="text-[11px] text-neutral-600 space-y-1 pt-1 text-center">
+              <div className="text-xs text-neutral-600 space-y-1 pt-1 text-center">
                 <p className="flex items-center justify-center gap-1.5 font-medium">
-                  <Phone className="h-3.5 w-3.5 text-[#C5A880]" />
+                  <Phone className="h-3.5 w-3.5 text-wood" />
                   <span>{contactInfo.phone}</span>
                 </p>
-                <p className="text-neutral-500 font-light text-[10px]">
+                <p className="text-neutral-500 text-xs">
                   {contactInfo.showroom}
                 </p>
               </div>

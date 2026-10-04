@@ -164,7 +164,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-[#C5A880]" />
+            <BookOpen className="h-4 w-4 text-wood" />
             <span>Blog & SEO İçerik Yönetimi</span>
           </h2>
           <p className="text-xs text-neutral-500 font-light mt-1">
@@ -174,7 +174,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
 
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Yeni Blog Yazısı Ekle</span>
@@ -289,7 +289,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
               <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#C5A880]" />
+                <Sparkles className="h-4 w-4 text-wood" />
                 <span>{editingPostId ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı Oluştur'}</span>
               </h3>
               <button
@@ -312,7 +312,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Örn: Masif Ahşap Mobilya Bakımı ve 2026 Trendleri"
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                 />
               </div>
 
@@ -326,7 +326,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="Dekorasyon & Tasarım"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                 </div>
 
@@ -339,7 +339,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.author}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                     placeholder="Ermay Mobilya Mimari Ekibi"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     value={formData.coverImage}
                     onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
                     placeholder="Görsel URL veya dosya yükleyin"
-                    className="flex-1 px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden"
+                    className="flex-1 px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                   <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xs border border-neutral-300 transition-colors">
                     <ImageIcon className="h-3.5 w-3.5 text-neutral-500" />
@@ -380,7 +380,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.summary}
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   placeholder="Arama motorlarında ve kartlarda görünecek 1-2 cümlelik özet..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                 />
               </div>
 
@@ -394,7 +394,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Detaylı mimari rehber, ahşap türleri, bakım tüyoları ve dekorasyon detaylarını buraya girin..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden font-mono text-xs leading-relaxed"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono text-xs leading-relaxed"
                 />
               </div>
 
@@ -407,7 +407,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                   placeholder="masif gürgen, modoko, makam takımı, ofis koltuğu"
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden font-mono"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono"
                 />
               </div>
 
@@ -417,7 +417,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   id="isPublished"
                   checked={formData.isPublished}
                   onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                  className="h-4 w-4 text-[#C5A880] border-neutral-300 rounded-xs focus:ring-[#C5A880]"
+                  className="h-4 w-4 text-wood border-neutral-300 rounded-xs focus:ring-wood"
                 />
                 <label htmlFor="isPublished" className="text-xs font-semibold text-neutral-800 cursor-pointer">
                   Hemen Yayına Al (Web sitesinde ve arama motorlarında görünsün)
@@ -435,7 +435,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-[#C5A880] hover:bg-[#B4966E] text-white font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-wood hover:bg-wood-dark text-white font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span>{editingPostId ? 'Güncellemeleri Kaydet' : 'Blog Yazısını Yayınla'}</span>

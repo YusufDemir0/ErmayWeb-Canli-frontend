@@ -87,7 +87,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-neutral-100 pb-4 mb-6 gap-3">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C5A880] block mb-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-wood block mb-1">
               Vitrin & Manşet Yönetimi
             </span>
             <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900">
@@ -98,7 +98,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <button
             type="button"
             onClick={handleAddSlide}
-            className="flex items-center gap-1.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors cursor-pointer shadow-xs"
           >
             <Plus className="h-4 w-4" />
             <span>Yeni Slayt Ekle</span>
@@ -112,12 +112,12 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
             {localHomeConfig.heroSlides.map((slide, index) => (
               <div
                 key={slide.id || index}
-                className="p-6 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2] space-y-4"
+                className="p-6 bg-paper rounded-xs border border-line space-y-4"
               >
                 {/* Slide Card Header */}
-                <div className="flex items-center justify-between border-b border-[#EAE3D2] pb-3">
+                <div className="flex items-center justify-between border-b border-line pb-3">
                   <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[#C5A880]" />
+                    <Sparkles className="h-4 w-4 text-wood" />
                     Slayt #{index + 1}
                   </span>
                   <button
@@ -231,7 +231,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
                 </div>
 
                 {/* Button Text & SMART TARGET PICKER (No manual typing required!) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#EAE3D2]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-line">
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1">
                       Buton Üzerindeki Metin
@@ -251,7 +251,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
 
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block mb-1 flex items-center gap-1">
-                      <LinkIcon className="h-3 w-3 text-[#C5A880]" />
+                      <LinkIcon className="h-3 w-3 text-wood" />
                       <span>Buton Yönlendirme Hedefi (Açılır Menüden Seçin)</span>
                     </label>
 
@@ -326,7 +326,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
 
           {/* Section Titles */}
           <div className="border-t border-neutral-200 pt-6 space-y-4">
-            <h4 className="text-xs font-bold text-[#8A4B20] uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-wood-dark uppercase tracking-wider">
               Ana Sayfa Bölüm Başlıkları
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -363,7 +363,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
+              className="bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
             >
               Ana Sayfa Değişikliklerini Kaydet
             </button>

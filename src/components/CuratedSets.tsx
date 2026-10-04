@@ -2,204 +2,107 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Package, ArrowRight, Check, Sparkles, ShoppingBag } from 'lucide-react';
-import { useCartStore } from '../stores/useCartStore';
+import { ArrowRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
+import { getProductImage } from '../lib/productImages';
 import OptimizedImage from './OptimizedImage';
+import DimensionLine from './DimensionLine';
+import type { Product } from '../types';
 
+const currencyFormatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 });
+const formatPrice = (amount: number) => currencyFormatter.format(amount).replace('TRY', 'TL');
+
+/**
+ * Takımlar: katalogda parça listesi (setPieces) tanımlı gerçek ürünler. Koda gömülü set, fiyat veya görsel yok;
+ * uygun ürün yoksa bölüm hiç görünmez.
+ */
 export const CuratedSets: React.FC = () => {
-  const addToCart = useCartStore((state) => state.addToCart);
   const products = useCMSStore((state) => state.products);
 
-  // Curated package definitions with set items.
-  // matchedProduct için rastgele ürüne (products[0..2]) düşülmez: eşleşme yoksa set kendi fiyatıyla katalog sayfasına gider;
-  // aksi halde "Yemek Odası Takımı" ceket askısının fiyatıyla gösterilip sepete askı ekleniyordu.
-  const SETS = [
-    {
-      id: 'set-milano-makam',
-      title: 'Milano İtalyan Deri Makam Takımı',
-      category: 'Makam & Ofis Takımı',
-      tag: 'Tam Takım Avantajı',
-      image: '/default-furniture.webp',
-      description: 'Masif meşe gövde, İtalyan taba deri kaplama ve döküm pirinç detaylı prestijli yönetici seti.',
-      items: [
-        '1 Adet Milano 240cm Makam Masası',
-        '1 Adet Entegre Çekmeceli Etajer',
-        '1 Adet Ahşap Sehpa',
-        '1 Adet Ergonomik Hakiki Deri Makam Koltuğu',
-        '2 Adet Misafir Berjeri',
-      ],
-      originalPrice: 84000,
-      price: 69900,
-      matchedProduct: products.find((p) => p.slug?.includes('makam') || p.name.includes('Makam')),
-    },
-    {
-      id: 'set-floransa-salon',
-      title: 'Floransa Masif Ahşap Salon Takımı',
-      category: 'Oturma Grubu & Salon',
-      tag: 'Atölye Özel Kombinasyon',
-      image: '/default-furniture.webp',
-      description: '%100 Fırınlanmış gürgen iskelet, leke tutmaz keten dokuma kumaş ve el işçiliği kapitone detaylar.',
-      items: [
-        '1 Adet Floransa 4\'lü Ana Koltuk (240cm)',
-        '1 Adet Floransa 3\'lü Koltuk (210cm)',
-        '2 Adet Hakiki Ahşap Ayaklı Berjer',
-        '1 Adet Doğal Traverten Mermer Orta Sehpa',
-      ],
-      originalPrice: 78500,
-      price: 64500,
-      matchedProduct: products.find((p) => p.slug?.includes('koltuk') || p.name.includes('Koltuk')),
-    },
-    {
-      id: 'set-roma-yemek',
-      title: 'Roma Doğal Mermer Yemek Odası Takımı',
-      category: 'Yemek Odası & Davet',
-      tag: 'Özel Seri Paket',
-      image: '/default-furniture.webp',
-      description: 'İtalyan Calacatta mermer tabla, masif ceviz ayaklar ve nubuk kumaş sandalyeler.',
-      items: [
-        '1 Adet Roma 220cm Mermer Yemek Masası',
-        '6 Adet Ergonomik Nubuk Yemek Sandalyesi',
-        '1 Adet 4 Kapaklı Aynalı Konsol',
-      ],
-      originalPrice: 62000,
-      price: 52900,
-      matchedProduct: products.find((p) => p.slug?.includes('yemek') || p.name.includes('Yemek')),
-    },
-  ];
+  const sets = React.useMemo(
+    () =>
+      products
+        .filter((p: Product) => Array.isArray(p.setPieces) && p.setPieces.length >= 3)
+        .sort((a, b) => (b.setPieces?.length ?? 0) - (a.setPieces?.length ?? 0))
+        .slice(0, 3),
+    [products]
+  );
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      maximumFractionDigits: 0,
-    }).format(amount).replace('TRY', 'TL');
-  };
-
-  const handleAddSetToCart = (setObj: typeof SETS[0]) => {
-    if (setObj.matchedProduct) {
-      addToCart(setObj.matchedProduct, 1);
-    }
-  };
+  if (sets.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-20 bg-white border-b border-[#EAE3D2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#EAE3D2] pb-6">
+    <section className="py-12 md:py-16 bg-paper border-y border-line">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
           <div className="space-y-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A880] flex items-center gap-1.5">
-              <Sparkles className="h-3 w-3" />
-              Doğrudan Üreticiden
-            </span>
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">
-              Özel Takım Kombinasyonları
-            </h2>
-            <p className="text-xs md:text-sm text-neutral-500 font-light max-w-xl">
-              Kendi fabrikamızda birbirine tam uyumlu olarak üretilen ve takım avantajıyla sunulan komple yaşam ve makam setleri.
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight">Takım halinde üretilenler</h2>
+            <p className="text-sm text-neutral-600 max-w-xl">
+              Parçaları aynı seride, birbirine ölçülü üretilen takımlar. Parça listesi ve fiyat katalogdaki güncel kayıttan gelir.
             </p>
           </div>
-
-          <Link
-            href="/katalog"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#B4966E] hover:text-neutral-900 transition-colors group"
-          >
-            <span>Tüm Takımları İncele</span>
-            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+          <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-semibold text-wood hover:text-ink transition-colors group">
+            <span>Tüm katalog</span>
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        {/* Curated Sets Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {SETS.map((setObj) => (
-            <div
-              key={setObj.id}
-              className="bg-[#FAF8F5] rounded-sm border border-[#EAE3D2] overflow-hidden hover:border-[#C5A880] transition-all flex flex-col justify-between group shadow-2xs hover:shadow-xs"
-            >
-              <div>
-                {/* Visual */}
-                <div className="aspect-[16/10] w-full overflow-hidden bg-neutral-200 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-line border border-line">
+          {sets.map((product) => {
+            const href = `/urun/${product.slug || product.id}`;
+            const price = Number(product.price);
+            const originalPrice = product.originalPrice ? Number(product.originalPrice) : null;
+            return (
+              <article key={product.id} className="bg-white flex flex-col">
+                <Link href={href} className="relative aspect-[16/10] overflow-hidden bg-paper block group">
                   <OptimizedImage
-                    src={setObj.image}
-                    alt={setObj.title}
+                    src={getProductImage(product)}
+                    alt={product.name}
                     fill
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                   />
-                  <div className="absolute top-3 left-3 bg-neutral-900/90 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-xs border border-white/20">
-                    {setObj.tag}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 space-y-4">
+                </Link>
+                <div className="p-5 flex-1 flex flex-col gap-4">
                   <div className="space-y-1">
-                    <span className="text-[9.5px] uppercase tracking-[0.2em] text-[#C5A880] font-bold block">
-                      {setObj.category}
-                    </span>
-                    <h3 className="font-serif text-lg font-bold text-neutral-900 tracking-tight">
-                      {setObj.title}
+                    {product.erpItemCode && <span className="font-mono text-xs text-neutral-500">{product.erpItemCode}</span>}
+                    <h3 className="font-display text-lg font-semibold text-ink leading-snug">
+                      <Link href={href} className="hover:text-wood transition-colors">{product.name}</Link>
                     </h3>
                   </div>
 
-                  <p className="text-neutral-600 text-xs font-light leading-relaxed">
-                    {setObj.description}
-                  </p>
+                  <ol className="text-sm text-neutral-700 divide-y divide-line border-y border-line">
+                    {product.setPieces!.map((piece, idx) => (
+                      <li key={piece.id || idx} className="flex items-baseline gap-3 py-1.5">
+                        <span className="font-mono text-xs text-steel tabular-nums-all">{String(idx + 1).padStart(2, '0')}</span>
+                        <span className="flex-1">{piece.title}</span>
+                        {piece.isOptional && <span className="text-xs text-neutral-500">isteğe bağlı</span>}
+                      </li>
+                    ))}
+                  </ol>
 
-                  {/* Included Items Checklist */}
-                  <div className="bg-white border border-[#EAE3D2] rounded-xs p-3.5 space-y-2">
-                    <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest block">
-                      Paket İçeriği:
-                    </span>
-                    <ul className="space-y-1.5 text-[11px] text-neutral-700 font-medium">
-                      {setObj.items.map((item, iIdx) => (
-                        <li key={iIdx} className="flex items-center gap-2">
-                          <Check className="h-3 w-3 text-[#C5A880] flex-shrink-0" />
-                          <span className="line-clamp-1">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
+                  <DimensionLine value={product.widthCm} />
 
-              {/* Price & Actions Footer */}
-              {(() => {
-                const displayPrice = setObj.matchedProduct ? Number(setObj.matchedProduct.price) : setObj.price;
-                const displayOriginalPrice = setObj.matchedProduct?.originalPrice 
-                  ? Number(setObj.matchedProduct.originalPrice) 
-                  : (setObj.originalPrice || null);
-
-                return (
-                  <div className="p-6 pt-0 border-t border-[#EAE3D2]/60 mt-4 flex items-center justify-between gap-4">
-                    <div className="min-w-fit">
-                      {displayOriginalPrice && displayOriginalPrice > displayPrice ? (
-                        <span className="text-[10px] text-neutral-400 line-through block">
-                          {formatPrice(displayOriginalPrice)}
-                        </span>
-                      ) : null}
-                      <span className="text-base md:text-lg font-extrabold text-neutral-900">
-                        {formatPrice(displayPrice)}
+                  <div className="mt-auto flex items-end justify-between gap-4">
+                    <div>
+                      {originalPrice && originalPrice > price && (
+                        <span className="block text-xs text-neutral-500 line-through tabular-nums-all">{formatPrice(originalPrice)}</span>
+                      )}
+                      <span className={`font-mono text-lg font-semibold tabular-nums-all ${originalPrice && originalPrice > price ? 'text-signal' : 'text-ink'}`}>
+                        {formatPrice(price)}
                       </span>
                     </div>
-
-                    <div className="w-full">
-                      <Link
-                        href={setObj.matchedProduct ? `/urun/${setObj.matchedProduct.slug || setObj.matchedProduct.id}` : '/kategori'}
-                        className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xs transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <span>Takımı İncele</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
+                    <Link
+                      href={href}
+                      className="inline-flex items-center gap-1.5 bg-ink hover:bg-wood text-white text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors"
+                    >
+                      <span>Takımı incele</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
-                );
-              })()}
-            </div>
-
-          ))}
+                </div>
+              </article>
+            );
+          })}
         </div>
-
       </div>
     </section>
   );

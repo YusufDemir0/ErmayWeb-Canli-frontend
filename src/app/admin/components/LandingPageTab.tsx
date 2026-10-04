@@ -46,7 +46,7 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
       {/* Information Header */}
       <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs">
         <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-          <Compass className="h-4 w-4 text-[#C5A880]" />
+          <Compass className="h-4 w-4 text-wood" />
           <span>Web Sitesi Açılış Sayfası Tercihi (Landing Route)</span>
         </h2>
         <p className="text-xs text-neutral-500 font-light mt-1 leading-relaxed">
@@ -61,14 +61,14 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
           onClick={() => setSelectedType('home')}
           className={`p-6 rounded-sm border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
             selectedType === 'home'
-              ? 'border-[#C5A880] bg-[#FBF9F5] shadow-xs'
+              ? 'border-wood bg-paper shadow-xs'
               : 'border-neutral-200 bg-white hover:border-neutral-300'
           }`}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Home className={`h-5 w-5 ${selectedType === 'home' ? 'text-[#C5A880]' : 'text-neutral-400'}`} />
-              {selectedType === 'home' && <CheckCircle2 className="h-4 w-4 text-[#C5A880]" />}
+              <Home className={`h-5 w-5 ${selectedType === 'home' ? 'text-wood' : 'text-neutral-400'}`} />
+              {selectedType === 'home' && <CheckCircle2 className="h-4 w-4 text-wood" />}
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Klasik Vitrin (Ana Sayfa)
@@ -85,14 +85,14 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
           onClick={() => setSelectedType('category')}
           className={`p-6 rounded-sm border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
             selectedType === 'category'
-              ? 'border-[#C5A880] bg-[#FBF9F5] shadow-xs'
+              ? 'border-wood bg-paper shadow-xs'
               : 'border-neutral-200 bg-white hover:border-neutral-300'
           }`}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Layers className={`h-5 w-5 ${selectedType === 'category' ? 'text-[#C5A880]' : 'text-neutral-400'}`} />
-              {selectedType === 'category' && <CheckCircle2 className="h-4 w-4 text-[#C5A880]" />}
+              <Layers className={`h-5 w-5 ${selectedType === 'category' ? 'text-wood' : 'text-neutral-400'}`} />
+              {selectedType === 'category' && <CheckCircle2 className="h-4 w-4 text-wood" />}
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Belirli Bir Kategori
@@ -111,14 +111,14 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
           onClick={() => setSelectedType('catalog')}
           className={`p-6 rounded-sm border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
             selectedType === 'catalog'
-              ? 'border-[#C5A880] bg-[#FBF9F5] shadow-xs'
+              ? 'border-wood bg-paper shadow-xs'
               : 'border-neutral-200 bg-white hover:border-neutral-300'
           }`}
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Sparkles className={`h-5 w-5 ${selectedType === 'catalog' ? 'text-[#C5A880]' : 'text-neutral-400'}`} />
-              {selectedType === 'catalog' && <CheckCircle2 className="h-4 w-4 text-[#C5A880]" />}
+              <Sparkles className={`h-5 w-5 ${selectedType === 'catalog' ? 'text-wood' : 'text-neutral-400'}`} />
+              {selectedType === 'catalog' && <CheckCircle2 className="h-4 w-4 text-wood" />}
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               Tüm Ürünler Kataloğu
@@ -141,7 +141,7 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
           <select
             value={selectedSlug}
             onChange={(e) => setSelectedSlug(e.target.value)}
-            className="w-full sm:w-80 px-3 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-hidden bg-white"
+            className="w-full sm:w-80 px-3 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden bg-white"
           >
             {categories.map((cat) => (
               <option key={cat.id} value={cat.slug}>
@@ -161,7 +161,7 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
           <span>{isSaving ? 'Kaydediliyor...' : 'Açılış Sayfası Tercihini Kaydet'}</span>

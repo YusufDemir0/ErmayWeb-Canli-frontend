@@ -41,11 +41,11 @@ export const TickerTab: React.FC<TickerTabProps> = ({
             placeholder="Örn: • NAKİT ÖDEMELERDE %10 EKSTRA İNDİRİM"
             value={newTickerText}
             onChange={(e) => setNewTickerText(e.target.value)}
-            className="flex-1 text-xs border border-neutral-300 p-3 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+            className="flex-1 text-xs border border-neutral-300 p-3 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
           />
           <button
             type="submit"
-            className="bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold uppercase tracking-wider px-6 py-3 rounded-xs transition-colors cursor-pointer"
+            className="bg-ink hover:bg-wood text-white text-xs font-semibold uppercase tracking-wider px-6 py-3 rounded-xs transition-colors cursor-pointer"
           >
             Metin Ekle
           </button>

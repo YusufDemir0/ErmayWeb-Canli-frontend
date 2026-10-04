@@ -59,24 +59,24 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
   };
 
   return (
-    <div className="w-full bg-[#FCFAF6] text-neutral-900 min-h-screen print:bg-white print:p-0 print:m-0">
+    <div className="w-full bg-paper text-neutral-900 min-h-screen print:bg-white print:p-0 print:m-0">
       {/* 1. TOP CONTROL BAR (Screen Only - PDF Print & Filter) */}
-      <nav className="print:hidden relative z-10 bg-white border-b border-neutral-200 shadow-2xs py-3.5 px-4 sm:px-6 lg:px-8">
+      <nav className="print:hidden relative z-10 bg-white border-b border-line py-3.5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-serif font-black tracking-wider text-sm sm:text-base text-neutral-900 uppercase">
+            <span className="font-display font-extrabold tracking-wider text-sm sm:text-base text-neutral-900 uppercase">
               ERMAY MOBİLYA
             </span>
             <span className="hidden sm:inline text-neutral-300">|</span>
-            <span className="hidden sm:inline text-xs uppercase tracking-widest text-neutral-500 font-semibold">
+            <span className="hidden sm:inline text-xs uppercase tracking-wider text-neutral-500 font-semibold">
               2026 Koleksiyon Kataloğu (A4 Yatay Baskı)
             </span>
           </div>
 
           {/* Category Filter */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 bg-neutral-100 px-3 py-1.5 rounded-sm border border-neutral-200 text-xs">
-              <Filter className="h-3.5 w-3.5 text-[#C5A880]" />
+            <div className="flex items-center gap-1.5 bg-neutral-100 px-3 py-1.5 rounded-xs border border-line text-xs">
+              <Filter className="h-3.5 w-3.5 text-wood" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -94,7 +94,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
             {/* Print CTA */}
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 bg-neutral-900 hover:bg-[#C5A880] text-white hover:text-neutral-950 px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
+              className="flex items-center gap-2 bg-neutral-900 hover:bg-wood text-white hover:text-neutral-950 px-4 py-2 rounded-xs text-sm font-semibold transition-colors cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
               <span>PDF İndir / Yazdır (A4 Yatay)</span>
@@ -117,20 +117,20 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
             return (
               <div 
                 key={product.id}
-                className="katalog-sheet-landscape bg-white rounded-sm border border-[#EAE3D2] shadow-sm p-6 md:p-8 print:p-0 print:border-none print:shadow-none"
+                className="katalog-sheet-landscape bg-white rounded-xs border border-line p-6 md:p-8 print:p-0 print:border-none print:shadow-none"
               >
                 {/* PRINT RUNNING HEADER */}
-                <header className="hidden print:flex border-b border-[#C5A880]/40 pb-1.5 mb-3 items-center justify-between print-header">
+                <header className="hidden print:flex border-b border-wood/40 pb-1.5 mb-3 items-center justify-between print-header">
                   <div className="flex items-center gap-2.5">
-                    <span className="font-serif text-xs font-black tracking-[0.25em] text-neutral-900 uppercase">
+                    <span className="font-display text-xs font-extrabold tracking-wider text-neutral-900 uppercase">
                       ERMAY MOBİLYA
                     </span>
-                    <span className="text-[#C5A880] font-light">|</span>
-                    <span className="text-[8.5px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">
-                      2026 Lüks Koleksiyon Lookbook
+                    <span className="text-wood">|</span>
+                    <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+                      2026 Fiyatlı Ürün Kataloğu
                     </span>
                   </div>
-                  <span className="font-mono text-[9px] font-bold text-[#C5A880] tracking-widest uppercase">
+                  <span className="font-mono text-xs font-bold text-wood tracking-wider uppercase">
                     SAYFA {pageNumber}
                   </span>
                 </header>
@@ -143,7 +143,7 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                       ? 'order-1 sm:order-1 print:order-1' 
                       : 'order-1 sm:order-2 print:order-2'
                   }`}>
-                    <div className="aspect-[16/10] w-full rounded-xs overflow-hidden border border-neutral-200 bg-neutral-100 shadow-2xs">
+                    <div className="aspect-[16/10] w-full rounded-xs overflow-hidden border border-line bg-neutral-100">
                       <img 
                         src={activeImg} 
                         alt={product.name} 
@@ -160,8 +160,8 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                           onClick={() => setActiveThumbMap((prev) => ({ ...prev, [product.id]: tIdx }))}
                           className={`aspect-[4/3] rounded-xs overflow-hidden border transition-all cursor-pointer ${
                             currentThumbIdx === tIdx
-                              ? 'border-[#C5A880] ring-1.5 ring-[#C5A880]/40'
-                              : 'border-neutral-200 opacity-80 hover:opacity-100'
+                              ? 'border-wood ring-1.5 ring-wood/40'
+                              : 'border-line opacity-80 hover:opacity-100'
                           }`}
                         >
                           <img src={thumbUrl} alt="" className="w-full h-full object-cover" />
@@ -176,48 +176,48 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                       ? 'order-2 sm:order-2 print:order-2' 
                       : 'order-2 sm:order-1 print:order-1'
                   }`}>
-                    <div className="border-b border-neutral-100 pb-2">
+                    <div className="border-b border-line pb-2">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[9.5px] uppercase tracking-[0.25em] text-[#C5A880] font-bold">
+                        <span className="text-xs uppercase tracking-wider text-wood font-bold">
                           {categoryTitle}
                         </span>
-                        <span className="font-mono text-[9px] text-neutral-400 uppercase tracking-wider">
+                        <span className="font-mono text-xs text-neutral-500 uppercase tracking-wider">
                           REF: ERM-{pageNumber}
                         </span>
                       </div>
-                      <h2 className="text-xl md:text-2xl font-serif font-bold text-neutral-900 tracking-tight leading-snug uppercase">
+                      <h2 className="text-xl md:text-2xl font-display font-bold text-neutral-900 tracking-tight leading-snug">
                         {product.name}
                       </h2>
                     </div>
 
-                    <p className="text-neutral-600 text-xs md:text-[13px] font-light leading-relaxed italic border-l-2 border-[#C5A880]/50 pl-3">
+                    <p className="text-neutral-600 text-xs md:text-[13px] leading-relaxed italic border-l-2 border-wood/50 pl-3">
                       "{product.description}"
                     </p>
 
                     {/* Specifications Box */}
-                    <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-3 space-y-2 text-xs">
-                      <div className="space-y-1.5 text-[11px] print:text-[10px]">
+                    <div className="bg-paper border border-line rounded-xs p-3 space-y-2 text-xs">
+                      <div className="space-y-1.5 text-xs print:text-[10px]">
                         <div className="flex items-start gap-2">
-                          <Ruler className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
+                          <Ruler className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
                           <div>
-                            <span className="text-[8.5px] uppercase font-bold text-neutral-400 block">Ölçüler</span>
+                            <span className="text-xs uppercase font-bold text-neutral-500 block">Ölçüler</span>
                             <span className="font-semibold text-neutral-800">{product.dimensions || 'G: 220cm | D: 95cm | Y: 75cm'}</span>
                           </div>
                         </div>
 
                         <div className="flex items-start gap-2">
-                          <Layers className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
+                          <Layers className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
                           <div>
-                            <span className="text-[8.5px] uppercase font-bold text-neutral-400 block">Materyal & Doku</span>
+                            <span className="text-xs uppercase font-bold text-neutral-500 block">Malzeme</span>
                             <span className="font-semibold text-neutral-800">{product.material}</span>
                           </div>
                         </div>
 
                         {product.setContents && (
-                          <div className="flex items-start gap-2 pt-1 border-t border-[#EAE3D2]">
-                            <Package className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-2 pt-1 border-t border-line">
+                            <Package className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
                             <div>
-                              <span className="text-[8.5px] uppercase font-bold text-neutral-400 block">Takım İçeriği</span>
+                              <span className="text-xs uppercase font-bold text-neutral-500 block">Takım İçeriği</span>
                               <span className="font-medium text-neutral-800">
                                 {typeof product.setContents === 'string' ? product.setContents : product.setContents.join(' + ')}
                               </span>
@@ -228,10 +228,10 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
 
                       {/* Features Checkmarks */}
                       {product.features && product.features.length > 0 && (
-                        <div className="pt-2 border-t border-[#EAE3D2] grid grid-cols-2 gap-1.5 text-[10px] text-neutral-600">
+                        <div className="pt-2 border-t border-line grid grid-cols-2 gap-1.5 text-xs text-neutral-600">
                           {product.features.slice(0, 4).map((f, i) => (
                             <div key={i} className="flex items-center gap-1">
-                              <Check className="h-3 w-3 text-[#C5A880] flex-shrink-0" />
+                              <Check className="h-3 w-3 text-wood flex-shrink-0" />
                               <span className="truncate">{f}</span>
                             </div>
                           ))}
@@ -242,31 +242,31 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                     {/* Pricing and Guarantee Footer */}
                     <div className="flex items-center justify-between pt-1">
                       <div>
-                        <span className="text-[8.5px] uppercase font-semibold text-neutral-400 block">Tavsiye Edilen Satış Fiyatı</span>
+                        <span className="text-xs uppercase font-semibold text-neutral-500 block">Tavsiye Edilen Satış Fiyatı</span>
                         <div className="flex items-baseline gap-2">
                           <span className="text-xl md:text-2xl font-bold text-neutral-900 tracking-tight">
                             {formatPrice(product.price)}
                           </span>
                           {product.originalPrice && product.originalPrice > product.price && (
-                            <span className="text-xs line-through text-neutral-400">
+                            <span className="text-xs line-through text-neutral-500">
                               {formatPrice(product.originalPrice)}
                             </span>
                           )}
                         </div>
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-[9.5px] font-semibold text-[#8D7B68] bg-[#C5A880]/10 px-3 py-1.5 rounded-xs border border-[#C5A880]/20">
-                        <ShieldCheck className="h-3.5 w-3.5 text-[#C5A880]" />
-                        <span>2 Yıl Garanti & Kargo Dahil</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#8D7B68] bg-wood/10 px-3 py-1.5 rounded-xs border border-wood/20">
+                        <ShieldCheck className="h-3.5 w-3.5 text-wood" />
+                        <span>2 yıl imalat garantisi</span>
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* PRINT RUNNING FOOTER */}
-                <footer className="hidden print:flex border-t border-[#C5A880]/40 pt-1.5 text-[8px] text-neutral-500 items-center justify-between uppercase tracking-wider">
+                <footer className="hidden print:flex border-t border-wood/40 pt-1.5 text-xs text-neutral-500 items-center justify-between uppercase tracking-wider">
                   <div>
-                    <span className="font-semibold text-neutral-700">MERKEZ MAĞAZA & İMALAT:</span> {contactInfo.showroom || 'Modoko Mobilyacılar Sitesi No: 42, Ümraniye / İstanbul'}
+                    <span className="font-semibold text-neutral-700">Merkez showroom ve atölye:</span> {contactInfo.showroom || 'Modoko Mobilyacılar Sitesi No: 42, Ümraniye / İstanbul'}
                   </div>
                   <div className="flex items-center gap-3">
                     <span>TEL: {contactInfo.phone || '+90 (216) 456 78 90'}</span>

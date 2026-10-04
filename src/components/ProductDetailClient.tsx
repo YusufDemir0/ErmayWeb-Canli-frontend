@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, 
   CheckCircle2, ArrowLeft, Layers, Ruler, Loader2, Compass, 
-  Sparkles, Eye, Check, MessageSquare, CreditCard, Box,
+  Eye, Check, MessageSquare, CreditCard, Box,
   Info, CornerDownRight, Send, CheckCircle, Award, Factory,
   Tag, PlusCircle, Percent, CheckSquare, Square
 } from 'lucide-react';
@@ -18,6 +18,8 @@ import apiClient from '../services/api';
 import { getProductImages } from '../lib/productImages';
 import type { Product, ProductColorVariant, ProductSetPiece } from '../types';
 import ProductCard from './ProductCard';
+import LeadTimeBadge from './LeadTimeBadge';
+import DimensionLine from './DimensionLine';
 import { toast } from '../stores/useToastStore';
 import { useWhatsappNumber } from '../lib/whatsapp';
 
@@ -32,16 +34,16 @@ export interface LuxurySwatch extends ProductColorVariant {
   description: string;
 }
 
-// 1. Sınıf Mimari ve Lüks Mobilya Kumaş / Deri / Ahşap Kartelası
+// Ürün kendi renk kaydını taşımıyorsa kullanılan yedek kartela (kumaş / deri / ahşap)
 export const LUXURY_SWATCHES: LuxurySwatch[] = [
-  { id: 'taba-deri', name: 'İtalyan Taba Hakiki Deri', color: '#8A4B20', hex: '#8A4B20', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: '1. Sınıf nefes alabilir İtalyan dana derisi. Pürüzsüz tuşe ve doğal damarlı doku.' },
-  { id: 'siyah-deri', name: 'Asil Siyah Hakiki Deri', color: '#18181B', hex: '#18181B', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: 'Yüksek sürtünme dayanımlı, lüks mat siyah deri yüzeyi.' },
+  { id: 'taba-deri', name: 'Taba Hakiki Deri', color: '#8A4B20', hex: '#8A4B20', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: 'Nefes alabilir dana derisi; doğal damarlı doku.' },
+  { id: 'siyah-deri', name: 'Siyah Hakiki Deri', color: '#18181B', hex: '#18181B', tag: 'Hakiki Deri', category: 'deri', categoryLabel: 'Hakiki Deri', description: 'Yüksek sürtünme dayanımlı mat siyah deri.' },
   { id: 'antrasit-nubuk', name: 'Antrasit Mat Nubuk', color: '#2C323B', hex: '#2C323B', tag: 'Nubuk', category: 'nubuk', categoryLabel: 'Mat Nubuk', description: 'Su ve leke itici mikrofiber teknolojili yumuşak dokulu nubuk.' },
   { id: 'duman-nubuk', name: 'Duman Grisi Nubuk', color: '#4B5563', hex: '#4B5563', tag: 'Nubuk', category: 'nubuk', categoryLabel: 'Mat Nubuk', description: 'Yumuşak tuşeli kadifemsi nubuk dokusu, kolay temizlenebilir.' },
   { id: 'krem-keten', name: 'Krem Doğal Dokuma Keten', color: '#E4DAC6', hex: '#E4DAC6', tag: 'Keten', category: 'keten', categoryLabel: 'Doğal Keten', description: '%100 doğal keten ve pamuk lifi harmanı. Terletmez ve nefes alır.' },
   { id: 'kum-keten', name: 'Kum Beji Doğal Keten', color: '#D4C5B0', hex: '#D4C5B0', tag: 'Keten', category: 'keten', categoryLabel: 'Doğal Keten', description: 'Aşınmaya dayanıklı sık dokuma keten kumaş, sıcak tonlar.' },
-  { id: 'vizon-boucle', name: 'Vizon Lüks Bouclé', color: '#877569', hex: '#877569', tag: 'Bouclé', category: 'boucle', categoryLabel: 'Lüks Buklet', description: 'Son trend sıcak ve kabarık dokulu buklet kumaş.' },
-  { id: 'zumrut-kadife', name: 'Zümrüt İtalyan Kadife', color: '#1B382B', hex: '#1B382B', tag: 'Kadife', category: 'boucle', categoryLabel: 'İtalyan Kadife', description: 'Zengin parlaklık ve lüks yumuşaklık sunan asil kadife döşeme.' },
+  { id: 'vizon-boucle', name: 'Vizon Bouclé', color: '#877569', hex: '#877569', tag: 'Bouclé', category: 'boucle', categoryLabel: 'Buklet', description: 'Kabarık dokulu buklet kumaş.' },
+  { id: 'zumrut-kadife', name: 'Zümrüt Kadife', color: '#1B382B', hex: '#1B382B', tag: 'Kadife', category: 'boucle', categoryLabel: 'Kadife', description: 'Yumuşak tuşeli kadife döşeme.' },
   { id: 'ceviz-ahsap', name: 'Doğal Amerikan Ceviz', color: '#5C381E', hex: '#5C381E', tag: 'Ahşap', category: 'ahsap', categoryLabel: 'Masif Ahşap', description: 'Doğal damarlı Amerikan ceviz kaplama, fırınlanmış dayanıklı gövde.' },
   { id: 'mese-ahsap', name: 'Açık İskandinav Meşe', color: '#C8A87B', hex: '#C8A87B', tag: 'Ahşap', category: 'ahsap', categoryLabel: 'Masif Ahşap', description: 'Mat vernikli İskandinav açık meşe masif ahşap yüzey.' },
 ];
@@ -60,14 +62,14 @@ const COLOR_HEX_MAP: Record<string, { hex: string; category: LuxurySwatch['categ
   ceviz: { hex: '#5C381E', category: 'ahsap', tag: 'Masif Ahşap' },
   mese: { hex: '#C8A87B', category: 'ahsap', tag: 'Masif Ahşap' },
   meşe: { hex: '#C8A87B', category: 'ahsap', tag: 'Masif Ahşap' },
-  vizon: { hex: '#877569', category: 'boucle', tag: 'Lüks Buklet' },
-  zumrut: { hex: '#1B382B', category: 'boucle', tag: 'İtalyan Kadife' },
-  zümrüt: { hex: '#1B382B', category: 'boucle', tag: 'İtalyan Kadife' },
+  vizon: { hex: '#877569', category: 'boucle', tag: 'Buklet' },
+  zumrut: { hex: '#1B382B', category: 'boucle', tag: 'Kadife' },
+  zümrüt: { hex: '#1B382B', category: 'boucle', tag: 'Kadife' },
   haki: { hex: '#2D4A3E', category: 'boucle', tag: 'Doğal Kumaş' },
   yesil: { hex: '#2D4A3E', category: 'boucle', tag: 'Doğal Kumaş' },
   yeşil: { hex: '#2D4A3E', category: 'boucle', tag: 'Doğal Kumaş' },
-  lacivert: { hex: '#1E3A8A', category: 'deri', tag: 'Lüks Döşeme' },
-  mavi: { hex: '#2563EB', category: 'deri', tag: 'Lüks Döşeme' },
+  lacivert: { hex: '#1E3A8A', category: 'deri', tag: 'Döşeme' },
+  mavi: { hex: '#2563EB', category: 'deri', tag: 'Döşeme' },
   bordo: { hex: '#7F1D1D', category: 'deri', tag: 'Özel Seri' },
   krom: { hex: '#D1D5DB', category: 'ahsap', tag: 'Metal Aksam' },
   gold: { hex: '#D4AF37', category: 'ahsap', tag: 'Metal Aksam' },
@@ -78,8 +80,8 @@ const MATERIAL_KEYWORDS: Array<{ keywords: string[]; category: LuxurySwatch['cat
   { keywords: ['nubuk'], category: 'nubuk', tag: 'Mat Nubuk' },
   { keywords: ['deri', 'leather'], category: 'deri', tag: 'Hakiki Deri' },
   { keywords: ['keten'], category: 'keten', tag: 'Doğal Keten' },
-  { keywords: ['kadife'], category: 'boucle', tag: 'İtalyan Kadife' },
-  { keywords: ['buklet', 'boucle'], category: 'boucle', tag: 'Lüks Buklet' },
+  { keywords: ['kadife'], category: 'boucle', tag: 'Kadife' },
+  { keywords: ['buklet', 'boucle'], category: 'boucle', tag: 'Buklet' },
   { keywords: ['ahşap', 'ahsap', 'masif', 'meşe', 'mese', 'ceviz', 'kaplama'], category: 'ahsap', tag: 'Masif Ahşap' },
 ];
 
@@ -142,7 +144,7 @@ export function resolveSwatchForColor(col: string | ProductColorVariant, idx = 0
         : foundCat === 'nubuk'
         ? 'Mat Nubuk'
         : foundCat === 'boucle'
-        ? 'Lüks Kumaş'
+        ? 'Kumaş'
         : 'Döşeme',
     description: `${str || 'Standart Seri'} 1. sınıf fabrika standart kaplaması.`,
   };
@@ -290,9 +292,9 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
   if (loading) {
     return (
-      <div className="w-full min-h-[60vh] bg-[#FCFAF6] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="h-8 w-8 text-[#C5A880] animate-spin" />
-        <span className="text-xs font-semibold text-neutral-500 tracking-widest uppercase">
+      <div className="w-full min-h-[60vh] bg-paper flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-8 w-8 text-wood animate-spin" />
+        <span className="text-xs font-semibold text-neutral-500 tracking-wider uppercase">
           Ürün Tasarımı Yükleniyor...
         </span>
       </div>
@@ -301,15 +303,15 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
   if (notFoundState || !product) {
     return (
-      <div className="w-full min-h-[60vh] bg-[#FCFAF6] flex flex-col items-center justify-center p-6 text-center space-y-4">
-        <div className="p-6 bg-white border border-[#EAE3D2] text-neutral-800 rounded-sm max-w-md space-y-4 shadow-xs">
-          <h2 className="font-serif text-xl font-bold uppercase tracking-tight">Koleksiyon Bulunamadı</h2>
-          <p className="text-xs text-neutral-500 font-light leading-relaxed">
+      <div className="w-full min-h-[60vh] bg-paper flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div className="p-6 bg-white border border-line text-neutral-800 rounded-xs max-w-md space-y-4">
+          <h2 className="font-display text-xl font-bold tracking-tight">Koleksiyon Bulunamadı</h2>
+          <p className="text-xs text-neutral-500 leading-relaxed">
             Aradığınız mobilya modeli üretimden kaldırılmış veya geçici olarak yayından alınmış olabilir.
           </p>
           <Link
             href="/katalog"
-            className="inline-block bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3 px-6 rounded-xs transition-colors"
+            className="inline-block bg-neutral-900 hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
           >
             2026 Kataloğuna Dön
           </Link>
@@ -457,8 +459,8 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
     }
 
     toast.success(
-      'Takım Sepete Eklendi',
-      `${product.name} ve ${bundleItems.length} tamamlayıcı parça sepetinize eklendi.`
+      'Takım talep sepetine eklendi',
+      `${product.name} ve ${bundleItems.length} tamamlayıcı parça talep sepetinize eklendi.`
     );
     setAddedToCartSuccess(true);
     setTimeout(() => setAddedToCartSuccess(false), 3000);
@@ -490,7 +492,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
   };
 
   return (
-    <div className="w-full bg-[#FCFAF6] min-h-screen py-8 md:py-12">
+    <div className="w-full bg-paper min-h-screen py-8 md:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
@@ -498,11 +500,11 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb Navigation & Back Link */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE3D2]">
-          <nav className="text-xs text-neutral-400 font-light flex items-center gap-2">
-            <Link href="/" className="hover:text-[#C5A880] transition-colors">Ana Sayfa</Link>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-line">
+          <nav className="text-xs text-neutral-500 flex items-center gap-2">
+            <Link href="/" className="hover:text-wood transition-colors">Ana Sayfa</Link>
             <span>/</span>
-            <Link href="/katalog" className="hover:text-[#C5A880] transition-colors">Katalog</Link>
+            <Link href="/katalog" className="hover:text-wood transition-colors">Katalog</Link>
             <span>/</span>
             <span className="text-neutral-700 font-medium">
               {typeof product.category === 'object' && product.category !== null
@@ -510,20 +512,20 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 : String(product.category || '')}
             </span>
             <span>/</span>
-            <span className="text-[#B4966E] font-semibold truncate max-w-[200px]">{product.name}</span>
+            <span className="text-wood-dark font-semibold truncate max-w-[200px]">{product.name}</span>
           </nav>
 
           <Link 
             href="/katalog" 
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-[#C5A880] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-wood transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Koleksiyon Kataloğu</span>
           </Link>
         </div>
 
-        {/* ATMACA OFIS TOP PRODUCT STAGE */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 bg-white p-6 md:p-10 rounded-sm border border-[#EAE3D2] shadow-2xs mb-12">
+        {/* ÜRÜN SAHNESİ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 bg-white p-6 md:p-10 rounded-xs border border-line mb-12">
           
           {/* Left Column: Interactive Image Gallery with Lens Zoom */}
           <div className="lg:col-span-7 space-y-4">
@@ -534,7 +536,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               onMouseEnter={() => setIsZoomed(true)}
               onMouseLeave={handleMouseLeave}
               onMouseMove={handleMouseMove}
-              className="relative aspect-[16/11] bg-neutral-100 rounded-xs overflow-hidden border border-neutral-200 cursor-crosshair group select-none"
+              className="relative aspect-[16/11] bg-neutral-100 rounded-xs overflow-hidden border border-line cursor-crosshair group select-none"
             >
               <img
                 ref={zoomImageRef}
@@ -548,15 +550,17 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               />
 
               {/* Zoom Instruction Badge */}
-              <div className={`absolute bottom-3 right-3 bg-neutral-900/80 backdrop-blur-xs text-white text-[9.5px] font-semibold px-2.5 py-1 rounded-xs flex items-center gap-1.5 transition-opacity duration-300 pointer-events-none ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
-                <Eye className="h-3.5 w-3.5 text-[#C5A880]" />
-                <span>Detay Büyüteci</span>
+              <div className={`absolute bottom-3 right-3 bg-white text-ink text-xs font-medium px-2 py-1 rounded-xs flex items-center gap-1.5 transition-opacity duration-300 pointer-events-none ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
+                <Eye className="h-3.5 w-3.5" />
+                <span>Yakınlaştırmak için üzerine gelin</span>
               </div>
 
               {/* Tag / Collection Badge */}
-              <div className="absolute top-3 left-3 bg-[#FAF8F5]/95 backdrop-blur-xs text-neutral-900 font-bold text-[9.5px] uppercase tracking-wider px-2.5 py-1 rounded-xs border border-[#C5A880]/30 shadow-2xs">
-                {product.badge || 'Doğrudan Atölye İmalatı'}
-              </div>
+              {product.badge && (
+                <div className="absolute top-3 left-3 bg-white text-ink font-medium text-xs px-2 py-1 rounded-xs border border-line">
+                  {product.badge}
+                </div>
+              )}
             </div>
 
             {/* Thumbnail Selectors */}
@@ -568,8 +572,8 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     onClick={() => setSelectedImageIndex(idx)}
                     className={`aspect-[4/3] rounded-xs overflow-hidden border-2 transition-all cursor-pointer ${
                       selectedImageIndex === idx 
-                        ? 'border-[#C5A880] ring-2 ring-[#C5A880]/30 scale-105' 
-                        : 'border-neutral-200 opacity-70 hover:opacity-100'
+                        ? 'border-ink' 
+                        : 'border-line opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -578,17 +582,19 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               </div>
             )}
 
-            {/* Quick Dimensions Box */}
-            <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-3.5 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-neutral-700">
-                <Ruler className="h-4 w-4 text-[#C5A880]" />
-                <span className="font-bold uppercase text-[10px] tracking-wider text-neutral-500">Standart Ölçüler:</span>
-                <span className="font-semibold text-neutral-900 font-mono">{product.dimensions || 'G: 220cm × D: 95cm × Y: 75cm'}</span>
+            {/* Ölçü künyesi: yalnız gerçek veri varsa */}
+            {(product.dimensions || product.widthCm) && (
+              <div className="border border-line rounded-xs p-3.5 space-y-2.5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <Ruler className="h-4 w-4 text-wood" aria-hidden="true" />
+                  <span className="text-neutral-600">Ölçüler</span>
+                  <span className="font-mono text-ink tabular-nums-all">
+                    {product.dimensions || [product.widthCm && `G ${product.widthCm}`, product.depthCm && `D ${product.depthCm}`, product.heightCm && `Y ${product.heightCm}`].filter(Boolean).join(' × ') + ' cm'}
+                  </span>
+                </div>
+                <DimensionLine value={product.widthCm} />
               </div>
-              <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-xs">
-                Standart Fabrika Seri Ölçüsü
-              </span>
-            </div>
+            )}
 
           </div>
 
@@ -597,35 +603,31 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
             
             {/* Header & Title */}
             <div className="space-y-1.5">
-              <span className="text-[10px] font-black text-[#C5A880] uppercase tracking-[0.25em] block">
-                ERMAY MOBİLYA • İMALAT & SATIŞ
-              </span>
-              <h1 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight leading-snug">
+              {product.erpItemCode && (
+                <span className="font-mono text-xs text-neutral-500 block">Ürün kodu {product.erpItemCode}</span>
+              )}
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight leading-snug">
                 {product.name}
               </h1>
 
-              {/* Stock / Manufacturing Status */}
-              <div className="flex items-center gap-3 pt-1">
-                <span className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                  {product.stock && product.stock > 0 ? 'Stokta Hazır (1-2 İş Günü Sevkiyat)' : 'Fabrika Seri İmalatı (3-5 İş Günü)'}
-                </span>
+              <div className="pt-1">
+                <LeadTimeBadge product={product} />
               </div>
             </div>
 
             {/* Editorial Mini Description */}
-            <p className="text-xs md:text-sm text-neutral-600 font-light leading-relaxed">
+            <p className="text-xs md:text-sm text-neutral-600 leading-relaxed">
               {product.description}
             </p>
 
             {/* Material / Leather Swatch Color Picker */}
-            <div className="space-y-3 pt-1 border-t border-neutral-100">
+            <div className="space-y-3 pt-1 border-t border-line">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-neutral-800 flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5 text-[#C5A880]" />
-                  <span>Kumaş, Deri & Ahşap Kartelası:</span>
+                <label className="text-sm font-semibold text-ink flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-wood" />
+                  <span>Renk ve malzeme</span>
                 </label>
-                <span className="text-xs font-bold text-[#C5A880]">
+                <span className="text-xs font-bold text-wood">
                   {selectedSwatch.name}
                 </span>
               </div>
@@ -647,9 +649,9 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     key={cat.id}
                     type="button"
                     onClick={() => setActiveFabricCategory(cat.id)}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-xs transition-colors cursor-pointer ${
+                    className={`text-xs font-bold px-2 py-0.5 rounded-xs transition-colors cursor-pointer ${
                       activeFabricCategory === cat.id
-                        ? 'bg-[#8A4B20] text-white shadow-2xs'
+                        ? 'bg-wood-dark text-white'
                         : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600'
                     }`}
                   >
@@ -669,92 +671,71 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                       onClick={() => handleSelectColor(swatch)}
                       className={`group relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xs border transition-all cursor-pointer ${
                         isSelected 
-                          ? 'border-[#C5A880] bg-[#FAF8F5] ring-1 ring-[#C5A880] shadow-xs' 
-                          : 'border-neutral-200 hover:border-neutral-400 bg-white'
+                          ? 'border-wood bg-paper ring-1 ring-wood' 
+                          : 'border-line hover:border-neutral-400 bg-white'
                       }`}
                     >
                       <div 
                         style={{ backgroundColor: swatchColor }}
-                        className="w-3.5 h-3.5 rounded-full border border-black/15 shadow-2xs shrink-0"
+                        className="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0"
                       />
-                      <span className="text-[11px] font-semibold text-neutral-800">
+                      <span className="text-xs font-semibold text-neutral-800">
                         {swatch.name}
                       </span>
                       {swatch.tag && (
-                        <span className="text-[9px] text-neutral-400 font-normal">
+                        <span className="text-xs text-neutral-500 font-normal">
                           ({swatch.tag})
                         </span>
                       )}
-                      {isSelected && <Check className="h-3 w-3 text-[#C5A880] shrink-0" />}
+                      {isSelected && <Check className="h-3 w-3 text-wood shrink-0" />}
                     </button>
                   );
                 })}
               </div>
 
               {/* Selected Fabric Description Box */}
-              <div className="bg-[#FAF8F5] border border-[#EAE3D2] p-3.5 rounded-xs space-y-1.5 text-xs">
+              <div className="bg-paper border border-line p-3.5 rounded-xs space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-neutral-900 flex items-center gap-1.5">
                     <span className="w-3 h-3 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: selectedSwatch.hex || '#8A4B20' }} />
                     {selectedSwatch.name}
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white border border-[#EAE3D2] text-[#8A4B20]">
+                  <span className="text-sm font-semibold px-2 py-0.5 rounded bg-white border border-line text-wood-dark">
                     {selectedSwatch.tag || 'Özel Seri'}
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-600 leading-relaxed">
+                <p className="text-xs text-neutral-600 leading-relaxed">
                   {(selectedSwatch as LuxurySwatch).description || 'Ermay Mobilya atölyelerinde 1. sınıf işçilikle titizlikle uygulanan özel döşeme seçeneği.'}
                 </p>
               </div>
             </div>
 
-            {/* Price Box */}
-            <div className="bg-[#FAF8F5] p-4 rounded-xs border border-[#EAE3D2] space-y-1.5">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-neutral-400 block">Fabrika Satış Fiyatı (%20 KDV Dahil)</span>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <span className="text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">
-                      {formatPrice(product.price)}
-                    </span>
-                    {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-sm text-neutral-400 line-through">
-                        {formatPrice(product.originalPrice)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="text-[11px] text-neutral-500 font-normal pt-1 border-t border-[#EAE3D2]/60 flex items-center justify-between">
-                <span>Fiyat Politikası:</span>
-                <span className="text-[11px] text-neutral-700 font-bold">Doğrudan İmalatçı Net Liste Fiyatı</span>
-              </div>
-            </div>
-
-            {/* Factory Direct & Wholesale B2B Trust Card */}
-            <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-3.5 space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-neutral-800 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
-                  <span>🏭</span>
-                  <span>Doğrudan Fabrika Satışı • Aracı Komisyonu Yok</span>
+            {/* Fiyat */}
+            <div className="border-y border-line py-4 space-y-1">
+              <span className="text-sm text-neutral-600 block">Fabrika satış fiyatı · KDV dahil</span>
+              <div className="flex items-baseline gap-3">
+                <span className={`font-mono text-3xl font-semibold tracking-tight tabular-nums-all ${product.originalPrice && product.originalPrice > product.price ? 'text-signal' : 'text-ink'}`}>
+                  {formatPrice(product.price)}
                 </span>
-                <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-xs border border-emerald-200">
-                  Fabrika Net Fiyatı
-                </span>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <span className="text-sm text-neutral-500 line-through tabular-nums-all">
+                    {formatPrice(product.originalPrice)}
+                  </span>
+                )}
               </div>
-              <div className="flex items-center justify-between pt-1 border-t border-[#EAE3D2]/60 text-[11px]">
-                <span className="text-neutral-600 font-light">
-                  Şirketiniz için 3+ adet veya komple ofis kurulumu mu yapıyorsunuz?
-                </span>
+              <p className="text-xs text-neutral-500">Online ödeme alınmaz; talebinizden sonra temsilcimiz teslimat ve ödemeyi sizinle netleştirir.</p>
+              <p className="text-xs text-neutral-600 pt-1">
+                3 adet ve üzeri ya da komple ofis kurulumu için{' '}
                 <a
                   href={`https://wa.me/${waNumber}?text=Merhaba%2C%20${encodeURIComponent(product.name)}%20modelinden%20%C5%9Firketimiz%20i%C3%A7in%20adetli%2Ftoplu%20ofis%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20toptan%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bold text-[#8A4B20] hover:underline shrink-0 ml-2"
+                  className="font-medium text-wood underline underline-offset-2 hover:text-wood-dark"
                 >
-                  Toptan İskonto İste &rarr;
+                  adetli fiyat isteyin
                 </a>
-              </div>
+                .
+              </p>
             </div>
 
             {/* Quantity Selector & Action Buttons */}
@@ -762,17 +743,19 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               {/* Action Buttons Row */}
               <div className="space-y-2.5">
                 <div className="flex flex-wrap sm:flex-nowrap items-stretch gap-2 sm:gap-2.5">
-                  <div className="flex items-center justify-between border border-[#EAE3D2] rounded-xs bg-[#FAF8F5] shrink-0">
+                  <div className="flex items-center justify-between border border-line-strong rounded-xs bg-white shrink-0">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-2.5 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                      aria-label="Adedi azalt"
+                      className="h-11 w-11 text-base text-neutral-700 hover:text-ink cursor-pointer"
                     >
                       -
                     </button>
-                    <span className="px-3 py-2.5 text-xs font-bold text-neutral-900">{quantity}</span>
+                    <span className="w-8 text-center font-mono text-sm text-ink tabular-nums-all" aria-live="polite">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-2.5 text-sm text-neutral-600 hover:text-neutral-900 cursor-pointer font-bold"
+                      aria-label="Adedi artır"
+                      className="h-11 w-11 text-base text-neutral-700 hover:text-ink cursor-pointer"
                     >
                       +
                     </button>
@@ -781,7 +764,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Add to Cart Button */}
                   <button
                     onClick={handleAddToCartClick}
-                    className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 py-3 px-3 sm:px-4 rounded-xs text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-[#C5A880] text-white transition-colors cursor-pointer shadow-xs whitespace-nowrap"
+                    className="flex-1 min-w-[130px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-ink hover:bg-wood text-white transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <ShoppingBag className="h-4 w-4 shrink-0" />
                     <span>Sepete Ekle</span>
@@ -790,7 +773,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Buy Now Button (UNTOUCHABLE: Hemen Al) */}
                   <button
                     onClick={handleBuyNowClick}
-                    className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-3 px-3 sm:px-4 rounded-xs text-xs font-bold uppercase tracking-wider bg-[#C5A880] hover:bg-[#B4966E] text-white transition-colors cursor-pointer shadow-xs whitespace-nowrap"
+                    className="flex-1 min-w-[120px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-wood hover:bg-wood-dark text-white transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <span>Hemen Al</span>
                   </button>
@@ -798,12 +781,13 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Toggle Favorite Button */}
                   <button
                     onClick={() => toggleFavorite(product)}
-                    className={`p-3 rounded-xs border transition-all cursor-pointer shrink-0 ${
+                    className={`h-11 w-11 flex items-center justify-center rounded-xs border transition-colors cursor-pointer shrink-0 ${
                       isFavorite 
-                        ? 'bg-rose-50 border-rose-300 text-rose-600' 
-                        : 'bg-white border-[#EAE3D2] text-neutral-600 hover:text-[#C5A880]'
+                        ? 'bg-white border-signal text-signal' 
+                        : 'bg-white border-line text-neutral-600 hover:text-wood'
                     }`}
-                    aria-label="Favorilere Ekle"
+                    aria-label={isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                    aria-pressed={isFavorite}
                   >
                     <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
@@ -821,70 +805,68 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                       )}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-sm hover:shadow-md active:scale-[0.99]"
+                      className="w-full h-11 border border-whatsapp text-whatsapp hover:bg-whatsapp hover:text-white font-semibold text-sm px-4 rounded-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                     >
-                      <MessageSquare className="h-4 w-4 fill-white text-white" />
-                      <span>WhatsApp ile Sipariş Ver & Danış (Hızlı Yanıt)</span>
+                      <MessageSquare className="h-4 w-4" />
+                      <span>WhatsApp’tan sorun</span>
                     </a>
                   );
                 })()}
               </div>
 
               {addedToCartSuccess && (
-                <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 p-3 rounded-xs text-xs flex items-center gap-2 animate-fade-in">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <span>Seçilen <strong>{selectedSwatch.name}</strong> seçeneği ile sepete eklendi!</span>
+                <div role="status" className="bg-ok-soft border border-ok/25 text-ok p-3 rounded-xs text-sm flex items-center gap-2 animate-fade-in">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span><strong>{selectedSwatch.name}</strong> seçeneğiyle talep sepetine eklendi.</span>
                 </div>
               )}
 
               {/* DETAILED TECHNICAL SPECIFICATIONS TABLE (XYZ ÖLÇÜLER, ÇEKMECE & ÜNİTE) */}
-              <div className="bg-white border border-[#EAE3D2] rounded-xs p-3.5 space-y-2 text-xs">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
-                    <Ruler className="h-3.5 w-3.5 text-[#C5A880]" />
-                    <span>Mobilya Teknik Özellikleri:</span>
+              <div className="bg-white border border-line rounded-xs p-3.5 space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-line pb-2">
+                  <span className="text-sm font-semibold text-ink flex items-center gap-1.5">
+                    <Ruler className="h-4 w-4 text-wood" />
+                    <span>Teknik künye</span>
                   </span>
-                  <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-xs">
-                    Standart Fabrika Seri Üretimi
-                  </span>
+                  <span className="text-xs text-neutral-500">Standart seri üretim</span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-[11px]">
-                  <div className="bg-[#FAF8F5] p-2 rounded-xs border border-neutral-200 text-center">
-                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Genişlik (X)</span>
-                    <strong className="text-neutral-900">{product.widthCm ? `${product.widthCm} cm` : 'Standart'}</strong>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs">
+                  <div className="bg-paper p-2 rounded-xs text-center">
+                    <span className="block text-xs font-sans text-neutral-500">Genişlik (X)</span>
+                    <strong className="text-ink font-medium">{product.widthCm ? `${product.widthCm} cm` : '—'}</strong>
                   </div>
-                  <div className="bg-[#FAF8F5] p-2 rounded-xs border border-neutral-200 text-center">
-                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Derinlik (Y)</span>
-                    <strong className="text-neutral-900">{product.depthCm ? `${product.depthCm} cm` : 'Standart'}</strong>
+                  <div className="bg-paper p-2 rounded-xs text-center">
+                    <span className="block text-xs font-sans text-neutral-500">Derinlik (Y)</span>
+                    <strong className="text-ink font-medium">{product.depthCm ? `${product.depthCm} cm` : '—'}</strong>
                   </div>
-                  <div className="bg-[#FAF8F5] p-2 rounded-xs border border-neutral-200 text-center">
-                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Yükseklik (Z)</span>
-                    <strong className="text-neutral-900">{product.heightCm ? `${product.heightCm} cm` : 'Standart'}</strong>
+                  <div className="bg-paper p-2 rounded-xs text-center">
+                    <span className="block text-xs font-sans text-neutral-500">Yükseklik (Z)</span>
+                    <strong className="text-ink font-medium">{product.heightCm ? `${product.heightCm} cm` : '—'}</strong>
                   </div>
-                  <div className="bg-[#FAF8F5] p-2 rounded-xs border border-neutral-200 text-center">
-                    <span className="block text-[9px] font-sans uppercase font-bold text-neutral-500">Çekmece Adedi</span>
-                    <strong className="text-neutral-900">{product.drawerCount !== undefined ? `${product.drawerCount} Adet` : 'Yok'}</strong>
+                  <div className="bg-paper p-2 rounded-xs text-center">
+                    <span className="block text-xs font-sans text-neutral-500">Çekmece Adedi</span>
+                    <strong className="text-ink font-medium">{product.drawerCount !== undefined && product.drawerCount !== null ? `${product.drawerCount} adet` : '—'}</strong>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10.5px] text-neutral-600 pt-1 font-sans">
+                <div className="flex items-center justify-between text-xs text-neutral-600 pt-1 font-sans">
                   <span>Ünite / Takım Parça Sayısı: <strong>{product.unitCount || 1} Parça</strong></span>
-                  <span>İmalat Malzemesi: <strong>{product.material || 'Masif Gürgen & MDF'}</strong></span>
+                  {product.material && <span>Malzeme: <strong>{product.material}</strong></span>}
                 </div>
               </div>
             </div>
 
             {/* Interactive Modular Set Pieces Breakdown */}
             {product.setPieces && product.setPieces.length > 0 && (
-              <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-4 space-y-3 text-xs">
+              <div className="bg-paper border border-line rounded-xs p-4 space-y-3 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10.5px] uppercase font-bold text-neutral-800 flex items-center gap-1.5">
-                    <Box className="h-4 w-4 text-[#C5A880]" />
-                    <span>Modüler Takım Parçaları:</span>
+                  <span className="text-sm font-semibold text-ink flex items-center gap-1.5">
+                    <Box className="h-4 w-4 text-wood" />
+                    <span>Takım parçaları</span>
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-xs">
-                    {selectedSetPieceTitles.length} / {product.setPieces.length} Parça Dahil
+                  <span className="font-mono text-xs text-neutral-600 tabular-nums-all">
+                    {selectedSetPieceTitles.length} / {product.setPieces.length} parça seçili
                   </span>
                 </div>
 
@@ -895,15 +877,24 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                       <div 
                         key={pIdx} 
                         onClick={() => toggleSetPiece(piece.title)}
-                        className={`flex items-center justify-between text-[11px] p-2.5 rounded-xs border transition-all cursor-pointer select-none ${
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleSetPiece(piece.title);
+                          }
+                        }}
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={0}
+                        className={`flex items-center justify-between text-xs p-2.5 rounded-xs border transition-all cursor-pointer select-none ${
                           isSelected 
-                            ? 'bg-white border-[#C5A880]/70 shadow-2xs' 
-                            : 'bg-neutral-50/80 border-dashed border-neutral-300 opacity-60 hover:opacity-85'
+                            ? 'bg-white border-wood/70' 
+                            : 'bg-neutral-50/80 border-dashed border-line-strong opacity-60 hover:opacity-85'
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           <div className={`w-4 h-4 rounded-xs border flex items-center justify-center transition-colors ${
-                            isSelected ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-neutral-400 bg-white'
+                            isSelected ? 'bg-ink border-ink text-white' : 'border-neutral-400 bg-white'
                           }`}>
                             {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                           </div>
@@ -912,14 +903,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                               {piece.title}
                             </span>
                             {piece.dimensions && (
-                              <span className="text-neutral-400 text-[10px] ml-1.5">({piece.dimensions})</span>
+                              <span className="text-neutral-500 text-xs ml-1.5">({piece.dimensions})</span>
                             )}
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2">
                           {!isSelected && (
-                            <span className="text-[9.5px] font-bold text-[#8A4B20] bg-amber-50 px-1.5 py-0.5 rounded-xs">
+                            <span className="text-xs font-medium text-wood-dark">
                               + Dahil Et
                             </span>
                           )}
@@ -927,7 +918,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                             <Link
                               href={`/urun/${piece.pieceProductId}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-[#C5A880] hover:text-[#B4966E] hover:underline"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-wood hover:text-wood-dark hover:underline"
                             >
                               <span>Ayrı İncele</span>
                               <CornerDownRight className="h-3 w-3" />
@@ -939,7 +930,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   })}
                 </div>
 
-                <p className="text-[10px] text-neutral-500 font-light leading-relaxed pt-1 border-t border-[#EAE3D2]/60">
+                <p className="text-xs text-neutral-500 leading-relaxed pt-1 border-t border-line/60">
                   * Takımdan çıkarmak veya geri eklemek istediğiniz parçaların üzerine tıklayabilirsiniz. Tercihiniz sepete ve WhatsApp sipariş temsilcisine otomatik aktarılır.
                 </p>
               </div>
@@ -949,16 +940,16 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
         </div>
 
-        {/* ATMACA OFIS 5-TAB DETAILED SECTION */}
-        <div className="bg-white rounded-sm border border-[#EAE3D2] shadow-2xs overflow-hidden mb-16">
+        {/* AYRINTI SEKMELERİ */}
+        <div className="bg-white rounded-xs border border-line overflow-hidden mb-16">
           
           {/* Tab Headers Bar */}
-          <div className="flex border-b border-[#EAE3D2] bg-[#FAF8F5] overflow-x-auto no-scrollbar">
+          <div className="flex border-b border-line bg-paper overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab('desc')}
-              className={`py-4 px-6 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
+              className={`py-4 px-6 text-sm md:text-sm font-semibold transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
                 activeTab === 'desc'
-                  ? 'border-[#C5A880] text-neutral-900 bg-white shadow-xs'
+                  ? 'border-wood text-neutral-900 bg-white'
                   : 'border-transparent text-neutral-500 hover:text-neutral-900'
               }`}
             >
@@ -966,9 +957,9 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
             </button>
             <button
               onClick={() => setActiveTab('specs')}
-              className={`py-4 px-6 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
+              className={`py-4 px-6 text-sm md:text-sm font-semibold transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
                 activeTab === 'specs'
-                  ? 'border-[#C5A880] text-neutral-900 bg-white shadow-xs'
+                  ? 'border-wood text-neutral-900 bg-white'
                   : 'border-transparent text-neutral-500 hover:text-neutral-900'
               }`}
             >
@@ -976,9 +967,9 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
             </button>
             <button
               onClick={() => setActiveTab('delivery')}
-              className={`py-4 px-6 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
+              className={`py-4 px-6 text-sm md:text-sm font-semibold transition-colors cursor-pointer border-b-2 whitespace-nowrap ${
                 activeTab === 'delivery'
-                  ? 'border-[#C5A880] text-neutral-900 bg-white shadow-xs'
+                  ? 'border-wood text-neutral-900 bg-white'
                   : 'border-transparent text-neutral-500 hover:text-neutral-900'
               }`}
             >
@@ -993,31 +984,30 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
             {activeTab === 'desc' && (
               <div className="space-y-8 animate-fade-in">
                 <div className="prose max-w-none text-neutral-700 text-sm leading-relaxed space-y-4">
-                  <h3 className="text-lg font-serif font-bold text-neutral-900 uppercase tracking-tight">
-                    {product.name} - İmalat Detayları ve Tasarım Yaklaşımı
+                  <h3 className="text-lg font-display font-bold text-ink tracking-tight">
+                    {product.name}
                   </h3>
                   <p>
                     {product.description}
                   </p>
-                  <p>
-                    Ermay Mobilya güvencesiyle üretilen tüm mobilyalarımız, 1. sınıf fırınlanmış gürgen ağacından imal edilen masif iskelet konstrüksiyonu, yüksek dansiteli HR soft sünger dolgusu ve leke tutmaz silinebilir lüks döşemelik kumaş/deri malzemelerle yıllarca ilk günkü formunu koruyacak şekilde üretilmektedir.
-                  </p>
+                  {product.material && (
+                    <p>
+                      Bu ürün Modoko&apos;daki atölyemizde standart seri olarak üretilir. Malzeme: {product.material}.
+                    </p>
+                  )}
                 </div>
 
-                {/* Feature Highlights Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-neutral-100">
-                  {(product.features || [
-                    '%100 Fırınlanmış Masif Gürgen İskelet & Çelik Güçlendirme',
-                    '35 DNS Yüksek Dayanımlı ve Çökmeyen HR Soft Sünger',
-                    'E1 Normunda Sağlığa Zararsız Bağlantı Elemanları & Ahşap Tutkalları',
-                    'Doğrudan Fabrikadan Satış & Çoklu Alım İskontosu',
-                  ]).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2]">
-                      <CheckCircle className="h-4 w-4 text-[#C5A880] flex-shrink-0" />
-                      <span className="text-xs font-semibold text-neutral-800">{feat}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* Özellikler: yalnız ürün kaydında varsa */}
+                {product.features && product.features.length > 0 && (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 pt-4 border-t border-line">
+                    {product.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-3 py-2 border-b border-line">
+                        <CheckCircle className="h-4 w-4 text-wood flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-neutral-800">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
 
@@ -1027,14 +1017,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 
                 {/* Dimensions Table */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                    <Ruler className="h-4 w-4 text-[#C5A880]" />
+                  <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                    <Ruler className="h-4 w-4 text-wood" />
                     Ölçü Tablosu ve Spesifikasyonlar
                   </h3>
                   
-                  <div className="overflow-x-auto border border-neutral-200 rounded-xs">
+                  <div className="overflow-x-auto border border-line rounded-xs">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#FAF8F5] border-b border-neutral-200 text-neutral-600 font-bold uppercase text-[10px] tracking-wider">
+                      <thead className="bg-paper border-b border-line text-neutral-600 font-bold uppercase text-xs tracking-wider">
                         <tr>
                           <th className="py-3 px-4">Parça / Modül</th>
                           <th className="py-3 px-4">Genişlik (cm)</th>
@@ -1043,7 +1033,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                           <th className="py-3 px-4">Malzeme / Yapı</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-neutral-200 text-neutral-800">
+                      <tbody className="divide-y divide-line text-neutral-800">
                         {product.setPieces && product.setPieces.length > 0 ? (
                           product.setPieces.map((piece, idx) => (
                             <tr key={idx} className="hover:bg-neutral-50">
@@ -1063,7 +1053,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                             <td className="py-3 px-4 text-neutral-600">
                               <div>{product.material || '1. Sınıf E1 Melamin & Elektrostatik Metal İskelet'}</div>
                               {product.drawerCount !== undefined && product.drawerCount > 0 && (
-                                <div className="text-[10px] text-neutral-500 font-mono mt-0.5">
+                                <div className="text-xs text-neutral-500 font-mono mt-0.5">
                                   {product.drawerCount} Çekmeceli (Teleskopik Ray)
                                 </div>
                               )}
@@ -1076,21 +1066,21 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 </div>
 
                 {/* Color and Fabric Options */}
-                <div className="space-y-4 pt-4 border-t border-neutral-100">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-                    <Layers className="h-4 w-4 text-[#C5A880]" />
-                    Mevcut Döşeme & Renk Varyasyonları
+                <div className="space-y-4 pt-4 border-t border-line">
+                  <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-wood" />
+                    Renk ve döşeme seçenekleri
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {productColors.map((col, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-3 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2]">
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-paper rounded-xs border border-line">
                         <div 
                           style={{ backgroundColor: col.hex || col.color || '#8A4B20' }}
-                          className="w-7 h-7 rounded-full border border-black/10 shadow-xs flex-shrink-0"
+                          className="w-7 h-7 rounded-full border border-black/10 flex-shrink-0"
                         />
                         <div>
                           <span className="text-xs font-bold text-neutral-900 block">{col.name}</span>
-                          <span className="text-[10px] text-neutral-500">{col.tag || 'Lüks Döşeme'}</span>
+                          <span className="text-xs text-neutral-500">{col.tag || 'Döşeme'}</span>
                         </div>
                       </div>
                     ))}
@@ -1107,10 +1097,10 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
                   {/* Delivery Info */}
-                  <div className="p-6 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2] space-y-3">
-                    <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm uppercase">
-                      <Truck className="h-5 w-5 text-[#C5A880]" />
-                      <h4>Teslimat ve Profesyonel Kurulum</h4>
+                  <div className="p-6 bg-paper rounded-xs border border-line space-y-3">
+                    <div className="flex items-center gap-2 text-ink font-semibold text-sm">
+                      <Truck className="h-5 w-5 text-wood" />
+                      <h4>Teslimat ve kurulum</h4>
                     </div>
                     <ul className="space-y-2 text-xs text-neutral-600 list-disc list-inside">
                       <li><strong>İstanbul İçi:</strong> Kendi lojistik araçlarımız ve uzman montaj kadromuzla 3-5 iş günü içinde teslimat ve montaj (ücret ve koşullar temsilcimizle netleştirilir).</li>
@@ -1120,15 +1110,15 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   </div>
 
                   {/* Return & Warranty Info */}
-                  <div className="p-6 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2] space-y-3">
-                    <div className="flex items-center gap-2 text-neutral-900 font-bold text-sm uppercase">
-                      <ShieldCheck className="h-5 w-5 text-[#C5A880]" />
-                      <h4>14 Gün Cayma Hakkı & 2 Yıl Üretici Garantisi</h4>
+                  <div className="p-6 bg-paper rounded-xs border border-line space-y-3">
+                    <div className="flex items-center gap-2 text-ink font-semibold text-sm">
+                      <ShieldCheck className="h-5 w-5 text-wood" />
+                      <h4>Cayma hakkı ve garanti</h4>
                     </div>
                     <ul className="space-y-2 text-xs text-neutral-600 list-disc list-inside">
                       <li><strong>14 Gün Cayma Hakkı:</strong> WhatsApp / telefon üzerinden uzaktan tamamlanan satışlarda, teslimat tarihinden itibaren 14 gün içinde 6502 sayılı Kanun kapsamındaki yasal cayma hakkınız bulunmaktadır.</li>
                       <li><strong>2 Yıl Üretici Garantisi:</strong> Tüm mekanik, iskelet ve üretim aksamları 2 yıl süreyle resmi Ermay Mobilya fabrika garantisi altındadır.</li>
-                      <li><strong>İstanbul İçi Teslimat & Montaj:</strong> Kendi montaj ekibimiz tarafından kata kadar teslim ve kurulum yapılır; koşullar temsilcimizle netleştirilir.</li>
+                      <li><strong>İstanbul içi teslimat ve montaj:</strong> Kendi montaj ekibimiz tarafından kata kadar teslim ve kurulum yapılır; koşullar temsilcimizle netleştirilir.</li>
                     </ul>
                   </div>
 
@@ -1143,20 +1133,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
         {/* TAKIMI TAMAMLA (FREQUENTLY BOUGHT TOGETHER / BUNDLE) SECTION */}
         {complementaryPieces.length > 0 && (
-          <div className="bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs p-6 md:p-8 space-y-6 shadow-xs">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#EAE3D2] pb-5">
+          <div className="bg-paper border border-line rounded-xs p-6 md:p-8 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-line pb-5">
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xs bg-[#C5A880]/15 text-[#917248] text-[10px] font-bold uppercase tracking-wider">
-                    <Sparkles className="h-3 w-3" />
-                    Koleksiyon Sinerjisi
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl md:text-2xl font-bold text-neutral-900 tracking-tight">
-                  Takımı Tamamla & Koleksiyon Uyumu
+                <h3 className="font-display text-xl md:text-2xl font-bold text-neutral-900 tracking-tight">
+                  Takımı tamamlayın
                 </h3>
-                <p className="text-xs text-neutral-500 font-light mt-1">
-                  Mekanınızda kusursuz tasarım bütünlüğü oluşturmak için tamamlayıcı parçaları birlikte seçebilirsiniz.
+                <p className="text-xs text-neutral-500 mt-1">
+                  Aynı seriden üretilen tamamlayıcı parçaları birlikte seçebilirsiniz.
                 </p>
               </div>
             </div>
@@ -1166,12 +1150,12 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               {/* Product Cards Row */}
               <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Main Product Card */}
-                <div className="relative bg-white border-2 border-[#C5A880] rounded-xs p-3 flex flex-col justify-between shadow-xs">
-                  <div className="absolute -top-2.5 left-3 bg-[#C5A880] text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-xs tracking-wider">
+                <div className="relative bg-white border-2 border-wood rounded-xs p-3 flex flex-col justify-between">
+                  <div className="absolute -top-2.5 left-3 bg-wood text-white text-sm font-semibold px-2 py-0.5 rounded-xs">
                     Ana Parça
                   </div>
                   <div>
-                    <div className="aspect-[4/3] w-full bg-[#FCFAF6] rounded-xs overflow-hidden relative mb-2.5 mt-1">
+                    <div className="aspect-[4/3] w-full bg-paper rounded-xs overflow-hidden relative mb-2.5 mt-1">
                       <img
                         src={currentImage}
                         alt={product.name}
@@ -1182,15 +1166,15 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     <h4 className="text-xs font-bold text-neutral-900 line-clamp-1">
                       {product.name}
                     </h4>
-                    <p className="text-[11px] text-[#C5A880] font-medium mt-0.5">
+                    <p className="text-xs text-wood font-medium mt-0.5">
                       Seçilen Doku: {selectedSwatch.name}
                     </p>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between">
+                  <div className="mt-3 pt-2 border-t border-line flex items-center justify-between">
                     <span className="text-xs font-extrabold text-neutral-900">
                       ₺{mainProductPrice.toLocaleString('tr-TR')}
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs">
+                    <span className="text-xs font-medium text-ok">
                       Dahil
                     </span>
                   </div>
@@ -1209,13 +1193,13 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                       onClick={() => toggleComplementaryItem(piece.id)}
                       className={`relative bg-white border rounded-xs p-3 flex flex-col justify-between cursor-pointer transition-all duration-200 select-none ${
                         isSelected
-                          ? 'border-neutral-900 ring-1 ring-neutral-900 shadow-xs'
-                          : 'border-neutral-200 opacity-60 hover:opacity-100 hover:border-neutral-300'
+                          ? 'border-neutral-900 ring-1 ring-neutral-900'
+                          : 'border-line opacity-60 hover:opacity-100 hover:border-line-strong'
                       }`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-500">
+                          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
                             Tamamlayıcı
                           </span>
                           <button
@@ -1224,14 +1208,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                             className="text-neutral-900"
                           >
                             {isSelected ? (
-                              <CheckSquare className="h-4 w-4 text-[#C5A880]" />
+                              <CheckSquare className="h-4 w-4 text-wood" />
                             ) : (
-                              <Square className="h-4 w-4 text-neutral-400" />
+                              <Square className="h-4 w-4 text-neutral-500" />
                             )}
                           </button>
                         </div>
 
-                        <div className="aspect-[4/3] w-full bg-[#FCFAF6] rounded-xs overflow-hidden relative mb-2.5">
+                        <div className="aspect-[4/3] w-full bg-paper rounded-xs overflow-hidden relative mb-2.5">
                           <img
                             src={pieceThumb}
                             alt={piece.name}
@@ -1243,19 +1227,19 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                         <h4 className="text-xs font-bold text-neutral-900 line-clamp-1">
                           {piece.name}
                         </h4>
-                        <p className="text-[10px] text-neutral-400 font-light mt-0.5 line-clamp-1">
+                        <p className="text-xs text-neutral-500 mt-0.5 line-clamp-1">
                           {typeof piece.category === 'object' && piece.category !== null
                             ? (piece.category as { name?: string }).name || 'Koleksiyon Parçası'
                             : String(piece.category || 'Koleksiyon Parçası')}
                         </p>
                       </div>
 
-                      <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between">
+                      <div className="mt-3 pt-2 border-t border-line flex items-center justify-between">
                         <span className="text-xs font-bold text-neutral-900">
                           ₺{pPrice.toLocaleString('tr-TR')}
                         </span>
                         <span
-                          className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-xs ${
+                          className={`text-sm font-semibold px-1.5 py-0.5 rounded-xs ${
                             isSelected
                               ? 'bg-neutral-900 text-white'
                               : 'bg-neutral-100 text-neutral-500'
@@ -1270,9 +1254,9 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               </div>
 
               {/* Bundle Checkout Summary Box */}
-              <div className="lg:col-span-4 bg-white border border-[#EAE3D2] rounded-xs p-5 space-y-4 shadow-xs">
+              <div className="lg:col-span-4 bg-white border border-line rounded-xs p-5 space-y-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A880]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-wood">
                     Takım Özeti
                   </span>
                   <h4 className="text-sm font-bold text-neutral-900">
@@ -1280,12 +1264,12 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   </h4>
                 </div>
 
-                <div className="space-y-2 pt-2 border-t border-neutral-100 text-xs">
+                <div className="space-y-2 pt-2 border-t border-line text-xs">
                   <div className="flex justify-between items-baseline pt-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
                       Birlikte Alım Toplamı:
                     </span>
-                    <span className="text-lg font-black text-neutral-900 font-serif">
+                    <span className="text-lg font-extrabold text-neutral-900 font-display">
                       ₺{finalBundleTotal.toLocaleString('tr-TR')}
                     </span>
                   </div>
@@ -1295,7 +1279,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 <button
                   type="button"
                   onClick={handleAddBundleToCart}
-                  className="w-full bg-neutral-900 hover:bg-[#C5A880] text-white py-3 px-4 rounded-xs text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                  className="w-full bg-neutral-900 hover:bg-wood text-white py-3 px-4 rounded-xs text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>
@@ -1303,13 +1287,13 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   </span>
                 </button>
 
-                <div className="space-y-1 text-[10px] text-neutral-500 font-light border-t border-neutral-100 pt-3">
+                <div className="space-y-1 text-xs text-neutral-500 border-t border-line pt-3">
                   <p className="flex items-center gap-1.5">
-                    <Check className="h-3 w-3 text-[#C5A880]" />
+                    <Check className="h-3 w-3 text-wood" />
                     Teslimat ve montaj koşulları temsilcimizle netleştirilir
                   </p>
                   <p className="flex items-center gap-1.5">
-                    <Check className="h-3 w-3 text-[#C5A880]" />
+                    <Check className="h-3 w-3 text-wood" />
                     Tüm parçalar aynı parti kumaş/ahşap tonunda hazırlanır
                   </p>
                 </div>
@@ -1321,8 +1305,8 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
         {/* RELATED PRODUCTS SECTION */}
         {relatedProducts.length > 0 && (
           <div className="space-y-6">
-            <h3 className="font-serif text-xl md:text-2xl font-bold text-neutral-900 uppercase tracking-tight border-l-4 border-[#C5A880] pl-4">
-              Uyumlu Koleksiyon & Benzer Ürünler
+            <h3 className="font-display text-xl md:text-2xl font-bold text-neutral-900 tracking-tight border-l-4 border-wood pl-4">
+              Benzer ürünler
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((p) => (

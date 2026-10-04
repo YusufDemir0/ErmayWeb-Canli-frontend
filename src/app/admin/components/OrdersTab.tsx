@@ -191,7 +191,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-5 mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#B4966E] bg-[#FBF9F5] px-2.5 py-1 rounded-xs border border-[#E5DEC9]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-wood-dark bg-paper px-2.5 py-1 rounded-xs border border-line-strong">
                 Müşteri Talep Motoru
               </span>
             </div>
@@ -207,12 +207,12 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
             <button
               onClick={() => fetchRequests()}
               disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 border border-neutral-300 hover:border-[#C5A880] text-xs font-semibold rounded-xs transition-colors cursor-pointer text-neutral-700 bg-white"
+              className="flex items-center gap-2 px-4 py-2 border border-neutral-300 hover:border-wood text-xs font-semibold rounded-xs transition-colors cursor-pointer text-neutral-700 bg-white"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-[#C5A880]' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-wood' : ''}`} />
               <span>Yenile</span>
             </button>
-            <span className="text-xs bg-[#FBF9F5] border border-[#E5DEC9] px-3.5 py-2 rounded-xs font-mono font-bold text-[#7A6140]">
+            <span className="text-xs bg-paper border border-line-strong px-3.5 py-2 rounded-xs font-mono font-bold text-[#7A6140]">
               Toplam: {totalCount} Talep
             </span>
           </div>
@@ -231,7 +231,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
             />
           </div>
 
@@ -243,7 +243,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
             >
               <option value="ALL">Tüm Durumlar</option>
               <option value="NEW">Yeni Talepler</option>
@@ -266,7 +266,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 setPreferenceFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+              className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
             >
               <option value="ALL">Tüm Tercihler</option>
               <option value="WHATSAPP">WhatsApp İletişimi</option>
@@ -279,7 +279,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
         <div className="space-y-4">
           {isLoading && requests.length === 0 ? (
             <div className="text-center py-16 text-neutral-400 space-y-3">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-[#C5A880]" />
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-wood" />
               <p className="text-xs">Talepler getiriliyor...</p>
             </div>
           ) : requests.length === 0 ? (
@@ -297,7 +297,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
               return (
                 <div
                   key={req.id}
-                  className="bg-white border border-neutral-200 hover:border-[#C5A880]/60 rounded-xs transition-[border-color,box-shadow] duration-200 shadow-2xs overflow-hidden"
+                  className="bg-white border border-neutral-200 hover:border-wood/60 rounded-xs transition-[border-color,box-shadow] duration-200 shadow-2xs overflow-hidden"
                 >
                   {/* Card Header Bar */}
                   <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/50 border-b border-neutral-100">
@@ -374,7 +374,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                           setTargetStatus(nextAllowed);
                           setStaffNote(req.staffNote || '');
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors shadow-2xs cursor-pointer"
                       >
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                         <span>Durum Değiştir</span>
@@ -440,7 +440,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                         <span>{req.city} {req.district ? `/ ${req.district}` : ''}</span>
                       </div>
                       {req.preferredStore && (
-                        <div className="text-[11px] text-[#B4966E] font-medium flex items-center gap-1.5 mt-1">
+                        <div className="text-[11px] text-wood-dark font-medium flex items-center gap-1.5 mt-1">
                           <Building2 className="h-3 w-3" />
                           <span>{req.preferredStore.name}</span>
                         </div>
@@ -451,7 +451,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                       <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
                         Talep Tutarı ({req.items?.length || 0} Kalem)
                       </span>
-                      <div className="text-base font-extrabold text-[#C87A53] mt-0.5">
+                      <div className="text-base font-extrabold text-signal mt-0.5">
                         {formatPrice(req.totalAmount)}
                       </div>
                       <span className="text-[10px] text-neutral-400">
@@ -471,11 +471,11 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
 
                   {/* Expanded Items & History Drawer */}
                   {isExpanded && (
-                    <div className="border-t border-neutral-100 bg-[#FBF9F5] p-5 space-y-5 animate-fade-in">
+                    <div className="border-t border-neutral-100 bg-paper p-5 space-y-5 animate-fade-in">
                       {/* Items Table */}
                       <div>
                         <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-3 flex items-center gap-2">
-                          <Package className="h-4 w-4 text-[#C5A880]" />
+                          <Package className="h-4 w-4 text-wood" />
                           <span>Talep Edilen Ürün Kalemleri</span>
                         </h4>
                         <div className="bg-white border border-neutral-200 rounded-xs overflow-hidden">
@@ -518,7 +518,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                       {req.events && req.events.length > 0 && (
                         <div>
                           <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-2 flex items-center gap-2">
-                            <History className="h-4 w-4 text-[#C5A880]" />
+                            <History className="h-4 w-4 text-wood" />
                             <span>İşlem & Durum Geçmişi</span>
                           </h4>
                           <div className="bg-white border border-neutral-200 rounded-xs p-3 space-y-2">
@@ -585,7 +585,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 <select
                   value={targetStatus}
                   onChange={(e) => setTargetStatus(e.target.value as RequestStatusType)}
-                  className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+                  className="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
                 >
                   {/* Mevcut durum: durumu değiştirmeden yalnızca personel notu eklemek için */}
                   <option value={selectedRequest.status}>
@@ -608,7 +608,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                   value={staffNote}
                   onChange={(e) => setStaffNote(e.target.value)}
                   placeholder="Müşteriyle görüşüldü, Modoko showroom randevusu teyit edildi..."
-                  className="w-full p-3 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-[#C5A880]"
+                  className="w-full p-3 text-xs bg-white border border-neutral-300 rounded-xs focus:outline-hidden focus:border-wood"
                 />
               </div>
 
@@ -623,7 +623,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 <button
                   type="submit"
                   disabled={isUpdatingStatus}
-                  className="px-5 py-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   {isUpdatingStatus && <RefreshCw className="h-3 w-3 animate-spin" />}
                   <span>Kaydet</span>

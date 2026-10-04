@@ -1,19 +1,19 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Clock, User, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Calendar, Clock, User, ArrowRight, BookOpen } from 'lucide-react';
 import apiClient from '../../services/api';
 import type { BlogPost } from '../../types';
 
 export const revalidate = 60; // ISR 60 saniye
 
 export const metadata: Metadata = {
-  title: 'Blog & Mimari Dekorasyon Rehberi | Ermay Mobilya Modoko',
-  description: 'Masif ahşap mobilya bakımı, lüks iç mekan mimari trendleri, Modoko atölye imalat süreçleri ve dekorasyon önerileri. Ermay Mobilya uzman mimari ekibinden rehberler.',
-  keywords: 'mobilya blog, masif ahşap bakımı, lüks mobilya trendleri, ofis dekorasyonu, makam odası tasarımı, modoko mobilya atölyesi, ahşap mobilya rehberi, iç mimarlık önerileri',
+  title: 'Blog: Ofis Mobilyası Rehberi | Ermay Mobilya',
+  description: 'Ofis mobilyası seçimi ve bakımı, ofis yerleşim önerileri ve Modoko atölyemizdeki üretim süreçleri.',
+  keywords: 'mobilya blog, masif ahşap bakımı, ofis mobilyası seçimi, ofis dekorasyonu, makam odası tasarımı, modoko mobilya atölyesi, ahşap mobilya rehberi, iç mimarlık önerileri',
   openGraph: {
-    title: 'Blog & Mimari Dekorasyon Rehberi | Ermay Mobilya',
-    description: 'Masif ahşap mobilya bakımı, lüks iç mekan trendleri ve dekorasyon önerileri.',
+    title: 'Blog: Ofis Mobilyası Rehberi | Ermay Mobilya',
+    description: 'Ofis mobilyası seçimi, bakımı ve ofis yerleşim önerileri.',
     url: 'https://ermaymobilya.com/blog',
     siteName: 'Ermay Mobilya',
     locale: 'tr_TR',
@@ -65,7 +65,7 @@ export default async function BlogIndexPage() {
   };
 
   return (
-    <div className="bg-[#FAF8F5] min-h-screen py-12 sm:py-16">
+    <div className="bg-paper min-h-screen py-12 sm:py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd).replace(/</g, '\\u003c') }}
@@ -74,31 +74,27 @@ export default async function BlogIndexPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Breadcrumb & Title */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#8C6D46] text-xs font-semibold uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>MİMARİ REHBER & BİLGİ BANKASI</span>
-          </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-neutral-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-ink tracking-tight">
             Tasarım, Zanaat ve Dekorasyon
           </h1>
 
-          <p className="text-sm sm:text-base text-neutral-600 font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
             Modoko atölyelerimizdeki 40 yıllık masif ahşap ustalığı, ergonomik ofis ve ev mobilyası tasarımları ve yapay zeka destekli mimari trend analizleri.
           </p>
         </div>
 
         {/* Blog Posts Grid */}
         {posts.length === 0 ? (
-          <div className="bg-white rounded-xs border border-neutral-200/80 p-12 text-center max-w-xl mx-auto space-y-4 shadow-xs">
-            <BookOpen className="h-12 w-12 text-[#C5A880] mx-auto opacity-70" />
-            <h2 className="text-lg font-serif font-bold text-neutral-900">Henüz Blog Yazısı Eklenmedi</h2>
-            <p className="text-xs text-neutral-500 font-light leading-relaxed">
+          <div className="bg-white rounded-xs border border-line p-12 text-center max-w-xl mx-auto space-y-4">
+            <BookOpen className="h-12 w-12 text-wood mx-auto opacity-70" />
+            <h2 className="text-lg font-display font-bold text-neutral-900">Henüz Blog Yazısı Eklenmedi</h2>
+            <p className="text-xs text-neutral-500 leading-relaxed">
               Yönetici panelinden yeni blog yazıları ekleyerek arama motorları ve yapay zeka botları için SEO gücünüzü artırabilirsiniz.
             </p>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors"
             >
               <span>Admin Paneline Git</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -109,7 +105,7 @@ export default async function BlogIndexPage() {
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white border border-neutral-200/80 hover:border-[#C5A880]/70 rounded-xs overflow-hidden flex flex-col transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:shadow-lg group"
+                className="bg-white border border-line hover:border-wood/70 rounded-xs overflow-hidden flex flex-col transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 group"
               >
                 {/* Cover Image */}
                 <Link href={`/blog/${post.slug}`} className="block relative aspect-16/10 overflow-hidden bg-neutral-100">
@@ -120,7 +116,7 @@ export default async function BlogIndexPage() {
                     loading="lazy"
                   />
                   {post.category && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-xs text-[10px] font-bold text-neutral-800 uppercase tracking-wider rounded-xs border border-neutral-200/50 shadow-2xs">
+                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 text-sm font-semibold text-neutral-800 rounded-xs border border-line">
                       {post.category}
                     </span>
                   )}
@@ -130,7 +126,7 @@ export default async function BlogIndexPage() {
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-3">
                     {/* Meta info */}
-                    <div className="flex items-center gap-4 text-[11px] text-neutral-400 font-mono">
+                    <div className="flex items-center gap-4 text-xs text-neutral-500 font-mono">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         <span>
@@ -147,28 +143,28 @@ export default async function BlogIndexPage() {
                       </div>
                     </div>
 
-                    <h2 className="text-lg font-serif font-bold text-neutral-900 group-hover:text-[#8C6D46] transition-colors line-clamp-2">
+                    <h2 className="text-lg font-display font-bold text-neutral-900 group-hover:text-wood-dark transition-colors line-clamp-2">
                       <Link href={`/blog/${post.slug}`}>
                         {post.title}
                       </Link>
                     </h2>
 
                     {post.summary && (
-                      <p className="text-xs text-neutral-600 font-light line-clamp-3 leading-relaxed">
+                      <p className="text-xs text-neutral-600 line-clamp-3 leading-relaxed">
                         {post.summary}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-xs">
-                    <span className="text-[11px] text-neutral-400 flex items-center gap-1">
+                  <div className="pt-4 border-t border-line flex items-center justify-between text-xs">
+                    <span className="text-xs text-neutral-500 flex items-center gap-1">
                       <User className="h-3 w-3" />
                       <span>{post.author || 'Ermay Mobilya'}</span>
                     </span>
 
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="inline-flex items-center gap-1 text-[#8C6D46] hover:text-neutral-900 font-bold tracking-wide transition-colors group-hover:translate-x-0.5"
+                      className="inline-flex items-center gap-1 text-wood-dark hover:text-neutral-900 font-bold tracking-wide transition-colors group-hover:translate-x-0.5"
                     >
                       <span>Devamını Oku</span>
                       <ArrowRight className="h-3.5 w-3.5" />

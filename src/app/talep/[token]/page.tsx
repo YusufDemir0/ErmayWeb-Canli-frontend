@@ -23,16 +23,54 @@ import {
 import { requestService, PublicReceiptDto } from '../../../services/requestService';
 import { cmsService } from '../../../services/cmsService';
 
-const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  NEW: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
-  CONTACTED: { bg: 'bg-sky-50', text: 'text-sky-800', border: 'border-sky-200' },
-  STORE_VISIT_SCHEDULED: { bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-200' },
-  AWAITING_PAYMENT: { bg: 'bg-purple-50', text: 'text-purple-800', border: 'border-purple-200' },
-  PAID_OFFLINE: { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
-  COMPLETED: { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
-  CANCELLED: { bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200' },
-  SPAM: { bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-neutral-200' },
-  EXPIRED: { bg: 'bg-neutral-100', text: 'text-neutral-700', border: 'border-neutral-200' },
+// Durum çizgisi, backend'deki geçiş haritasının (orderStateMachine.service.ts) mutlu yolunu gösterir; yeni durum üretmez.
+const STEP_LABELS: Record<string, string> = {
+  NEW: 'Talep alındı',
+  CONTACTED: 'Temsilci iletişime geçti',
+  STORE_VISIT_SCHEDULED: 'Mağaza ziyareti planlandı',
+  AWAITING_PAYMENT: 'Ödeme bekleniyor',
+  PAID_OFFLINE: 'Ödeme teyit edildi',
+  COMPLETED: 'Sipariş tamamlandı',
+};
+const TERMINAL_OFF_PATH = ['CANCELLED', 'SPAM', 'EXPIRED'];
+
+function getStatusSteps(status: string, preference: string): string[] {
+  const includeVisit = preference === 'STORE_VISIT' || status === 'STORE_VISIT_SCHEDULED';
+  return ['NEW', 'CONTACTED', ...(includeVisit ? ['STORE_VISIT_SCHEDULED'] : []), 'AWAITING_PAYMENT', 'PAID_OFFLINE', 'COMPLETED'];
+}
+
+const StatusTimeline: React.FC<{ status: string; preference: string }> = ({ status, preference }) => {
+  const steps = getStatusSteps(status, preference);
+  const currentIdx = status === 'COMPLETED' ? steps.length - 1 : steps.indexOf(status);
+  return (
+    <ol className="grid gap-0 sm:grid-flow-col sm:auto-cols-fr">
+      {steps.map((step, idx) => {
+        const done = idx < currentIdx || status === 'COMPLETED';
+        const current = idx === currentIdx && status !== 'COMPLETED';
+        return (
+          <li key={step} className="relative flex sm:flex-col gap-3 sm:gap-2 pb-4 sm:pb-0 sm:pr-3" aria-current={current ? 'step' : undefined}>
+            {idx < steps.length - 1 && (
+              <span
+                className={`absolute left-[9px] top-5 bottom-0 w-px sm:left-5 sm:right-0 sm:top-[9px] sm:bottom-auto sm:h-px sm:w-auto ${done ? 'bg-ink' : 'bg-line-strong'}`}
+                aria-hidden="true"
+              />
+            )}
+            <span
+              className={`relative z-10 h-[19px] w-[19px] shrink-0 rounded-full border-2 flex items-center justify-center ${
+                done ? 'bg-ink border-ink text-white' : current ? 'bg-white border-wood' : 'bg-white border-line-strong'
+              }`}
+            >
+              {done && <Check className="h-3 w-3" strokeWidth={3} />}
+              {current && <span className="h-2 w-2 rounded-full bg-wood" />}
+            </span>
+            <span className={`text-sm leading-snug ${current ? 'font-semibold text-ink' : done ? 'text-neutral-700' : 'text-neutral-500'}`}>
+              {STEP_LABELS[step]}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
 };
 
 export default function PublicReceiptPage() {
@@ -123,10 +161,10 @@ export default function PublicReceiptPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-neutral-50 min-h-screen py-24 flex items-center justify-center">
+      <div className="w-full bg-white min-h-screen py-24 flex items-center justify-center">
         <div className="text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-camel mx-auto" />
-          <p className="text-xs text-neutral-500 font-light">Dijital talep fişiniz yükleniyor...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-wood mx-auto" />
+          <p className="text-xs text-neutral-500">Dijital talep fişiniz yükleniyor...</p>
         </div>
       </div>
     );
@@ -134,17 +172,17 @@ export default function PublicReceiptPage() {
 
   if (error || !receipt) {
     return (
-      <div className="w-full bg-neutral-50 min-h-screen py-20">
+      <div className="w-full bg-white min-h-screen py-20">
         <div className="max-w-md mx-auto px-4 text-center">
-          <div className="bg-white border border-neutral-200/80 rounded-sm p-8 shadow-sm">
-            <AlertCircle className="h-12 w-12 text-rose-500 mx-auto mb-4" />
+          <div className="bg-white border border-line rounded-xs p-8">
+            <AlertCircle className="h-12 w-12 text-signal mx-auto mb-4" />
             <h2 className="text-lg font-normal text-neutral-800 mb-2">Fiş Bulunamadı</h2>
-            <p className="text-xs text-neutral-500 font-light mb-6">
+            <p className="text-xs text-neutral-500 mb-6">
               {error || 'Aradığınız sipariş talebi mevcut değil veya bağlantı süresi dolmuş.'}
             </p>
             <Link
               href="/"
-              className="inline-block bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold px-6 py-3 rounded-xs uppercase tracking-wider transition-colors"
+              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold px-6 py-3 rounded-xs transition-colors"
             >
               Ana Sayfaya Dön
             </Link>
@@ -160,53 +198,52 @@ export default function PublicReceiptPage() {
   const whatsappMessage = `Merhaba, ${receipt.code} numaralı sipariş talebim hakkında görüşmek istiyorum.\n\nTalep Fişim:\n${receiptUrl}`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
-  const statusStyle = STATUS_COLORS[receipt.status] || STATUS_COLORS.NEW;
 
   return (
-    <div className="w-full bg-neutral-50 min-h-screen py-10 md:py-16 print:py-0 print:bg-white">
+    <div className="w-full bg-white min-h-screen py-10 md:py-14 print:py-0">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
         {/* Top Navigation & Print Button */}
         <div className="flex items-center justify-between mb-8 print:hidden">
           <Link
             href="/"
-            className="text-xs text-neutral-500 hover:text-brand-dark flex items-center gap-1.5 transition-colors"
+            className="text-sm text-neutral-600 hover:text-ink flex items-center gap-1.5 transition-colors py-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Ana Sayfaya Dön</span>
+            <span>Ana sayfa</span>
           </Link>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 text-xs font-medium text-neutral-700 hover:text-brand-camel bg-white border border-neutral-200 px-4 py-2 rounded-xs shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-sm font-medium text-ink hover:bg-paper border border-line-strong px-4 h-11 rounded-xs transition-colors cursor-pointer"
           >
             <Printer className="h-4 w-4" />
-            <span>Fişi Yazdır</span>
+            <span>Fişi yazdır</span>
           </button>
         </div>
 
         {/* Main Receipt Container */}
-        <div className="bg-white border border-neutral-200/80 rounded-sm shadow-sm overflow-hidden print:border-none print:shadow-none">
+        <div className="bg-white border border-line rounded-xs overflow-hidden print:border-none">
           
           {/* Header Banner */}
-          <div className="p-6 sm:p-8 border-b border-neutral-100 bg-neutral-50/50">
+          <div className="p-6 sm:p-8 border-b border-line bg-paper">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <span className="text-[11px] font-semibold uppercase tracking-widest text-brand-camel">
-                  Ermay Mobilya • Dijital Sipariş Fişi
+                <span className="text-sm text-neutral-600">
+                  Ermay Mobilya · Talep fişi
                 </span>
                 <div className="flex items-center gap-3 mt-1.5">
-                  <h1 className="text-xl sm:text-2xl font-mono font-bold tracking-tight text-neutral-900">
+                  <h1 className="text-2xl sm:text-3xl font-mono font-semibold tracking-tight text-ink">
                     {receipt.code}
                   </h1>
                   <button
                     onClick={handleCopyCode}
-                    className="inline-flex items-center gap-1 text-[11px] text-neutral-500 hover:text-brand-dark bg-white border border-neutral-200 px-2 py-1 rounded-xs transition-colors cursor-pointer print:hidden"
+                    className="inline-flex items-center gap-1 text-xs text-neutral-700 hover:text-ink bg-white border border-line-strong px-2 h-8 rounded-xs transition-colors cursor-pointer print:hidden"
                     title="Kodu Kopyala"
                   >
                     {copied ? (
                       <>
-                        <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-medium">Kopyalandı</span>
+                        <Check className="h-3.5 w-3.5 text-ok" />
+                        <span className="text-ok font-medium">Kopyalandı</span>
                       </>
                     ) : (
                       <>
@@ -216,83 +253,90 @@ export default function PublicReceiptPage() {
                     )}
                   </button>
                 </div>
-                <p className="text-xs text-neutral-400 font-light mt-1 flex items-center gap-1.5">
+                <p className="text-xs text-neutral-600 mt-1 flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
                   <span>{formatDate(receipt.createdAt)}</span>
                 </p>
               </div>
 
-              {/* Status Badge */}
-              <div className="sm:text-right">
-                <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
-                  <span className="h-2 w-2 rounded-full bg-current" />
-                  {receipt.statusLabel}
-                </span>
-                <p className="text-[11px] text-neutral-400 font-light mt-1.5">
-                  {receipt.preference === 'WHATSAPP' ? 'İletişim: WhatsApp' : 'İletişim: Mağaza Ziyareti'}
+              <p className="text-sm text-neutral-600 sm:text-right">
+                {receipt.preference === 'WHATSAPP' ? 'İletişim: WhatsApp' : 'İletişim: mağaza ziyareti'}
+              </p>
+            </div>
+
+            {/* Durum: akış çizgisi; akış dışı son durumlar (iptal, spam, süre aşımı) düz mesajla */}
+            <div className="mt-6 pt-5 border-t border-line">
+              <h2 className="sr-only">Talep durumu</h2>
+              {TERMINAL_OFF_PATH.includes(receipt.status) ? (
+                <p className="text-sm text-ink border-l-4 border-signal pl-3">
+                  <strong>{receipt.statusLabel}.</strong> Sorunuz varsa temsilcimize WhatsApp&apos;tan yazabilirsiniz.
                 </p>
-              </div>
+              ) : (
+                <StatusTimeline status={receipt.status} preference={receipt.preference} />
+              )}
             </div>
           </div>
 
           {/* Customer & Location Summary (Masked) */}
-          <div className="p-6 sm:p-8 border-b border-neutral-100 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white text-xs">
+          <div className="p-6 sm:p-8 border-b border-line grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white text-sm">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
-                Müşteri Bilgisi (Maskeli)
+              <span className="text-xs text-neutral-500 block mb-1">
+                Müşteri (maskelenmiş)
               </span>
-              <p className="text-sm font-medium text-neutral-800">{receipt.maskedName}</p>
+              <p className="text-sm font-medium text-ink">{receipt.maskedName}</p>
               <p className="text-neutral-500 font-mono mt-0.5">{receipt.maskedPhone}</p>
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
-                Teslimat Bölgesi
+              <span className="text-xs text-neutral-500 block mb-1">
+                Teslimat bölgesi
               </span>
-              <p className="text-sm font-medium text-neutral-800">
+              <p className="text-sm font-medium text-ink">
                 {receipt.city}{receipt.district ? ` / ${receipt.district}` : ''}
               </p>
-              <p className="text-neutral-400 font-light mt-0.5">Türkiye</p>
+              <p className="text-neutral-500 mt-0.5">Türkiye</p>
             </div>
           </div>
 
           {/* Action CTA Banner depending on Preference */}
-          <div className="p-6 sm:p-8 bg-neutral-50/70 border-b border-neutral-100 print:hidden">
+          <div className="p-6 sm:p-8 border-b border-line print:hidden">
             {receipt.preference === 'WHATSAPP' ? (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-emerald-50/60 border border-emerald-200/80 p-6 rounded-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-emerald-600" />
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-950">
-                      WhatsApp Satış Temsilcisine Bağlanın
+                    <span className="font-mono text-sm text-wood">Sıradaki adım</span>
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-ink">
+                      Talep kodunuzla temsilcimize yazın
                     </h3>
                   </div>
-                  <p className="text-xs text-emerald-800 font-light leading-relaxed max-w-lg">
-                    Talebiniz kayıt altına alınmıştır. Teslimat tarihi, montaj randevusu ve şirket fatura bilgisi teyidi için doğrudan temsilcimizle görüşebilirsiniz.
+                  <p className="text-sm text-neutral-600 leading-relaxed max-w-lg">
+                    Talebiniz kaydedildi. Teslimat tarihi, montaj randevusu ve fatura bilgisini temsilcimizle netleştirebilirsiniz.
                   </p>
                 </div>
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-6 py-3.5 rounded-sm uppercase tracking-wider transition-colors shadow-xs"
+                  className="flex-shrink-0 inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-dark text-white text-sm font-semibold px-5 h-12 rounded-xs transition-colors"
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>WhatsApp'tan Yaz</span>
+                  <span>WhatsApp’tan yazın</span>
                 </a>
               </div>
             ) : (
-              <div className="bg-sky-50/60 border border-sky-200/80 p-6 rounded-sm space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <StoreIcon className="h-5 w-5 text-sky-700" />
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-sky-950">
-                      Showroom Ziyaretiniz İçin Bilgiler
+                    <StoreIcon className="h-5 w-5 text-wood" />
+                    <h3 className="text-base font-semibold text-ink">
+                      Showroom ziyaretiniz
                     </h3>
                   </div>
                   {receipt.preferredStore?.phone && (
                     <a
                       href={`tel:${receipt.preferredStore.phone}`}
-                      className="text-xs font-medium text-sky-800 hover:text-sky-950 underline flex items-center gap-1"
+                      className="text-sm font-mono text-ink hover:text-wood underline flex items-center gap-1"
                     >
                       <Phone className="h-3.5 w-3.5" />
                       <span>{receipt.preferredStore.phone}</span>
@@ -301,17 +345,17 @@ export default function PublicReceiptPage() {
                 </div>
 
                 {receipt.preferredStore ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-sky-900 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm pt-1">
                     <div>
-                      <p className="font-semibold text-neutral-800">{receipt.preferredStore.name}</p>
-                      <p className="text-neutral-600 font-light mt-1 flex items-start gap-1.5">
-                        <MapPin className="h-4 w-4 text-sky-600 flex-shrink-0 mt-0.5" />
+                      <p className="font-semibold text-ink">{receipt.preferredStore.name}</p>
+                      <p className="text-neutral-600 mt-1 flex items-start gap-1.5">
+                        <MapPin className="h-4 w-4 text-wood flex-shrink-0 mt-0.5" />
                         <span>{receipt.preferredStore.address}</span>
                       </p>
                       {receipt.preferredStore.hours && (
-                        <p className="text-neutral-500 font-light mt-2 flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 text-sky-600 flex-shrink-0" />
-                          <span>Çalışma Saatleri: {receipt.preferredStore.hours}</span>
+                        <p className="text-neutral-500 mt-2 flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-wood flex-shrink-0" />
+                          <span>Çalışma saatleri: {receipt.preferredStore.hours}</span>
                         </p>
                       )}
                     </div>
@@ -321,26 +365,26 @@ export default function PublicReceiptPage() {
                           href={receipt.preferredStore.mapUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium px-4 py-2.5 rounded-xs transition-colors shadow-xs"
+                          className="inline-flex items-center gap-1.5 bg-ink hover:bg-wood text-white text-sm font-semibold px-4 h-11 rounded-xs transition-colors"
                         >
                           <MapPin className="h-3.5 w-3.5" />
-                          <span>Google Maps'te Aç</span>
+                          <span>Haritada aç</span>
                         </a>
                       )}
                       <a
                         href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+                        className="inline-flex items-center gap-1.5 text-sm text-whatsapp hover:text-whatsapp-dark font-medium py-2"
                       >
                         <MessageSquare className="h-3.5 w-3.5" />
-                        <span>Ziyaret Saatini WhatsApp ile Bildir</span>
+                        <span>Ziyaret saatinizi WhatsApp’tan bildirin</span>
                       </a>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-neutral-600 font-light">
-                    Temsilcimiz showroom ziyareti saatinizi teyit etmek için sizinle iletişime geçecektir.
+                  <p className="text-sm text-neutral-600">
+                    Temsilcimiz ziyaret saatinizi teyit etmek için sizinle iletişime geçecek.
                   </p>
                 )}
               </div>
@@ -349,38 +393,38 @@ export default function PublicReceiptPage() {
 
           {/* Items Table */}
           <div className="p-6 sm:p-8">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-4">
-              Talep Edilen Ürünler ({receipt.items.length} Kalem)
+            <h3 className="text-base font-semibold text-ink mb-3">
+              Ürünler <span className="font-mono text-xs font-normal text-neutral-500">{receipt.items.length} kalem</span>
             </h3>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-neutral-400 uppercase tracking-wider text-[10px]">
-                    <th className="py-2.5 font-bold">Ürün Bilgisi</th>
-                    <th className="py-2.5 font-bold text-center">Adet</th>
-                    <th className="py-2.5 font-bold text-right">Birim Fiyat</th>
-                    <th className="py-2.5 font-bold text-right">Toplam</th>
+                  <tr className="border-b border-line text-neutral-500 text-xs">
+                    <th className="py-2.5 font-medium">Ürün</th>
+                    <th className="py-2.5 font-medium text-center">Adet</th>
+                    <th className="py-2.5 font-medium text-right">Birim fiyat</th>
+                    <th className="py-2.5 font-medium text-right">Toplam</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100">
+                <tbody className="divide-y divide-line">
                   {receipt.items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-neutral-50/50 transition-colors">
+                    <tr key={idx}>
                       <td className="py-3.5 pr-4">
-                        <p className="font-medium text-neutral-800">{item.productName}</p>
+                        <p className="font-medium text-ink">{item.productName}</p>
                         {item.colorLabel && (
-                          <span className="inline-block mt-0.5 text-[10px] text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded-xs">
+                          <span className="inline-block mt-0.5 text-xs text-neutral-600">
                             {item.colorLabel}
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 text-center text-neutral-700 font-medium">
+                      <td className="py-3.5 text-center text-ink font-mono tabular-nums-all">
                         {item.quantity}
                       </td>
-                      <td className="py-3.5 text-right text-neutral-600 font-mono">
+                      <td className="py-3.5 text-right text-neutral-700 font-mono tabular-nums-all">
                         {formatPrice(item.unitPrice)}
                       </td>
-                      <td className="py-3.5 text-right font-semibold text-neutral-900 font-mono">
+                      <td className="py-3.5 text-right font-semibold text-ink font-mono tabular-nums-all">
                         {formatPrice(item.lineTotal)}
                       </td>
                     </tr>
@@ -390,41 +434,41 @@ export default function PublicReceiptPage() {
             </div>
 
             {/* Calculations Footer */}
-            <div className="mt-6 pt-6 border-t border-neutral-200/80 flex flex-col items-end space-y-2 text-xs">
+            <div className="mt-6 pt-6 border-t border-line flex flex-col items-end space-y-2 text-sm">
               <div className="w-full sm:w-72 space-y-2">
-                <div className="flex justify-between text-neutral-600 font-light">
-                  <span>Katalog Ara Toplam:</span>
-                  <span className="font-mono text-neutral-800">{formatPrice(receipt.subtotal)}</span>
+                <div className="flex justify-between text-neutral-600">
+                  <span>Katalog ara toplamı</span>
+                  <span className="font-mono text-ink tabular-nums-all">{formatPrice(receipt.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-neutral-600 font-light">
-                  <span>KDV (%20):</span>
+                <div className="flex justify-between text-neutral-600">
+                  <span>KDV (%20)</span>
                   <span className="text-neutral-800">Dahil</span>
                 </div>
-                <div className="flex justify-between text-neutral-600 font-light">
-                  <span>Nakliye & Kurulum:</span>
-                  <span className="text-neutral-800 font-medium">Temsilciyle Netleştirilir</span>
+                <div className="flex justify-between text-neutral-600">
+                  <span>Teslimat ve kurulum</span>
+                  <span className="text-ink">Temsilciyle netleşir</span>
                 </div>
-                <div className="flex justify-between pt-3 border-t border-neutral-200 text-sm font-bold text-neutral-900">
-                  <span>Tahmini Tutar:</span>
-                  <span className="font-mono text-brand-terracotta">{formatPrice(receipt.subtotal)}</span>
+                <div className="flex justify-between pt-3 border-t border-line text-base font-semibold text-ink">
+                  <span>Tahmini tutar</span>
+                  <span className="font-mono tabular-nums-all">{formatPrice(receipt.subtotal)}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Official Bank Account and Security Notice */}
-          <div className="p-6 sm:p-8 bg-neutral-50/80 border-t border-neutral-100 space-y-3">
+          <div className="p-6 sm:p-8 bg-paper border-t border-line space-y-3">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="text-xs space-y-1">
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider text-[11px]">
-                  Resmi Şirket Hesabı ve Güvenlik Bildirimi
+              <ShieldAlert className="h-5 w-5 text-signal flex-shrink-0 mt-0.5" />
+              <div className="text-sm space-y-1">
+                <h4 className="font-semibold text-ink">
+                  Ödeme yalnız resmi şirket hesabına
                 </h4>
-                <p className="text-neutral-600 font-light leading-relaxed">
+                <p className="text-neutral-600 leading-relaxed">
                   {receipt.officialIbanNotice}
                 </p>
-                <p className="text-[11px] text-neutral-500 font-light pt-1">
-                  Ermay Mobilya personeli veya satış temsilcileri şahsi banka hesaplarına asla para transferi kabul etmemektedir.
+                <p className="text-xs text-neutral-600 pt-1">
+                  Ermay Mobilya personeli veya satış temsilcileri şahsi banka hesabına para kabul etmez.
                 </p>
               </div>
             </div>
@@ -433,13 +477,13 @@ export default function PublicReceiptPage() {
         </div>
 
         {/* Footer help text */}
-        <div className="text-center mt-8 text-xs text-neutral-400 font-light print:hidden">
+        <div className="text-center mt-8 text-sm text-neutral-600 print:hidden">
           <p>
-            Her türlü soru ve talebiniz için{' '}
-            <a href={`tel:${whatsappNumber}`} className="text-brand-camel underline hover:text-brand-dark">
-              Showroom Danışma Hattı
-            </a>
-            'nı arayabilirsiniz.
+            Sorularınız için{' '}
+            <a href={`tel:+${whatsappNumber}`} className="text-wood underline underline-offset-2 hover:text-ink">
+              showroom danışma hattını
+            </a>{' '}
+            arayabilirsiniz.
           </p>
         </div>
 

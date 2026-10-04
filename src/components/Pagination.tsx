@@ -57,7 +57,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   if (totalItems === 0) return null;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-neutral-50/80 border-t border-neutral-200 text-xs text-neutral-600">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-neutral-50/80 border-t border-line text-xs text-neutral-600">
       {/* Information & Page Size Selector */}
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-medium text-neutral-500">
@@ -66,12 +66,12 @@ export const Pagination: React.FC<PaginationProps> = ({
         </span>
 
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 pl-2 border-l border-neutral-200">
-            <span className="text-[11px] text-neutral-400 font-medium">Sayfa Başına:</span>
+          <div className="flex items-center gap-1.5 pl-2 border-l border-line">
+            <span className="text-xs text-neutral-500 font-medium">Sayfa Başına:</span>
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="bg-white border border-neutral-200 rounded px-2 py-0.5 text-xs font-semibold text-neutral-800 focus:outline-none focus:border-[#C5A880] cursor-pointer"
+              className="bg-white border border-line rounded px-2 py-0.5 text-xs font-semibold text-neutral-800 focus:outline-none focus:border-wood cursor-pointer"
             >
               {pageSizeOptions.map((opt) => (
                 <option key={opt} value={opt}>
@@ -88,7 +88,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="p-1.5 rounded border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+          className="p-1.5 rounded border border-line bg-white text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
           title="Önceki Sayfa"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -98,7 +98,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           {getPageNumbers().map((p, idx) => {
             if (p === '...') {
               return (
-                <span key={`ellipsis-${idx}`} className="px-2 text-neutral-400 font-mono select-none">
+                <span key={`ellipsis-${idx}`} className="px-2 text-neutral-500 font-mono select-none">
                   ...
                 </span>
               );
@@ -113,8 +113,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                 onClick={() => onPageChange(pageNum)}
                 className={`min-w-[28px] h-7 px-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-[#C5A880] text-white shadow-2xs'
-                    : 'bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-100'
+                    ? 'bg-wood text-white'
+                    : 'bg-white border border-line text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
                 {pageNum}
@@ -126,7 +126,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+          className="p-1.5 rounded border border-line bg-white text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
           title="Sonraki Sayfa"
         >
           <ChevronRight className="h-4 w-4" />

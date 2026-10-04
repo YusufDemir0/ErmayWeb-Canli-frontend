@@ -228,7 +228,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
       {/* Top Header Strip & Add Product Trigger */}
       <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A880] block mb-1">
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-wood block mb-1">
             İmalat & Envanter Yönetimi
           </span>
           <h2 className="text-xl font-bold uppercase tracking-tight text-neutral-900">
@@ -247,13 +247,13 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
             }}
             className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-xs transition-colors cursor-pointer shadow-xs border border-neutral-700"
           >
-            <Wand2 className="h-4 w-4 text-[#C5A880]" />
+            <Wand2 className="h-4 w-4 text-wood" />
             <span>Toplu ERP Kategori Eşleme</span>
           </button>
 
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-xs transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-xs transition-colors cursor-pointer shadow-xs"
           >
             <Plus className="h-4 w-4" />
             <span>Yeni Ürün Ekle</span>
@@ -270,7 +270,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
             placeholder="Ürün adı veya açıklama ile ara..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-neutral-50/50"
+            className="w-full pl-10 pr-4 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-neutral-50/50"
           />
         </div>
 
@@ -279,7 +279,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
           <select
             value={selectedCategoryFilter}
             onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-            className="text-xs border border-neutral-300 py-2 px-3 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-white min-w-[160px]"
+            className="text-xs border border-neutral-300 py-2 px-3 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white min-w-[160px]"
           >
             <option value="all">Tüm Kategoriler ({products.length})</option>
             {categories.map((c) => (
@@ -295,7 +295,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
       <div className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#FAF8F5] border-b border-neutral-200 text-neutral-600 font-bold uppercase text-[10px] tracking-wider">
+            <thead className="bg-paper border-b border-neutral-200 text-neutral-600 font-bold uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Görsel</th>
                 <th className="py-3.5 px-4">Ürün Adı</th>
@@ -349,7 +349,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                               </span>
                             )}
                             {p.badge && (
-                              <span className="inline-block text-[9px] bg-[#C5A880]/15 text-[#8A4B20] font-bold px-1.5 py-0.5 rounded-xs">
+                              <span className="inline-block text-[9px] bg-wood/15 text-wood-dark font-bold px-1.5 py-0.5 rounded-xs">
                                 {p.badge}
                               </span>
                             )}
@@ -389,7 +389,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                         <td className="py-3 px-4 text-right space-x-2">
                           <button
                             onClick={() => handleEditClick(p)}
-                            className="p-1.5 text-neutral-600 hover:text-[#C5A880] hover:bg-neutral-100 rounded-xs transition-colors cursor-pointer"
+                            className="p-1.5 text-neutral-600 hover:text-wood hover:bg-neutral-100 rounded-xs transition-colors cursor-pointer"
                             title="Düzenle"
                           >
                             <Edit3 className="h-4 w-4" />
@@ -448,9 +448,9 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
           <div className="bg-white rounded-sm border border-neutral-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
-            <div className="p-6 border-b border-neutral-200 flex items-center justify-between bg-[#FAF8F5]">
+            <div className="p-6 border-b border-neutral-200 flex items-center justify-between bg-paper">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xs bg-neutral-900 flex items-center justify-center text-[#C5A880]">
+                <div className="w-9 h-9 rounded-xs bg-neutral-900 flex items-center justify-center text-wood">
                   <Wand2 className="h-5 w-5" />
                 </div>
                 <div>
@@ -474,14 +474,14 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
             {/* Modal Body */}
             <div className="p-6 space-y-5 overflow-y-auto flex-1">
               {/* Target Category Selector */}
-              <div className="bg-[#FCFAF6] p-4 rounded-xs border border-[#EAE3D2] space-y-2">
+              <div className="bg-paper p-4 rounded-xs border border-line space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-neutral-800 block">
                   1. Hedef Web Kategorisini Seçin *
                 </label>
                 <select
                   value={wizardTargetCategoryId}
                   onChange={(e) => setWizardTargetCategoryId(e.target.value)}
-                  className="w-full text-xs border border-neutral-300 py-2.5 px-3 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-white font-medium"
+                  className="w-full text-xs border border-neutral-300 py-2.5 px-3 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white font-medium"
                 >
                   <option value="" disabled>-- Lütfen Kategori Seçiniz --</option>
                   {categories.map((c) => (
@@ -509,7 +509,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                       placeholder="Kod veya isim ile filtreleyin (örn: MBL-, MASA, KOLTUK, SEKRETER)..."
                       value={wizardSearch}
                       onChange={(e) => setWizardSearch(e.target.value)}
-                      className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-white font-mono"
+                      className="w-full text-xs pl-9 pr-3 py-2 border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white font-mono"
                     />
                   </div>
 
@@ -518,7 +518,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                       type="checkbox"
                       checked={wizardOnlyUnlinked}
                       onChange={(e) => setWizardOnlyUnlinked(e.target.checked)}
-                      className="rounded border-neutral-300 text-[#C5A880] focus:ring-[#C5A880]"
+                      className="rounded border-neutral-300 text-wood focus:ring-wood"
                     />
                     <span>Sadece Web'de Olmayanlar</span>
                   </label>
@@ -551,14 +551,14 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                         <div
                           key={erp.erpId}
                           onClick={() => handleToggleWizardItem(idStr)}
-                          className={`p-3 flex items-center justify-between hover:bg-[#FAF8F5] transition-colors cursor-pointer ${
-                            isSelected ? 'bg-[#FCFAF6]' : ''
+                          className={`p-3 flex items-center justify-between hover:bg-paper transition-colors cursor-pointer ${
+                            isSelected ? 'bg-paper' : ''
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="text-neutral-500">
                               {isSelected ? (
-                                <CheckSquare className="h-4 w-4 text-[#C5A880]" />
+                                <CheckSquare className="h-4 w-4 text-wood" />
                               ) : (
                                 <Square className="h-4 w-4 text-neutral-300" />
                               )}
@@ -615,7 +615,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                   className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xs transition-colors shadow-xs ${
                     isBulkSubmitting || wizardSelectedIds.length === 0 || !wizardTargetCategoryId
                       ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
-                      : 'bg-[#C5A880] hover:bg-[#B4966E] text-white cursor-pointer'
+                      : 'bg-wood hover:bg-wood-dark text-white cursor-pointer'
                   }`}
                 >
                   {isBulkSubmitting ? 'Bağlanıyor...' : `Seçilen ${wizardSelectedIds.length} Ürünü Eşle & Yayına Al`}

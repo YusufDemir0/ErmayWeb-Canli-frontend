@@ -266,7 +266,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
   return (
     <div
-      className="relative w-full bg-white rounded-3xl border border-neutral-200/90 shadow-sm p-3.5 sm:p-5 overflow-hidden transition-all"
+      className="relative w-full bg-white rounded-xs border border-line p-3.5 sm:p-5 overflow-hidden transition-all"
       style={{ willChange: 'transform', transform: 'translateZ(0)' }}
       onClick={() => {
         // Clicking map card backdrop closes bubble if open
@@ -279,7 +279,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#C5A880] animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-wood animate-pulse" />
           <span className="font-semibold text-neutral-800">
             {activeRegionId && REGION_NAMES[activeRegionId]
               ? REGION_NAMES[activeRegionId]
@@ -291,7 +291,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               onClick={() => {
                 if (onSelectRegion) onSelectRegion(null);
               }}
-              className="text-[11px] font-medium text-[#8A4B20] hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-0.5 rounded-full transition-colors ml-1 cursor-pointer"
+              className="text-xs font-medium text-wood-dark hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-0.5 rounded-full transition-colors ml-1 cursor-pointer"
             >
               Tam Görünüme Dön
             </button>
@@ -299,17 +299,17 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px]">
+        <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#CBD5E1] border border-neutral-400" />
             <span className="hidden sm:inline">Mağaza Var</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C5A880]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-wood" />
             <span>Seçili İl</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF] border border-neutral-300" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FFFFFF] border border-line-strong" />
             <span className="hidden sm:inline">Diğer İller</span>
           </div>
         </div>
@@ -434,9 +434,9 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
         {/* Hovered city tooltip (lightweight) */}
         {hoveredCity && !activeBubbleCity && (
-          <div className="absolute top-2 left-2 bg-neutral-900/90 text-white text-xs px-3 py-1.5 rounded-xl shadow-md pointer-events-none transition-opacity flex items-center gap-2">
+          <div className="absolute top-2 left-2 bg-neutral-900/90 text-white text-xs px-3 py-1.5 rounded-xs pointer-events-none transition-opacity flex items-center gap-2">
             <span className="font-semibold">{hoveredCity}</span>
-            <span className="text-neutral-400 text-[11px]">
+            <span className="text-neutral-500 text-xs">
               {cityStoresMap.has(hoveredCity.toLowerCase())
                 ? `• ${cityStoresMap.get(hoveredCity.toLowerCase())?.length} Mağaza (Tıkla ve İncele)`
                 : '• Mağaza yok (Tıkla ve Bilgi Al)'}
@@ -451,14 +451,14 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         */}
         {activeBubbleCity && (
           <div
-            className="absolute z-30 inset-x-2 bottom-2 md:inset-x-auto md:bottom-auto md:top-3 md:right-3 md:w-96 max-h-[88%] bg-white/98 backdrop-blur-md rounded-2xl shadow-2xl border border-neutral-200/95 flex flex-col overflow-hidden animate-fade-in"
+            className="absolute z-30 inset-x-2 bottom-2 md:inset-x-auto md:bottom-auto md:top-3 md:right-3 md:w-96 max-h-[88%] bg-white/98 rounded-xs shadow-2xl border border-line flex flex-col overflow-hidden animate-fade-in"
             onClick={(e) => e.stopPropagation()}
             style={{ willChange: 'transform' }}
           >
             {/* Bubble Header */}
-            <div className="p-3.5 sm:p-4 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/80">
+            <div className="p-3.5 sm:p-4 border-b border-line flex items-center justify-between bg-neutral-50/80">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#C5A880]/20 flex items-center justify-center text-[#8A4B20]">
+                <div className="w-8 h-8 rounded-full bg-wood/20 flex items-center justify-center text-wood-dark">
                   {bubbleStores.length > 0 ? (
                     <Store className="w-4 h-4" />
                   ) : (
@@ -470,12 +470,12 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                     <h3 className="font-semibold text-neutral-900 text-sm">
                       {activeBubbleCity}
                     </h3>
-                    <span className="text-[10px] font-medium text-neutral-500">
+                    <span className="text-xs font-medium text-neutral-500">
                       ({bubbleProv ? REGION_NAMES[bubbleProv.region] || bubbleProv.region : 'Türkiye'})
                     </span>
                   </div>
-                  <span className={`text-[11px] font-medium ${
-                    bubbleStores.length > 0 ? 'text-emerald-700' : 'text-neutral-500'
+                  <span className={`text-xs font-medium ${
+                    bubbleStores.length > 0 ? 'text-ok' : 'text-neutral-500'
                   }`}>
                     {bubbleStores.length > 0
                       ? `${bubbleStores.length} Satış Noktası Aktif`
@@ -502,7 +502,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                 bubbleStores.map((store) => (
                   <div
                     key={store.id}
-                    className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-2 hover:border-[#C5A880]/80 transition-colors"
+                    className="p-3 rounded-xs bg-neutral-50 border border-line space-y-2 hover:border-wood/80 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-1.5">
                       <div>
@@ -510,7 +510,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                           {store.name}
                         </h4>
                         {store.district && (
-                          <span className="text-[10px] text-neutral-500 font-medium">
+                          <span className="text-xs text-neutral-500 font-medium">
                             {store.district}
                           </span>
                         )}
@@ -518,32 +518,32 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                       <button
                         type="button"
                         onClick={() => handleCopy(store)}
-                        className="text-neutral-400 hover:text-neutral-800 p-1 transition-colors"
+                        className="text-neutral-500 hover:text-neutral-800 p-1 transition-colors"
                         title="Adresi Kopyala"
                       >
                         {copiedStoreId === store.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <Check className="w-3.5 h-3.5 text-ok" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
 
-                    <p className="text-[11px] text-neutral-600 leading-relaxed font-light flex items-start gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-neutral-600 leading-relaxed flex items-start gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-neutral-500 shrink-0 mt-0.5" />
                       <span>{store.address}</span>
                     </p>
 
                     {store.hours && (
-                      <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 font-light">
-                        <Clock className="w-3 h-3 text-neutral-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                        <Clock className="w-3 h-3 text-neutral-500 shrink-0" />
                         <span>{store.hours}</span>
                       </div>
                     )}
 
                     {store.phone && (
-                      <div className="flex items-center gap-1.5 text-[11px] text-neutral-800 font-medium">
-                        <Phone className="w-3 h-3 text-neutral-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-800 font-medium">
+                        <Phone className="w-3 h-3 text-neutral-500 shrink-0" />
                         <a href={`tel:${store.phone}`} className="hover:underline">
                           {store.phone}
                         </a>
@@ -551,14 +551,14 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                     )}
 
                     {/* Action buttons inside bubble */}
-                    <div className="pt-2 border-t border-neutral-200/60 flex items-center gap-2">
+                    <div className="pt-2 border-t border-line flex items-center gap-2">
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                           `${store.name} ${store.address}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 py-1.5 px-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg transition-colors flex items-center justify-center gap-1 text-[11px] font-medium"
+                        className="flex-1 py-1.5 px-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xs transition-colors flex items-center justify-center gap-1 text-xs font-medium"
                       >
                         <span>Yol Tarifi</span>
                         <ArrowUpRight className="w-3 h-3" />
@@ -570,7 +570,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="py-1.5 px-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-lg transition-colors flex items-center justify-center gap-1 text-[11px] font-medium"
+                        className="py-1.5 px-2.5 bg-whatsapp hover:bg-whatsapp-dark text-white rounded-xs transition-colors flex items-center justify-center gap-1 text-xs font-medium"
                       >
                         <MessageCircle className="w-3 h-3" />
                         <span>WhatsApp</span>
@@ -583,7 +583,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                             handleCloseBubble();
                             onScrollToStore(store.id);
                           }}
-                          className="py-1.5 px-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-lg text-[10px] font-medium transition-colors"
+                          className="py-1.5 px-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-xs text-xs font-medium transition-colors"
                           title="Aşağıdaki Mağaza Kartına Kaydır"
                         >
                           Karta Git
@@ -595,12 +595,12 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               ) : (
                 /* NO PHYSICAL STORE IN THIS PROVINCE - FACTORY DIRECT MESSAGE */
                 <div className="space-y-3 py-1">
-                  <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 text-[11px] text-amber-900 leading-relaxed space-y-1.5">
+                  <div className="bg-paper border border-line rounded-xs p-3 text-xs text-wood-dark leading-relaxed space-y-1.5">
                     <p className="font-semibold text-neutral-900 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#C5A880]" />
+                      <MapPin className="w-3.5 h-3.5 text-wood" />
                       <span>{activeBubbleCity} İlimizde Fiziksel Mağazamız Bulunmamaktadır.</span>
                     </p>
-                    <p className="text-neutral-600 font-light">
+                    <p className="text-neutral-600">
                       Ermay Mobilya doğrudan üreticidir. İstanbul üretim tesislerimizden{' '}
                       <strong>{activeBubbleCity}</strong> ve tüm Türkiye geneline sigortalı nakliye, randevulu teslimat ve fabrika satış fiyatı avantajıyla gönderim sağlanmaktadır.
                     </p>
@@ -613,7 +613,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 px-3 bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 text-xs shadow-xs"
+                      className="w-full py-2.5 px-3 bg-whatsapp hover:bg-whatsapp-dark text-white font-medium rounded-xs transition-colors flex items-center justify-center gap-2 text-xs"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>{activeBubbleCity} İçin Teslimat Bilgisi Al (WhatsApp)</span>
@@ -621,7 +621,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
                     <a
                       href="tel:05324194151"
-                      className="w-full py-2 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 text-[11px]"
+                      className="w-full py-2 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium rounded-xs transition-colors flex items-center justify-center gap-2 text-xs"
                     >
                       <Phone className="w-3.5 h-3.5 text-neutral-500" />
                       <span>Fabrika Satış Destek: 0532 419 41 51</span>

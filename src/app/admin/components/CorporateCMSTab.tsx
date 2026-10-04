@@ -76,11 +76,11 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
         
         {/* Header */}
         <div className="border-b border-neutral-100 pb-4 mb-6">
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C5A880] block mb-1">
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-wood block mb-1">
             Kurumsal İçerik & Hikaye Yönetimi
           </span>
           <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-[#C5A880]" />
+            <Building2 className="h-4 w-4 text-wood" />
             <span>Hakkımızda & İmalat Hikayesi CMS</span>
           </h3>
         </div>
@@ -88,7 +88,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
         <form onSubmit={handleSave} className="space-y-6 max-w-4xl">
           
           {/* Hero Section */}
-          <div className="bg-[#FAF8F5] p-5 rounded-xs border border-[#EAE3D2] space-y-4">
+          <div className="bg-paper p-5 rounded-xs border border-line space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               1. Hero Manşet Bölümü
             </h4>
@@ -118,7 +118,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
                     setLocalCorpConfig({ ...localCorpConfig, heroHighlight: e.target.value })
                   }
                   placeholder="Örn: Zanaat ve İmalat Gücü"
-                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white text-[#8A4B20] font-bold"
+                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white text-wood-dark font-bold"
                 />
               </div>
             </div>
@@ -151,14 +151,14 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
                     onChange={(e) => setLocalCorpConfig({ ...localCorpConfig, heroImage: e.target.value })}
                     className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
                   />
-                  {uploadingHero && <span className="text-[10px] text-[#C5A880]">Görsel yükleniyor...</span>}
+                  {uploadingHero && <span className="text-[10px] text-wood">Görsel yükleniyor...</span>}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Unified Adaptive Story Content Box */}
-          <div className="bg-[#FAF8F5] p-5 rounded-xs border border-[#EAE3D2] space-y-4">
+          <div className="bg-paper p-5 rounded-xs border border-line space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
                 2. Şirket Hikayesi & İmalat Felsefesi (Tek ve Esnek Metin Alanı)
@@ -179,7 +179,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
                   setLocalCorpConfig({ ...localCorpConfig, storyContent: e.target.value })
                 }
                 placeholder="1986 yılından bu yana kendi üretim tesislerimizde fırınlanmış gürgen ağacını, yüksek dansiteli süngeri ve birinci sınıf döşemeleri harmanlayarak..."
-                className="w-full text-xs border border-neutral-300 p-3 rounded-xs bg-white leading-relaxed focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                className="w-full text-xs border border-neutral-300 p-3 rounded-xs bg-white leading-relaxed focus:ring-1 focus:ring-wood focus:outline-none"
               />
             </div>
 
@@ -212,7 +212,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
                     onChange={(e) => setLocalCorpConfig({ ...localCorpConfig, storyImage: e.target.value })}
                     className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
                   />
-                  {uploadingStory && <span className="text-[10px] text-[#C5A880]">Görsel yükleniyor...</span>}
+                  {uploadingStory && <span className="text-[10px] text-wood">Görsel yükleniyor...</span>}
                 </div>
               </div>
             </div>
@@ -222,7 +222,7 @@ export const CorporateCMSTab: React.FC<CorporateCMSTabProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
+              className="bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
             >
               Kurumsal Sayfası Değişikliklerini Kaydet
             </button>

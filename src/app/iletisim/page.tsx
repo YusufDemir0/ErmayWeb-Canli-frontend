@@ -97,25 +97,25 @@ export default async function IletisimPage() {
   };
 
   return (
-    <div className="w-full bg-neutral-50 min-h-screen py-12">
+    <div className="w-full bg-white min-h-screen py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
-        <nav className="text-xs text-neutral-400 font-light flex items-center gap-2 mb-8">
-          <Link href="/" className="hover:text-[#C5A880] transition-colors">Ana Sayfa</Link>
+        <nav className="text-xs text-neutral-500 flex items-center gap-2 mb-8">
+          <Link href="/" className="hover:text-wood transition-colors">Ana Sayfa</Link>
           <span>/</span>
           <span className="text-neutral-600 font-normal">İletişim</span>
         </nav>
 
         {/* Light Hero Header */}
-        <div className="bg-white text-neutral-900 rounded-sm p-8 md:p-12 mb-12 border border-neutral-200 shadow-sm text-center">
-          <h1 className="text-3xl md:text-5xl font-light tracking-widest uppercase mb-2 text-neutral-900">
-            İLETİŞİM
+        <div className="bg-white text-neutral-900 rounded-xs p-8 md:p-12 mb-12 border border-line text-center">
+          <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-2 text-ink">
+            İletişim
           </h1>
-          <p className="text-xs text-neutral-500 font-light tracking-wider">
+          <p className="text-sm text-neutral-600">
             Fabrika satış, toplu alım ve showroom ziyaretleriniz için bize ulaşın
           </p>
         </div>
@@ -130,14 +130,14 @@ export default async function IletisimPage() {
           {/* Right Column: Clean White Contact Cards */}
           <div className="lg:col-span-5 space-y-4">
             {/* Telefon Card */}
-            <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
-              <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
+            <div className="bg-white text-neutral-800 p-5 rounded-xs border border-line flex items-start gap-4">
+              <div className="p-3 bg-wood/10 border border-wood/30 rounded-xs text-wood flex-shrink-0">
                 <Phone className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Telefon</h3>
+                <h3 className="text-xs font-bold text-neutral-500">Telefon</h3>
                 {contactInfo.phones.map((phone) => (
-                  <a key={phone} href={`tel:${toE164(phone)}`} className="block text-sm font-semibold text-neutral-900 mt-1 hover:text-[#C5A880]">
+                  <a key={phone} href={`tel:${toE164(phone)}`} className="block text-sm font-semibold text-neutral-900 mt-1 hover:text-wood">
                     {phone}
                   </a>
                 ))}
@@ -146,36 +146,36 @@ export default async function IletisimPage() {
 
             {/* Çalışma Saatleri (yer tutucu faks numarasının yerine, CMS'ten) */}
             {contactInfo.workingHours && (
-              <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
-                <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
+              <div className="bg-white text-neutral-800 p-5 rounded-xs border border-line flex items-start gap-4">
+                <div className="p-3 bg-wood/10 border border-wood/30 rounded-xs text-wood flex-shrink-0">
                   <Clock className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Çalışma Saatleri</h3>
+                  <h3 className="text-xs font-bold text-neutral-500">Çalışma Saatleri</h3>
                   <p className="text-sm font-semibold text-neutral-900 mt-1">{contactInfo.workingHours}</p>
                 </div>
               </div>
             )}
 
             {/* E-Posta Card */}
-            <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
-              <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
+            <div className="bg-white text-neutral-800 p-5 rounded-xs border border-line flex items-start gap-4">
+              <div className="p-3 bg-wood/10 border border-wood/30 rounded-xs text-wood flex-shrink-0">
                 <Mail className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">E-Posta</h3>
+                <h3 className="text-xs font-bold text-neutral-500">E-Posta</h3>
                 <p className="text-sm font-semibold text-neutral-900 mt-1">{contactInfo.email}</p>
               </div>
             </div>
 
             {/* Adres Card */}
-            <div className="bg-white text-neutral-800 p-5 rounded-sm border border-neutral-200 flex items-start gap-4 shadow-xs">
-              <div className="p-3 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#C5A880] flex-shrink-0">
+            <div className="bg-white text-neutral-800 p-5 rounded-xs border border-line flex items-start gap-4">
+              <div className="p-3 bg-wood/10 border border-wood/30 rounded-xs text-wood flex-shrink-0">
                 <MapPin className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">Adres</h3>
-                <p className="text-xs font-light text-neutral-700 mt-1 leading-relaxed">{contactInfo.address}</p>
+                <h3 className="text-xs font-bold text-neutral-500">Adres</h3>
+                <p className="text-xs text-neutral-700 mt-1 leading-relaxed">{contactInfo.address}</p>
               </div>
             </div>
           </div>

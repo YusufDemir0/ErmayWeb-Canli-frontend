@@ -52,11 +52,11 @@ export const PopupTab: React.FC<PopupTabProps> = ({
         
         {/* Header */}
         <div className="border-b border-neutral-100 pb-4 mb-6">
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C5A880] block mb-1">
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-wood block mb-1">
             Ziyaretçi Etkileşimi
           </span>
           <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#C5A880]" />
+            <Sparkles className="h-4 w-4 text-wood" />
             <span>Açılış Kampanya & Tanıtım Popup Yönetimi</span>
           </h3>
         </div>
@@ -64,12 +64,12 @@ export const PopupTab: React.FC<PopupTabProps> = ({
         <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
           
           {/* Active Switch */}
-          <label className="flex items-center gap-3 cursor-pointer p-4 bg-[#FAF8F5] border border-[#EAE3D2] rounded-xs">
+          <label className="flex items-center gap-3 cursor-pointer p-4 bg-paper border border-line rounded-xs">
             <input
               type="checkbox"
               checked={localPopup.enabled}
               onChange={(e) => setLocalPopup({ ...localPopup, enabled: e.target.checked })}
-              className="h-5 w-5 text-[#C5A880] rounded-xs border-neutral-300 focus:ring-[#C5A880]"
+              className="h-5 w-5 text-wood rounded-xs border-neutral-300 focus:ring-wood"
             />
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 block">
@@ -92,11 +92,11 @@ export const PopupTab: React.FC<PopupTabProps> = ({
                 onClick={() => setLocalPopup({ ...localPopup, popupType: 'coupon' })}
                 className={`p-3 rounded-xs border text-left cursor-pointer transition-all ${
                   (localPopup.popupType || 'coupon') === 'coupon'
-                    ? 'border-[#C5A880] bg-[#FAF8F5] ring-1 ring-[#C5A880]'
+                    ? 'border-wood bg-paper ring-1 ring-wood'
                     : 'border-neutral-200 bg-white hover:border-neutral-300'
                 }`}
               >
-                <Tag className="h-4 w-4 text-[#C5A880] mb-1.5" />
+                <Tag className="h-4 w-4 text-wood mb-1.5" />
                 <div className="text-xs font-bold text-neutral-900">İndirim Kuponu</div>
                 <div className="text-[10px] text-neutral-500 font-light mt-0.5">Kupon kodu kopyalatır</div>
               </button>
@@ -106,11 +106,11 @@ export const PopupTab: React.FC<PopupTabProps> = ({
                 onClick={() => setLocalPopup({ ...localPopup, popupType: 'collection' })}
                 className={`p-3 rounded-xs border text-left cursor-pointer transition-all ${
                   localPopup.popupType === 'collection'
-                    ? 'border-[#C5A880] bg-[#FAF8F5] ring-1 ring-[#C5A880]'
+                    ? 'border-wood bg-paper ring-1 ring-wood'
                     : 'border-neutral-200 bg-white hover:border-neutral-300'
                 }`}
               >
-                <Layers className="h-4 w-4 text-[#C5A880] mb-1.5" />
+                <Layers className="h-4 w-4 text-wood mb-1.5" />
                 <div className="text-xs font-bold text-neutral-900">Koleksiyon Tanıtımı</div>
                 <div className="text-[10px] text-neutral-500 font-light mt-0.5">Yeni sezon modelini tanıtır</div>
               </button>
@@ -120,11 +120,11 @@ export const PopupTab: React.FC<PopupTabProps> = ({
                 onClick={() => setLocalPopup({ ...localPopup, popupType: 'announcement' })}
                 className={`p-3 rounded-xs border text-left cursor-pointer transition-all ${
                   localPopup.popupType === 'announcement'
-                    ? 'border-[#C5A880] bg-[#FAF8F5] ring-1 ring-[#C5A880]'
+                    ? 'border-wood bg-paper ring-1 ring-wood'
                     : 'border-neutral-200 bg-white hover:border-neutral-300'
                 }`}
               >
-                <Megaphone className="h-4 w-4 text-[#C5A880] mb-1.5" />
+                <Megaphone className="h-4 w-4 text-wood mb-1.5" />
                 <div className="text-xs font-bold text-neutral-900">Genel Duyuru</div>
                 <div className="text-[10px] text-neutral-500 font-light mt-0.5">Fuar / İmalat duyurusu</div>
               </button>
@@ -132,7 +132,7 @@ export const PopupTab: React.FC<PopupTabProps> = ({
           </div>
 
           {/* Popup Image Upload & Preview */}
-          <div className="space-y-2 p-4 bg-[#FAF8F5] rounded-xs border border-[#EAE3D2]">
+          <div className="space-y-2 p-4 bg-paper rounded-xs border border-line">
             <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
               Popup Üst Kapak Görseli
             </label>
@@ -160,7 +160,7 @@ export const PopupTab: React.FC<PopupTabProps> = ({
                   onChange={(e) => setLocalPopup({ ...localPopup, image: e.target.value })}
                   className="w-full text-xs border border-neutral-300 p-2 rounded-xs bg-white"
                 />
-                {uploading && <span className="text-[10px] text-[#C5A880]">Görsel yükleniyor...</span>}
+                {uploading && <span className="text-[10px] text-wood">Görsel yükleniyor...</span>}
               </div>
             </div>
           </div>
@@ -219,7 +219,7 @@ export const PopupTab: React.FC<PopupTabProps> = ({
                 value={localPopup.discountCode}
                 onChange={(e) => setLocalPopup({ ...localPopup, discountCode: e.target.value.toUpperCase() })}
                 placeholder="Örn: ERMAY2026"
-                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white font-mono font-bold text-[#8A4B20]"
+                className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs bg-white font-mono font-bold text-wood-dark"
               />
             </div>
           )}
@@ -257,7 +257,7 @@ export const PopupTab: React.FC<PopupTabProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-neutral-900 hover:bg-[#C5A880] text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
+              className="bg-neutral-900 hover:bg-wood text-white text-xs font-bold uppercase tracking-widest py-3.5 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
             >
               Popup Ayarlarını Kaydet
             </button>

@@ -49,7 +49,7 @@ export const Hero: React.FC = () => {
       id="hero-banner"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full h-[65vh] md:h-[82vh] bg-neutral-900 overflow-hidden select-none"
+      className="relative w-full h-[65vh] md:h-[82vh] bg-ink overflow-hidden select-none"
     >
       {/* Background Slides */}
       {slides.map((slide, index) => {
@@ -70,68 +70,60 @@ export const Hero: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900" />
+              <div className="w-full h-full bg-ink" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-ink/25" />
           </div>
         );
       })}
 
-      {/* Content Overlay */}
-      <div className="absolute inset-0 z-20 flex items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-xl bg-white/95 backdrop-blur-md p-8 md:p-12 shadow-2xl rounded-sm border border-neutral-100 animate-fade-in-up">
-          <span className="text-[10px] md:text-xs font-black tracking-[0.3em] text-[#C5A880] uppercase block mb-3 md:mb-4">
-            {activeSlide.badge || 'ERMAY MOBİLYA • DOĞRUDAN ÜRETİCİDEN'}
-          </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-neutral-900 leading-tight tracking-tight mb-4 md:mb-6">
+      {/* Content Overlay: düz, opak panel (cam efekti yok) */}
+      <div className="absolute inset-0 z-20 flex items-end md:items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-0">
+        <div key={currentSlide} className="max-w-xl bg-white p-6 md:p-10 border-l-4 border-wood animate-fade-in">
+          {activeSlide.badge && (
+            <span className="text-xs font-semibold text-wood uppercase tracking-wider block mb-3">
+              {activeSlide.badge}
+            </span>
+          )}
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-display font-bold text-ink leading-[1.08] tracking-tight mb-4">
             {activeSlide.title}
           </h2>
-          <p className="text-neutral-600 text-xs md:text-sm font-light leading-relaxed mb-6 md:mb-8">
-            {activeSlide.subtitle}
-          </p>
+          {activeSlide.subtitle && (
+            <p className="text-neutral-600 text-sm md:text-base leading-relaxed mb-6 md:mb-8">
+              {activeSlide.subtitle}
+            </p>
+          )}
           <Link
             href={resolveButtonLink(activeSlide.buttonLink)}
-            className="group inline-flex items-center gap-2.5 bg-neutral-900 hover:bg-[#C5A880] text-white text-xs md:text-sm uppercase tracking-widest font-bold py-3.5 px-7 md:py-4 md:px-8 transition-colors duration-300 rounded-xs cursor-pointer shadow-lg"
+            className="group inline-flex items-center gap-2.5 bg-ink hover:bg-wood text-white text-sm font-semibold py-3.5 px-6 transition-colors duration-200 rounded-xs"
           >
-            <span>{activeSlide.buttonText || 'Koleksiyonu İncele'}</span>
-            <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1.5 transition-transform" />
+            <span>{activeSlide.buttonText || 'Ürünleri incele'}</span>
+            <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
 
-      {/* Slider Left & Right Floating Arrows */}
+      {/* Slayt kontrolleri: köşeli düğmeler ve mono sayaç */}
       {slides.length > 1 && (
-        <>
+        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-30 flex items-center gap-1 bg-white">
           <button
             onClick={handlePrev}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-[#C5A880] text-white backdrop-blur-xs transition-all cursor-pointer border border-white/20 shadow-md"
-            aria-label="Önceki Slayt"
+            className="h-11 w-11 flex items-center justify-center text-ink hover:bg-paper transition-colors cursor-pointer"
+            aria-label="Önceki slayt"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          
+          <span className="font-mono text-xs text-neutral-600 tabular-nums-all px-1" aria-live="polite">
+            {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+          </span>
           <button
             onClick={handleNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-[#C5A880] text-white backdrop-blur-xs transition-all cursor-pointer border border-white/20 shadow-md"
-            aria-label="Sonraki Slayt"
+            className="h-11 w-11 flex items-center justify-center text-ink hover:bg-paper transition-colors cursor-pointer"
+            aria-label="Sonraki slayt"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-
-          {/* Bottom Dots Indicator */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  index === currentSlide ? 'w-8 bg-[#C5A880]' : 'w-2 bg-white/50 hover:bg-white/80'
-                }`}
-                aria-label={`Slayta git ${index + 1}`}
-              />
-            ))}
-          </div>
-        </>
+        </div>
       )}
     </section>
   );

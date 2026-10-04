@@ -8,10 +8,10 @@ export const revalidate = 60; // ISR every 60 seconds
 
 export const metadata: Metadata = {
   title: '2026 Koleksiyon Kataloğu | A4 Yatay Lookbook | Ermay Mobilya',
-  description: 'Ermay Mobilya 2026 seçkin lüks koleksiyon kataloğu. Makam odaları, yemek ve oturma grupları, TV üniteleri ve tasarım detayları. A4 yatay formatında yazdırın ve inceleyin.',
-  keywords: 'mobilya kataloğu, 2026 mobilya modelleri, modoko katalog, ofis mobilyası katalog, lüks koltuk takımları katalog',
+  description: 'Ermay Mobilya 2026 fiyatlı ürün kataloğu: makam takımları, toplantı ve çalışma masaları, bankolar ve ofis koltukları. A4 yatay formatında yazdırın ve inceleyin.',
+  keywords: 'mobilya kataloğu, 2026 mobilya modelleri, modoko katalog, ofis mobilyası katalog, makam takımı katalog',
   openGraph: {
-    title: '2026 Lüks Koleksiyon Kataloğu | Ermay Mobilya',
+    title: '2026 Fiyatlı Ürün Kataloğu | Ermay Mobilya',
     description: 'Ermay Mobilya 2026 Lookbook ve koleksiyon kataloğunu online inceleyin veya PDF olarak indirin.',
     url: 'https://ermaymobilya.com/katalog',
     siteName: 'Ermay Mobilya',

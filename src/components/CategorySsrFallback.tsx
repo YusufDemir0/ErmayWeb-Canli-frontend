@@ -8,7 +8,7 @@ import type { Product } from '../types';
  */
 export default function CategorySsrFallback({ title, products }: { title: string; products: Product[] }) {
   return (
-    <div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center text-xs text-neutral-400">
+    <div className="min-h-screen bg-paper flex items-center justify-center text-xs text-neutral-500">
       <h1 className="sr-only">{title} | Ermay Mobilya</h1>
       <span aria-hidden="true">Yükleniyor...</span>
       {products.length > 0 && (

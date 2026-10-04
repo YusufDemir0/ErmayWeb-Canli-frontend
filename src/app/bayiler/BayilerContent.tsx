@@ -13,7 +13,6 @@ import {
   Compass,
   Store,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 import type { StoreItem } from '../../types';
 import { TurkeyMap, REGION_NAMES } from '../../components/TurkeyMap';
@@ -230,31 +229,31 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Navigation Breadcrumb */}
-        <nav className="text-xs text-neutral-400 font-light flex items-center gap-2 mb-6 sm:mb-8">
+        <nav className="text-xs text-neutral-500 flex items-center gap-2 mb-6 sm:mb-8">
           <Link href="/anasayfa" className="hover:text-neutral-900 transition-colors">Ana Sayfa</Link>
           <span>/</span>
-          <span className="text-neutral-700 font-normal">Satış Noktaları & Mağazalar</span>
+          <span className="text-neutral-700 font-normal">Satış noktaları</span>
         </nav>
 
         {/* Minimal Modern Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-200/60 text-neutral-700 text-xs mb-3 font-medium">
-              <Compass className="w-3.5 h-3.5 text-[#8A4B20]" />
-              <span>Türkiye Geneli Satış & Showroom Ağı</span>
+              <Compass className="w-3.5 h-3.5 text-wood-dark" />
+              <span>Showroomlar ve satış noktaları</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-light text-neutral-900 tracking-tight">
-              Satış Noktaları & Showroomlar
+            <h1 className="text-2xl sm:text-4xl text-neutral-900 tracking-tight">
+              Showroomlar
             </h1>
-            <p className="text-neutral-500 text-xs sm:text-sm mt-2.5 leading-relaxed font-light">
+            <p className="text-neutral-500 text-xs sm:text-sm mt-2.5 leading-relaxed">
               Mobilyalarımızı yakından incelemek, malzeme kalitesini ve dokusunu deneyimlemek için mağazalarımıza davetlisiniz. Şehrinizde mağaza olmasa dahi doğrudan fabrikadan tüm Türkiye&apos;ye sigortalı kapıya teslimat yapılmaktadır.
             </p>
           </div>
 
           {/* User Location Badge if detected */}
           {userDetectedCity && (
-            <div className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-2xl border border-neutral-200 shadow-2xs text-xs text-neutral-600 shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            <div className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xs border border-line text-xs text-neutral-600 shrink-0">
+              <span className="w-2 h-2 rounded-full bg-whatsapp animate-ping" />
               <span>Tespit Edilen Bölgeniz: <strong>{userDetectedCity}</strong></span>
             </div>
           )}
@@ -272,8 +271,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
             }}
             className={`px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
               activeRegionId === null
-                ? 'bg-neutral-900 text-white shadow-xs'
-                : 'bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-200'
+                ? 'bg-neutral-900 text-white'
+                : 'bg-white hover:bg-neutral-100 text-neutral-700 border border-line'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -294,12 +293,12 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
               }}
               className={`px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 activeRegionId === reg.regionId
-                  ? 'bg-[#C5A880] text-white shadow-xs'
-                  : 'bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-200'
+                  ? 'bg-wood text-white'
+                  : 'bg-white hover:bg-neutral-100 text-neutral-700 border border-line'
               }`}
             >
               <span>{reg.name}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+              <span className={`text-xs px-1.5 py-0.2 rounded-full ${
                 activeRegionId === reg.regionId
                   ? 'bg-white/30 text-white'
                   : 'bg-neutral-100 text-neutral-600'
@@ -313,7 +312,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         {/* STICKY MAP CONTAINER (OPTIMIZED FOR ALL SCREENS) */}
         <div
           ref={mapSectionRef}
-          className="sticky top-16 sm:top-20 z-20 mb-12 sm:mb-16 bg-[#FAF9F6]/95 backdrop-blur-md pt-1 pb-3"
+          className="sticky top-16 sm:top-20 z-20 mb-12 sm:mb-16 bg-[#FAF9F6]/95 pt-1 pb-3"
         >
           <TurkeyMap
             stores={activeStores}
@@ -330,9 +329,9 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         {/* STORE CARDS LIST (ORDERED BY REGION DENSITY) */}
         <div className="space-y-12 sm:space-y-16">
           {activeStores.length === 0 && (
-            <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center text-sm text-neutral-600">
+            <div className="bg-white border border-line rounded-xs p-8 text-center text-sm text-neutral-600">
               Mağaza bilgileri şu anda yüklenemedi. Showroom adreslerimiz için{' '}
-              <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-[#8A4B20] font-semibold underline">
+              <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-wood-dark font-semibold underline">
                 WhatsApp hattımızdan
               </a>{' '}
               bize ulaşabilirsiniz.
@@ -348,12 +347,12 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
               className="scroll-mt-32"
             >
               {/* Region Label */}
-              <div className="flex items-center justify-between pb-3 mb-6 border-b border-neutral-200">
+              <div className="flex items-center justify-between pb-3 mb-6 border-b border-line">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-neutral-800">
                     {region.name}
                   </span>
-                  <span className="text-xs text-neutral-500 font-light">
+                  <span className="text-xs text-neutral-500">
                     ({region.count} Aktif Showroom)
                   </span>
                 </div>
@@ -364,7 +363,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                     setActiveRegionId(region.regionId);
                     mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="text-xs text-[#8A4B20] hover:text-neutral-900 font-medium transition-colors"
+                  className="text-xs text-wood-dark hover:text-neutral-900 font-medium transition-colors"
                 >
                   Haritada Odakla &rarr;
                 </button>
@@ -381,22 +380,22 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                       ref={(el) => {
                         storeCardRefs.current[store.id] = el;
                       }}
-                      className={`bg-white rounded-3xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
+                      className={`bg-white rounded-xs border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
                         isSelected
-                          ? 'border-[#C5A880] ring-2 ring-[#C5A880]/30 shadow-md'
-                          : 'border-neutral-200/80 hover:border-neutral-300 shadow-2xs hover:shadow-xs'
+                          ? 'border-wood ring-2 ring-wood/30'
+                          : 'border-line hover:border-line-strong'
                       }`}
                     >
                       {/* Store Photo */}
                       <div className="p-3">
-                        <div className="aspect-[16/10] rounded-2xl overflow-hidden bg-neutral-100 relative">
+                        <div className="aspect-[16/10] rounded-xs overflow-hidden bg-neutral-100 relative">
                           <img
                             src={store.image || '/default-furniture.webp'}
                             alt={store.name}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500"
                             loading="lazy"
                           />
-                          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs text-neutral-900 text-[11px] font-medium px-3 py-1 rounded-full shadow-2xs">
+                          <div className="absolute top-3 left-3 bg-white/90 text-neutral-900 text-xs font-medium px-3 py-1 rounded-full">
                             {store.city} {store.district ? `· ${store.district}` : ''}
                           </div>
                         </div>
@@ -415,7 +414,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                                 handleSelectCity(store.city);
                                 mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
                               }}
-                              className="text-[11px] text-[#8A4B20] hover:underline shrink-0 font-medium"
+                              className="text-xs text-wood-dark hover:underline shrink-0 font-medium"
                               title="Haritada Göster"
                             >
                               Harita
@@ -423,19 +422,19 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           </div>
 
                           {/* Address */}
-                          <div className="flex items-start justify-between gap-2 text-xs text-neutral-500 font-light leading-relaxed">
+                          <div className="flex items-start justify-between gap-2 text-xs text-neutral-500 leading-relaxed">
                             <div className="flex items-start gap-2">
-                              <MapPin className="h-4 w-4 text-neutral-400 shrink-0 mt-0.5" />
+                              <MapPin className="h-4 w-4 text-neutral-500 shrink-0 mt-0.5" />
                               <span>{store.address}</span>
                             </div>
                             <button
                               type="button"
                               onClick={() => handleCopyAddress(store)}
-                              className="text-neutral-400 hover:text-neutral-800 transition-colors shrink-0 p-1 cursor-pointer"
+                              className="text-neutral-500 hover:text-neutral-800 transition-colors shrink-0 p-1 cursor-pointer"
                               title="Adresi Kopyala"
                             >
                               {copiedStoreId === store.id ? (
-                                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                                <Check className="h-3.5 w-3.5 text-ok" />
                               ) : (
                                 <Copy className="h-3.5 w-3.5" />
                               )}
@@ -444,8 +443,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
 
                           {/* Hours */}
                           {store.hours && (
-                            <div className="flex items-center gap-2 text-xs text-neutral-500 font-light">
-                              <Clock className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-neutral-500">
+                              <Clock className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
                               <span>{store.hours}</span>
                             </div>
                           )}
@@ -453,7 +452,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           {/* Phone */}
                           {store.phone && (
                             <div className="flex items-center gap-2 text-xs text-neutral-800 font-medium">
-                              <Phone className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
+                              <Phone className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
                               <a href={`tel:${store.phone}`} className="hover:underline">
                                 {store.phone}
                               </a>
@@ -462,14 +461,14 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                         </div>
 
                         {/* Modern Curved Actions */}
-                        <div className="pt-4 border-t border-neutral-100 flex items-center gap-2.5">
+                        <div className="pt-4 border-t border-line flex items-center gap-2.5">
                           <a
                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                               `${store.name} ${store.address}`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1 py-2.5 px-4 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+                            className="flex-1 py-2.5 px-4 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium rounded-full transition-colors flex items-center justify-center gap-1.5"
                           >
                             <span>Yol Tarifi</span>
                             <ArrowUpRight className="h-3.5 w-3.5" />
@@ -481,7 +480,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="py-2.5 px-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-medium rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+                            className="py-2.5 px-3.5 bg-whatsapp hover:bg-whatsapp-dark text-white text-xs font-medium rounded-full transition-colors flex items-center justify-center gap-1.5"
                             title="WhatsApp İletişim"
                           >
                             <MessageCircle className="h-4 w-4" />
@@ -499,16 +498,15 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         </div>
 
         {/* Factory Direct Delivery Note (All 81 Provinces) */}
-        <div className="mt-16 p-6 sm:p-8 bg-neutral-900 text-white rounded-3xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-16 p-6 sm:p-8 bg-ink text-white rounded-xs flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 text-[#C5A880] text-xs font-medium uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
-              <span>Tüm Türkiye&apos;ye Doğrudan Üreticiden Teslimat</span>
+            <div className="text-wood-light text-sm">
+              Türkiye geneline teslimat
             </div>
-            <h3 className="text-xl sm:text-2xl font-light">
-              Şehrinizde Showroom Yok mu? Hiç Sorun Değil.
+            <h3 className="text-xl sm:text-2xl font-display font-semibold">
+              Şehrinizde showroom yoksa da sipariş verebilirsiniz.
             </h3>
-            <p className="text-neutral-400 text-xs sm:text-sm font-light max-w-xl">
+            <p className="text-neutral-300 text-xs sm:text-sm max-w-xl">
               Ermay Mobilya, 81 ilimizin tamamına sigortalı nakliye, randevulu teslimat ve uzman montaj desteği sunar. Aracı komisyonu olmadan doğrudan fabrika satış fiyatı avantajıyla sipariş verin.
             </p>
           </div>
@@ -517,10 +515,10 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
             href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 bg-[#C5A880] hover:bg-[#b3956e] text-neutral-900 font-medium text-xs rounded-full transition-colors shrink-0 shadow-sm flex items-center gap-2"
+            className="px-6 py-3.5 bg-wood hover:bg-[#b3956e] text-neutral-900 font-medium text-xs rounded-full transition-colors shrink-0 flex items-center gap-2"
           >
             <MessageCircle className="w-4 h-4 text-neutral-900" />
-            <span>Teslimat & Sevkiyat Danışmanı</span>
+            <span>Teslimat danışmanı</span>
           </a>
         </div>
 

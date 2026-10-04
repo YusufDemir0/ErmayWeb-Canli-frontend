@@ -116,7 +116,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
   };
 
   return (
-    <article className="bg-[#FAF8F5] min-h-screen py-10 sm:py-16">
+    <article className="bg-paper min-h-screen py-10 sm:py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, '\\u003c') }}
@@ -130,39 +130,39 @@ export default async function BlogPostDetailPage({ params }: Props) {
         {/* Navigation Breadcrumbs */}
         <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-8 font-mono">
           <Link href="/" className="hover:text-neutral-900 transition-colors">Ana Sayfa</Link>
-          <ChevronRight className="h-3 w-3 text-neutral-400" />
+          <ChevronRight className="h-3 w-3 text-neutral-500" />
           <Link href="/blog" className="hover:text-neutral-900 transition-colors">Blog</Link>
-          <ChevronRight className="h-3 w-3 text-neutral-400" />
+          <ChevronRight className="h-3 w-3 text-neutral-500" />
           <span className="text-neutral-900 truncate max-w-xs">{post.title}</span>
         </nav>
 
         {/* Article Header Card */}
         <header className="space-y-6 mb-10">
           {post.category && (
-            <span className="inline-block px-3 py-1 bg-[#C5A880]/15 text-[#8C6D46] border border-[#C5A880]/30 text-[11px] font-bold uppercase tracking-widest rounded-xs">
+            <span className="inline-block px-3 py-1 bg-wood/15 text-wood-dark border border-wood/30 text-sm font-semibold rounded-xs">
               {post.category}
             </span>
           )}
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-neutral-900 leading-tight">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-extrabold text-neutral-900 leading-tight">
             {post.title}
           </h1>
 
           {post.summary && (
-            <p className="text-base sm:text-lg text-neutral-600 font-light leading-relaxed border-l-2 border-[#C5A880] pl-4 italic">
+            <p className="text-base sm:text-lg text-neutral-600 leading-relaxed border-l-2 border-wood pl-4 italic">
               {post.summary}
             </p>
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-neutral-200/80 text-xs text-neutral-500">
+          <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-line text-xs text-neutral-500">
             <div className="flex items-center gap-5">
               <span className="flex items-center gap-1.5 font-medium text-neutral-700">
-                <User className="h-3.5 w-3.5 text-[#C5A880]" />
+                <User className="h-3.5 w-3.5 text-wood" />
                 <span>{post.author || 'Ermay Mobilya Mimari Ekibi'}</span>
               </span>
 
               <span className="flex items-center gap-1.5 font-mono">
-                <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+                <Calendar className="h-3.5 w-3.5 text-neutral-500" />
                 <span>
                   {new Date(post.publishedAt || post.createdAt).toLocaleDateString('tr-TR', {
                     day: '2-digit',
@@ -173,7 +173,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
               </span>
 
               <span className="flex items-center gap-1.5 font-mono">
-                <Clock className="h-3.5 w-3.5 text-neutral-400" />
+                <Clock className="h-3.5 w-3.5 text-neutral-500" />
                 <span>{post.readTimeMin || 4} dakika okuma</span>
               </span>
             </div>
@@ -183,7 +183,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
                 href={`https://wa.me/905324194151?text=${encodeURIComponent(`Merhaba, "${post.title}" başlıklı blog yazınızı okudum, bilgi almak istiyorum.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xs transition-colors font-bold text-xs shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-whatsapp hover:bg-whatsapp-dark text-white rounded-xs transition-colors font-bold text-xs"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 <span>Mimara Danış</span>
@@ -194,7 +194,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
         {/* Featured Cover Image */}
         {post.coverImage && (
-          <div className="relative aspect-16/9 rounded-xs overflow-hidden mb-12 shadow-md border border-neutral-200/80 bg-neutral-100">
+          <div className="relative aspect-16/9 rounded-xs overflow-hidden mb-12 border border-line bg-neutral-100">
             <img
               src={post.coverImage}
               alt={post.title}
@@ -204,15 +204,15 @@ export default async function BlogPostDetailPage({ params }: Props) {
         )}
 
         {/* Article Body Content */}
-        <div className="bg-white p-6 sm:p-10 lg:p-12 rounded-xs border border-neutral-200/80 shadow-xs mb-12 space-y-6">
-          <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed text-sm sm:text-base space-y-4 whitespace-pre-line font-light">
+        <div className="bg-white p-6 sm:p-10 lg:p-12 rounded-xs border border-line mb-12 space-y-6">
+          <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed text-sm sm:text-base space-y-4 whitespace-pre-line">
             {post.content}
           </div>
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div className="pt-8 border-t border-neutral-100 flex flex-wrap items-center gap-2">
-              <Tag className="h-3.5 w-3.5 text-neutral-400 mr-1" />
+            <div className="pt-8 border-t border-line flex flex-wrap items-center gap-2">
+              <Tag className="h-3.5 w-3.5 text-neutral-500 mr-1" />
               {post.tags.map((tag, idx) => (
                 <span
                   key={idx}
@@ -226,10 +226,10 @@ export default async function BlogPostDetailPage({ params }: Props) {
         </div>
 
         {/* Footer CTA & Back Navigation */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-white border border-[#C5A880]/30 rounded-xs shadow-xs">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-white border border-wood/30 rounded-xs">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700 hover:text-[#8C6D46] transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700 hover:text-wood-dark transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Tüm Blog Yazılarına Dön</span>
@@ -237,7 +237,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
           <Link
             href="/katalog"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold rounded-xs transition-colors shadow-2xs"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-wood hover:bg-wood-dark text-white text-xs font-bold rounded-xs transition-colors"
           >
             <span>Koleksiyonu Keşfet</span>
             <ChevronRight className="h-4 w-4" />

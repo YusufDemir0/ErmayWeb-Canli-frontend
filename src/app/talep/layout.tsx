@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: 'Sipariş Talebi & Fiş | Ermay Mobilya',
+  title: 'Sipariş Talebi | Ermay Mobilya',
   robots: {
     index: false,
     follow: false,

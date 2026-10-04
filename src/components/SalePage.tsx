@@ -32,12 +32,12 @@ const getDiscountRate = (price: number, originalPrice?: number) => {
 // Modoko Showroom & Workshop atelier badge
 const ShowroomSaleBadge = memo(() => {
   return (
-    <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-3.5 py-1.5 rounded-xs backdrop-blur-xs">
-      <span className="text-xs font-semibold text-neutral-100 uppercase tracking-widest">
-        Modoko Showroom & Atölye:
+    <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-3.5 py-1.5 rounded-xs">
+      <span className="text-xs text-neutral-200">
+        Modoko showroom ve atölye
       </span>
-      <span className="text-xs font-extrabold text-amber-200 uppercase tracking-wide">
-        Doğrudan Üretici Avantajı
+      <span className="text-xs font-semibold text-wood-light">
+        Üretici fiyatı
       </span>
     </div>
   );
@@ -174,16 +174,13 @@ export const SalePage: React.FC<SalePageProps> = ({
   };
 
   return (
-    <div className="w-full bg-neutral-50 min-h-screen">
+    <div className="w-full bg-white min-h-screen">
       {/* SHOWROOM & WORKSHOP CAMPAIGN TICKER */}
-      <div className="bg-gradient-to-r from-brand-terracotta to-brand-terracotta-dark text-white py-4 px-4 shadow-sm border-b border-brand-terracotta-dark">
+      <div className="bg-ink text-white py-4 px-4 border-b-4 border-signal">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="bg-white/20 px-3 py-1 rounded-sm text-[10px] uppercase font-bold tracking-widest">
-              Atölye Seçkisi
-            </span>
-            <h2 className="text-sm md:text-base font-medium tracking-wide">
-              Showroom Teşhir & Atölye Tasarımlarında <strong className="font-extrabold">Özel İmalat Fiyatları</strong>
+            <h2 className="text-sm md:text-base">
+              Showroom teşhir ürünlerinde <strong className="font-semibold">indirimli fiyat</strong>
             </h2>
           </div>
           
@@ -195,45 +192,45 @@ export const SalePage: React.FC<SalePageProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* FILTER SIDEBAR (LEFT) */}
-        <aside className="lg:col-span-1 bg-white p-6 rounded-sm border border-neutral-200/60 shadow-sm h-fit">
-          <div className="flex items-center justify-between border-b border-neutral-100 pb-4 mb-6">
-            <span className="text-sm font-semibold uppercase tracking-wider text-brand-dark flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-brand-camel" />
+        <aside className="lg:col-span-1 bg-white p-6 rounded-xs border border-line h-fit">
+          <div className="flex items-center justify-between border-b border-line pb-4 mb-6">
+            <span className="text-sm font-semibold uppercase tracking-wider text-ink flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4 text-wood" />
               Filtreler
             </span>
             <button 
               onClick={handleResetFilters}
-              className="text-xs text-neutral-400 hover:text-brand-camel underline cursor-pointer"
+              className="text-xs text-neutral-500 hover:text-wood underline cursor-pointer"
             >
               Temizle
             </button>
           </div>
 
           {/* Category Filter */}
-          <div className="mb-6 pb-6 border-b border-neutral-100">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800 mb-3">Kategoriler</h4>
+          <div className="mb-6 pb-6 border-b border-line">
+            <h4 className="text-sm font-semibold text-neutral-800 mb-3">Kategoriler</h4>
             <div className="space-y-2">
               {saleCategories.map((c) => (
-                <label key={c.id} className="flex items-center gap-2.5 text-xs text-neutral-600 hover:text-brand-dark cursor-pointer">
+                <label key={c.id} className="flex items-center gap-2.5 text-xs text-neutral-600 hover:text-ink cursor-pointer">
                   <input
                     type="checkbox"
                     checked={selectedCats.includes(c.id)}
                     onChange={() => handleCategoryCheckboxChange(c.id)}
-                    className="h-4 w-4 border-neutral-300 rounded-sm text-brand-camel focus:ring-brand-camel"
+                    className="h-4 w-4 border-line-strong rounded-xs text-wood focus:ring-wood"
                   />
                   <span>{c.name}</span>
-                  <span className="ml-auto text-[10px] font-mono text-neutral-400">{c.count}</span>
+                  <span className="ml-auto text-xs font-mono text-neutral-500">{c.count}</span>
                 </label>
               ))}
               {saleCategories.length === 0 && (
-                <p className="text-[11px] text-neutral-400">İndirimli ürün bulunan kategori yok.</p>
+                <p className="text-xs text-neutral-500">İndirimli ürün bulunan kategori yok.</p>
               )}
             </div>
           </div>
 
           {/* Price Range Filter */}
-          <div className="mb-6 pb-6 border-b border-neutral-100">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800 mb-3">Fiyat Aralığı (TL)</h4>
+          <div className="mb-6 pb-6 border-b border-line">
+            <h4 className="text-sm font-semibold text-neutral-800 mb-3">Fiyat Aralığı (TL)</h4>
             <form onSubmit={handlePriceFilterSubmit} className="space-y-3">
               <div className="flex gap-2 items-center">
                 <input
@@ -241,20 +238,20 @@ export const SalePage: React.FC<SalePageProps> = ({
                   placeholder="Min"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-neutral-200 p-2 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                  className="w-full text-xs border border-line p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                 />
-                <span className="text-neutral-400">-</span>
+                <span className="text-neutral-500">-</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-neutral-200 p-2 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                  className="w-full text-xs border border-line p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-neutral-100 hover:bg-brand-camel hover:text-white text-neutral-800 text-[10px] uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
+                className="w-full bg-neutral-100 hover:bg-wood hover:text-white text-neutral-800 text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
               >
                 Uygula
               </button>
@@ -262,8 +259,8 @@ export const SalePage: React.FC<SalePageProps> = ({
           </div>
 
           {/* Discount Rate Filter */}
-          <div className="mb-6 pb-6 border-b border-neutral-100">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-800 mb-3">İndirim Oranı</h4>
+          <div className="mb-6 pb-6 border-b border-line">
+            <h4 className="text-sm font-semibold text-neutral-800 mb-3">İndirim Oranı</h4>
             <div className="space-y-2">
               {[
                 { label: 'Tüm İndirimler', value: 0 },
@@ -271,7 +268,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                 { label: '%20 ve Üzeri', value: 20 },
                 { label: '%30 ve Üzeri', value: 30 }
               ].map((rate) => (
-                <label key={rate.value} className="flex items-center gap-2.5 text-xs text-neutral-600 hover:text-brand-dark cursor-pointer">
+                <label key={rate.value} className="flex items-center gap-2.5 text-xs text-neutral-600 hover:text-ink cursor-pointer">
                   <input
                     type="radio"
                     name="discount-rate"
@@ -280,7 +277,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                       setMinDiscount(rate.value);
                       setCurrentPage(1);
                     }}
-                    className="h-4 w-4 text-brand-camel border-neutral-300 focus:ring-brand-camel"
+                    className="h-4 w-4 text-wood border-line-strong focus:ring-wood"
                   />
                   <span>{rate.label}</span>
                 </label>
@@ -299,7 +296,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                   setInStockOnly(!inStockOnly);
                   setCurrentPage(1);
                 }}
-                className="h-4 w-4 text-brand-camel border-neutral-300 rounded-sm focus:ring-brand-camel"
+                className="h-4 w-4 text-wood border-line-strong rounded-xs focus:ring-wood"
               />
             </label>
           </div>
@@ -308,23 +305,23 @@ export const SalePage: React.FC<SalePageProps> = ({
         {/* CATALOG AREA (RIGHT) */}
         <main className="lg:col-span-3">
           {/* Header Controls */}
-          <div className="bg-white p-4 rounded-sm border border-neutral-200/60 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+          <div className="bg-white p-4 rounded-xs border border-line flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
             <div className="text-center sm:text-left">
               <h3 className="text-sm font-semibold text-neutral-800">İndirimli Ürünler</h3>
-              <p className="text-xs text-neutral-400 font-light mt-0.5">{totalItems} kampanya ürünü listeleniyor</p>
+              <p className="text-xs text-neutral-500 mt-0.5">{totalItems} kampanya ürünü listeleniyor</p>
             </div>
 
             <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
               {/* Sorting */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-neutral-400 whitespace-nowrap">Sırala:</span>
+                <span className="text-xs text-neutral-500 whitespace-nowrap">Sırala:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => {
                     setSortBy(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="text-xs border border-neutral-200 p-2 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none bg-white text-neutral-700 cursor-pointer"
+                  className="text-xs border border-line p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white text-neutral-700 cursor-pointer"
                 >
                   <option value="default">Varsayılan</option>
                   <option value="price-asc">Fiyata Göre: Artan</option>
@@ -335,11 +332,11 @@ export const SalePage: React.FC<SalePageProps> = ({
               </div>
 
               {/* View Toggle */}
-              <div className="flex items-center border border-neutral-200 rounded-xs">
+              <div className="flex items-center border border-line rounded-xs">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 transition-colors cursor-pointer ${
-                    viewMode === 'grid' ? 'bg-neutral-100 text-brand-camel' : 'text-neutral-400 hover:text-neutral-700'
+                    viewMode === 'grid' ? 'bg-neutral-100 text-wood' : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                   aria-label="Izgara Görünümü"
                 >
@@ -347,8 +344,8 @@ export const SalePage: React.FC<SalePageProps> = ({
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 border-l border-neutral-200 transition-colors cursor-pointer ${
-                    viewMode === 'list' ? 'bg-neutral-100 text-brand-camel' : 'text-neutral-400 hover:text-neutral-700'
+                  className={`p-2 border-l border-line transition-colors cursor-pointer ${
+                    viewMode === 'list' ? 'bg-neutral-100 text-wood' : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                   aria-label="Liste Görünümü"
                 >
@@ -360,12 +357,12 @@ export const SalePage: React.FC<SalePageProps> = ({
 
           {/* Catalog Listings */}
           {totalItems === 0 ? (
-            <div className="text-center py-20 bg-white border border-neutral-200/60 rounded-sm shadow-xs">
+            <div className="text-center py-20 bg-white border border-line rounded-xs">
               <HelpCircle className="h-12 w-12 text-neutral-300 mx-auto stroke-[1.5] mb-4" />
-              <p className="text-neutral-500 font-light text-sm mb-4">Aradığınız kriterlere uygun indirimli ürün bulunamadı.</p>
+              <p className="text-neutral-500 text-sm mb-4">Aradığınız kriterlere uygun indirimli ürün bulunamadı.</p>
               <button
                 onClick={handleResetFilters}
-                className="bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold tracking-widest uppercase py-3.5 px-8 transition-colors rounded-sm cursor-pointer"
+                className="bg-ink hover:bg-wood text-white text-sm font-semibold py-3.5 px-8 transition-colors rounded-xs cursor-pointer"
               >
                 Filtreleri Temizle
               </button>
@@ -379,23 +376,23 @@ export const SalePage: React.FC<SalePageProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="group relative flex flex-col bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-neutral-300"
+                    className="group relative flex flex-col bg-white border border-line rounded-xs overflow-hidden transition-colors duration-200 hover:border-line-strong"
                   >
                     {/* Image Box */}
-                    <div className="relative aspect-[4/5] bg-neutral-50 overflow-hidden cursor-pointer" onClick={() => openQuickView(product)}>
+                    <div className="relative aspect-[4/5] bg-paper overflow-hidden cursor-pointer" onClick={() => openQuickView(product)}>
                       <OptimizedImage
                         src={product.image || ''}
                         alt={product.name}
                         fill
-                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
+                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.03] will-change-transform"
                       />
                       {/* Floating Badges */}
                       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-                        <span className="text-[9px] tracking-widest font-bold uppercase py-1 px-2.5 bg-brand-terracotta text-white shadow-sm rounded-xs">
-                          %{discount} İndirim
+                        <span className="text-xs font-semibold py-1 px-2 bg-signal text-white rounded-xs tabular-nums-all">
+                          %{discount} indirim
                         </span>
                         {!product.inStock && (
-                          <span className="text-[9px] tracking-widest font-semibold uppercase py-1 px-2.5 bg-neutral-600 text-white shadow-sm rounded-xs">
+                          <span className="text-xs font-medium py-1 px-2 bg-ink text-white rounded-xs">
                             Tükendi
                           </span>
                         )}
@@ -407,8 +404,8 @@ export const SalePage: React.FC<SalePageProps> = ({
                           e.stopPropagation();
                           toggleFavorite(product);
                         }}
-                        className={`absolute top-3 right-3 z-10 p-2.5 rounded-full bg-white/90 backdrop-blur-sm shadow-xs border border-neutral-100 transition-all duration-300 hover:scale-110 cursor-pointer ${
-                          isFav ? 'text-brand-terracotta' : 'text-neutral-500 hover:text-brand-camel'
+                        className={`absolute top-3 right-3 z-10 h-9 w-9 flex items-center justify-center rounded-full bg-white border border-line transition-colors cursor-pointer ${
+                          isFav ? 'text-signal' : 'text-neutral-500 hover:text-wood'
                         }`}
                         aria-label="Favori"
                       >
@@ -416,13 +413,13 @@ export const SalePage: React.FC<SalePageProps> = ({
                       </button>
 
                       {/* Action Overlays */}
-                      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 via-black/20 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex items-center justify-center gap-3">
+                      <div className="absolute inset-x-0 bottom-0 p-3 bg-white border-t border-line translate-y-full group-hover:translate-y-0 group-focus-within:translate-y-0 transition-transform duration-300 ease-out flex items-center justify-center gap-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             openQuickView(product);
                           }}
-                          className="flex items-center gap-1.5 bg-white text-neutral-800 text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all hover:bg-neutral-100 cursor-pointer"
+                          className="flex items-center gap-1.5 border border-line-strong text-ink text-sm font-medium h-10 px-3 rounded-xs transition-colors hover:bg-paper cursor-pointer"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>Detay</span>
@@ -432,10 +429,10 @@ export const SalePage: React.FC<SalePageProps> = ({
                             e.stopPropagation();
                             addToCart(product, 1);
                           }}
-                          className="flex items-center gap-1.5 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 px-4 rounded-xs shadow-md transition-all cursor-pointer bg-brand-camel hover:bg-brand-camel-dark"
+                          className="flex items-center gap-1.5 text-white text-sm font-medium h-10 px-3 rounded-xs transition-colors cursor-pointer bg-ink hover:bg-wood"
                         >
                           <ShoppingBag className="h-3.5 w-3.5" />
-                          <span>Sepete Ekle</span>
+                          <span>Sepete ekle</span>
                         </button>
                       </div>
                     </div>
@@ -443,15 +440,12 @@ export const SalePage: React.FC<SalePageProps> = ({
                     {/* Meta Info */}
                     <div className="p-4 md:p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest mb-1.5 block">
-                          {product.category === 'living-room' && 'Oturma Odası'}
-                          {product.category === 'bedroom' && 'Yatak Odası'}
-                          {product.category === 'dining' && 'Yemek Odası'}
-                          {product.category === 'accessories' && 'Aksesuar'}
+                        <span className="text-xs text-neutral-500 mb-1 block">
+                          {typeof product.category === 'object' && product.category ? product.category.name : ''}
                         </span>
                         <h4 
                           onClick={() => openQuickView(product)}
-                          className="text-neutral-800 text-sm md:text-base font-normal tracking-wide hover:text-brand-camel transition-colors duration-300 line-clamp-1 cursor-pointer mb-2"
+                          className="text-ink text-sm md:text-base font-medium hover:text-wood transition-colors line-clamp-2 cursor-pointer mb-2"
                         >
                           {product.name}
                         </h4>
@@ -460,10 +454,10 @@ export const SalePage: React.FC<SalePageProps> = ({
                       {/* Prices & CTAs */}
                       <div className="mt-2 flex items-end justify-between">
                         <div className="flex flex-col">
-                          <span className="text-xs text-neutral-400 line-through tracking-wider">
+                          <span className="text-xs text-neutral-500 line-through tabular-nums-all">
                             {formatPrice(product.originalPrice!)}
                           </span>
-                          <span className="text-sm md:text-base font-semibold tracking-wider text-brand-terracotta">
+                          <span className="font-mono text-base font-semibold text-signal tabular-nums-all">
                             {formatPrice(product.price)}
                           </span>
                         </div>
@@ -473,7 +467,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                             e.stopPropagation();
                             addToCart(product, 1);
                           }}
-                          className="hidden sm:flex items-center gap-1 border text-[10px] tracking-widest font-semibold uppercase py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-neutral-200 text-neutral-700 hover:border-brand-camel hover:bg-brand-camel hover:text-white"
+                          className="hidden sm:flex items-center gap-1 border text-sm font-semibold py-2 px-3.5 transition-all duration-300 rounded-xs cursor-pointer border-line text-neutral-700 hover:border-wood hover:bg-wood hover:text-white"
                         >
                           <ShoppingBag className="h-3 w-3" />
                           <span>Ekle</span>
@@ -493,7 +487,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="group relative flex flex-col md:flex-row bg-white border border-neutral-200/60 rounded-sm overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-neutral-300"
+                    className="group relative flex flex-col md:flex-row bg-white border border-line rounded-xs overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-line-strong"
                   >
                     {/* Left Column: Image Box */}
                     <div className="relative w-full md:w-64 xl:w-72 aspect-[4/3] md:aspect-auto bg-neutral-50 flex-shrink-0 cursor-pointer overflow-hidden min-h-[200px]" onClick={() => openQuickView(product)}>
@@ -505,11 +499,11 @@ export const SalePage: React.FC<SalePageProps> = ({
                       />
                       {/* Floating Badges */}
                       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-                        <span className="text-[9px] tracking-widest font-bold uppercase py-1 px-2.5 bg-brand-terracotta text-white shadow-sm rounded-xs">
+                        <span className="text-xs font-semibold py-1 px-2 bg-signal text-white rounded-xs">
                           %{discount} İndirim
                         </span>
                         {!product.inStock && (
-                          <span className="text-[9px] tracking-widest font-semibold uppercase py-1 px-2.5 bg-neutral-600 text-white shadow-sm rounded-xs">
+                          <span className="text-xs font-medium py-1 px-2 bg-ink text-white rounded-xs">
                             Tükendi
                           </span>
                         )}
@@ -521,8 +515,8 @@ export const SalePage: React.FC<SalePageProps> = ({
                           e.stopPropagation();
                           toggleFavorite(product);
                         }}
-                        className={`absolute top-3 right-3 z-10 p-2.5 rounded-full bg-white/90 backdrop-blur-sm shadow-xs border border-neutral-100 transition-all duration-300 hover:scale-110 cursor-pointer ${
-                          isFav ? 'text-brand-terracotta' : 'text-neutral-500 hover:text-brand-camel'
+                        className={`absolute top-3 right-3 z-10 p-2.5 rounded-full bg-white/90 border border-line transition-all duration-300 cursor-pointer ${
+                          isFav ? 'text-signal' : 'text-neutral-500 hover:text-wood'
                         }`}
                         aria-label="Favori"
                       >
@@ -536,7 +530,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                         {/* Header Row */}
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div>
-                            <span className="text-[9px] font-semibold text-neutral-400 uppercase tracking-widest block mb-1">
+                            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider block mb-1">
                               {product.category === 'living-room' && 'Oturma Odası'}
                               {product.category === 'bedroom' && 'Yatak Odası'}
                               {product.category === 'dining' && 'Yemek Odası'}
@@ -544,7 +538,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                             </span>
                             <h4 
                               onClick={() => openQuickView(product)}
-                              className="text-neutral-800 text-base md:text-lg font-normal tracking-wide hover:text-brand-camel transition-colors duration-300 cursor-pointer"
+                              className="text-neutral-800 text-base md:text-lg font-normal tracking-wide hover:text-wood transition-colors duration-300 cursor-pointer"
                             >
                               {product.name}
                             </h4>
@@ -552,34 +546,34 @@ export const SalePage: React.FC<SalePageProps> = ({
 
                           {/* Craftsmanship Badge */}
                           <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className="text-[10.5px] font-semibold text-brand-camel bg-brand-camel/10 px-2 py-0.5 rounded-xs">
+                            <span className="text-xs font-semibold text-wood bg-wood/10 px-2 py-0.5 rounded-xs">
                               Fabrika Seri İmalatı
                             </span>
                           </div>
                         </div>
 
                         {/* Description Text */}
-                        <p className="text-xs text-neutral-500 font-light leading-relaxed mb-4 max-w-2xl">
+                        <p className="text-xs text-neutral-500 leading-relaxed mb-4 max-w-2xl">
                           {product.description}
                         </p>
 
                         {/* Material Specs */}
-                        <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-neutral-400 font-light mb-4">
+                        <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-neutral-500 mb-4">
                           <span><strong>Malzeme:</strong> {product.material}</span>
                           <span><strong>Boyutlar:</strong> {product.dimensions}</span>
                         </div>
                       </div>
 
                       {/* Footer Actions / Price row */}
-                      <div className="border-t border-neutral-100 pt-4 flex items-center justify-between gap-4">
+                      <div className="border-t border-line pt-4 flex items-center justify-between gap-4">
                         <div className="flex items-end gap-3">
-                          <span className="text-xs text-neutral-400 line-through tracking-wider">
+                          <span className="text-xs text-neutral-500 line-through tabular-nums-all">
                             {formatPrice(product.originalPrice!)}
                           </span>
-                          <span className="text-lg font-bold tracking-wider text-brand-terracotta">
+                          <span className="text-lg font-bold tracking-wider text-signal">
                             {formatPrice(product.price)}
                           </span>
-                          <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-sm font-semibold">
+                          <span className="text-xs text-ok bg-ok-soft px-2 py-0.5 rounded-xs font-semibold">
                             Tasarruf: {formatPrice(product.originalPrice! - product.price)}
                           </span>
                         </div>
@@ -587,7 +581,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => openQuickView(product)}
-                            className="flex items-center gap-1.5 border border-neutral-200 text-neutral-700 hover:text-brand-dark hover:border-brand-dark text-xs tracking-wider uppercase font-semibold py-2.5 px-4 transition-all duration-300 rounded-xs cursor-pointer"
+                            className="flex items-center gap-1.5 border border-line text-neutral-700 hover:text-ink hover:border-ink text-sm font-semibold py-2.5 px-4 transition-all duration-300 rounded-xs cursor-pointer"
                           >
                             <Eye className="h-3.5 w-3.5" />
                             <span>Hızlı Bakış</span>
@@ -597,9 +591,9 @@ export const SalePage: React.FC<SalePageProps> = ({
                               if (product.inStock) addToCart(product, 1);
                             }}
                             disabled={!product.inStock}
-                            className={`flex items-center gap-1.5 text-white text-xs tracking-wider uppercase font-semibold py-2.5 px-5 transition-all duration-300 rounded-xs shadow-xs cursor-pointer ${
+                            className={`flex items-center gap-1.5 text-white text-sm font-semibold py-2.5 px-5 transition-all duration-300 rounded-xs cursor-pointer ${
                               product.inStock 
-                                ? 'bg-brand-dark hover:bg-brand-camel' 
+                                ? 'bg-ink hover:bg-wood' 
                                 : 'bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none'
                             }`}
                           >
@@ -621,10 +615,10 @@ export const SalePage: React.FC<SalePageProps> = ({
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className={`p-2 rounded-xs border border-neutral-200 flex items-center justify-center transition-all ${
+                className={`p-2 rounded-xs border border-line flex items-center justify-center transition-all ${
                   currentPage === 1 
                     ? 'text-neutral-300 bg-white cursor-not-allowed' 
-                    : 'text-neutral-600 hover:bg-neutral-100 bg-white hover:text-brand-dark cursor-pointer'
+                    : 'text-neutral-600 hover:bg-neutral-100 bg-white hover:text-ink cursor-pointer'
                 }`}
                 aria-label="Önceki Sayfa"
               >
@@ -640,8 +634,8 @@ export const SalePage: React.FC<SalePageProps> = ({
                     onClick={() => setCurrentPage(pageNum)}
                     className={`h-9 w-9 rounded-xs border text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
                       isCurrent 
-                        ? 'bg-brand-camel border-brand-camel text-white shadow-xs' 
-                        : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 hover:text-brand-dark'
+                        ? 'bg-wood border-wood text-white' 
+                        : 'border-line bg-white text-neutral-600 hover:bg-neutral-100 hover:text-ink'
                     }`}
                   >
                     {pageNum}
@@ -652,10 +646,10 @@ export const SalePage: React.FC<SalePageProps> = ({
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className={`p-2 rounded-xs border border-neutral-200 flex items-center justify-center transition-all ${
+                className={`p-2 rounded-xs border border-line flex items-center justify-center transition-all ${
                   currentPage === totalPages 
                     ? 'text-neutral-300 bg-white cursor-not-allowed' 
-                    : 'text-neutral-600 hover:bg-neutral-100 bg-white hover:text-brand-dark cursor-pointer'
+                    : 'text-neutral-600 hover:bg-neutral-100 bg-white hover:text-ink cursor-pointer'
                 }`}
                 aria-label="Sonraki Sayfa"
               >

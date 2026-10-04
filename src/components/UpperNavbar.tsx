@@ -3,30 +3,31 @@
 import React from 'react';
 import { useCMSStore } from '../stores/useCMSStore';
 
+/** CMS duyuruları: tek, sabit satır. Kayan şerit ve yanıp sönen noktalar yok; sığmayan maddeler küçük ekranda gizlenir. */
 export const UpperNavbar: React.FC = () => {
   const tickerItems = useCMSStore((state) => state.tickerItems);
 
   if (!tickerItems || tickerItems.length === 0) return null;
 
-  // CMS metinleri bazen kendi madde işaretiyle ("• ...") girilmiş; bileşen zaten nokta çizdiği için çift görünüyordu
+  // CMS metinleri bazen kendi madde işaretiyle ("• ...") girilmiş; ayırıcıyı bileşen çiziyor
   const cleanItems = tickerItems
     .map((item) => String(item).replace(/^[\s•·●▪\-–—]+/, '').trim())
     .filter(Boolean);
   if (cleanItems.length === 0) return null;
 
-  // Duplicate items array for smooth infinite marquee effect
-  const repeatedItems = [...cleanItems, ...cleanItems, ...cleanItems, ...cleanItems];
-
   return (
-    <div className="bg-gradient-to-r from-brand-camel via-brand-camel-dark to-brand-camel text-white text-xs font-semibold py-2 overflow-hidden shadow-xs select-none">
-      <div className="flex whitespace-nowrap animate-marquee">
-        {repeatedItems.map((item, idx) => (
-          <span key={idx} className="mx-6 tracking-wider uppercase flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
-            {item}
-          </span>
+    <div className="bg-ink text-neutral-200 text-xs py-2 px-4 select-none print:hidden">
+      <ul className="max-w-7xl mx-auto flex items-center justify-center gap-x-6 overflow-hidden whitespace-nowrap">
+        {cleanItems.map((item, idx) => (
+          <li
+            key={idx}
+            className={`items-center gap-6 ${idx === 0 ? 'flex' : idx === 1 ? 'hidden md:flex' : 'hidden xl:flex'}`}
+          >
+            {idx > 0 && <span className="text-neutral-500" aria-hidden="true">/</span>}
+            <span>{item}</span>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

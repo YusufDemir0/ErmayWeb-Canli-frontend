@@ -135,7 +135,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       {/* Top Header Strip */}
       <div className="bg-white p-6 rounded-sm border border-neutral-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A880] block mb-1">
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-wood block mb-1">
             Lokasyon & Satış Ağları
           </span>
           <h2 className="text-xl font-bold uppercase tracking-tight text-neutral-900">
@@ -145,7 +145,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-xs transition-colors cursor-pointer shadow-xs"
+          className="flex items-center gap-2 bg-wood hover:bg-wood-dark text-white text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-xs transition-colors cursor-pointer shadow-xs"
         >
           <Plus className="h-4 w-4" />
           <span>Yeni Mağaza / Bayi Ekle</span>
@@ -161,7 +161,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
             placeholder="İl, ilçe veya mağaza adı ile ara..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-neutral-50/50"
+            className="w-full pl-10 pr-4 py-2 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-neutral-50/50"
           />
         </div>
       </div>
@@ -176,7 +176,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
           filteredStores.map((store) => (
             <div
               key={store.id}
-              className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden flex flex-col justify-between hover:border-[#C5A880]/50 transition-colors"
+              className="bg-white rounded-sm border border-neutral-200 shadow-xs overflow-hidden flex flex-col justify-between hover:border-wood/50 transition-colors"
             >
               <div>
                 {/* Store Image */}
@@ -193,7 +193,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                       <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Görsel Yok</span>
                     </div>
                   )}
-                  <span className="absolute top-2.5 left-2.5 bg-[#FAF8F5] text-neutral-900 font-bold text-[9px] uppercase px-2.5 py-1 rounded-xs border border-[#EAE3D2] shadow-2xs">
+                  <span className="absolute top-2.5 left-2.5 bg-paper text-neutral-900 font-bold text-[9px] uppercase px-2.5 py-1 rounded-xs border border-line shadow-2xs">
                     {store.city} {store.district ? `/ ${store.district}` : ''}
                   </span>
                   <span className={`absolute top-2.5 right-2.5 text-[9px] font-bold uppercase px-2 py-0.5 rounded-xs ${
@@ -211,12 +211,12 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
                   <div className="space-y-2 text-xs text-neutral-600">
                     <div className="flex items-start gap-2">
-                      <MapPin className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
+                      <MapPin className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
                       <span className="leading-snug">{store.address}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Phone className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0" />
+                      <Phone className="h-3.5 w-3.5 text-wood flex-shrink-0" />
                       <a href={`tel:${store.phone}`} className="hover:text-neutral-900 font-mono font-medium">
                         {store.phone}
                       </a>
@@ -224,14 +224,14 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
                     {store.email && (
                       <div className="flex items-center gap-2">
-                        <Mail className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0" />
+                        <Mail className="h-3.5 w-3.5 text-wood flex-shrink-0" />
                         <span className="font-light truncate">{store.email}</span>
                       </div>
                     )}
 
                     {store.hours && (
                       <div className="flex items-start gap-2 pt-1 border-t border-neutral-100 text-[11px] text-neutral-500">
-                        <Clock className="h-3.5 w-3.5 text-[#C5A880] flex-shrink-0 mt-0.5" />
+                        <Clock className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
                         <span>{store.hours}</span>
                       </div>
                     )}
@@ -246,7 +246,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     href={store.mapUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#C5A880] hover:text-[#8A4B20]"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-wood hover:text-wood-dark"
                   >
                     <span>Haritada Gör</span>
                     <ExternalLink className="h-3 w-3" />
@@ -256,7 +256,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleEditClick(store)}
-                    className="p-1.5 text-neutral-600 hover:text-[#C5A880] hover:bg-neutral-100 rounded-xs transition-colors cursor-pointer"
+                    className="p-1.5 text-neutral-600 hover:text-wood hover:bg-neutral-100 rounded-xs transition-colors cursor-pointer"
                     title="Düzenle"
                   >
                     <Edit3 className="h-4 w-4" />
@@ -286,9 +286,9 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
           <div className="relative w-full max-w-2xl bg-white rounded-sm shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
             
             {/* Modal Header */}
-            <div className="bg-[#FAF8F5] px-6 py-4 border-b border-[#EAE3D2] flex items-center justify-between">
+            <div className="bg-paper px-6 py-4 border-b border-line flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C5A880] block">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-wood block">
                   {editingStoreId ? 'Mağaza Revizyonu' : 'Yeni Bayi Kaydı'}
                 </span>
                 <h3 className="text-base font-bold text-neutral-900 uppercase">
@@ -317,7 +317,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Örn: Modoko Fabrika Satış Mağazası"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
 
@@ -331,7 +331,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     placeholder="Örn: İstanbul"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
               </div>
@@ -346,7 +346,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                     placeholder="Örn: Ümraniye"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
 
@@ -360,7 +360,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="0532 419 41 51"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none font-mono"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none font-mono"
                   />
                 </div>
               </div>
@@ -375,7 +375,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42..."
-                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none leading-relaxed"
+                  className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none leading-relaxed"
                 />
               </div>
 
@@ -389,7 +389,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="modoko@ermaymobilya.com"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
 
@@ -402,7 +402,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     value={formData.hours}
                     onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                     placeholder="09:00 - 20:00"
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
               </div>
@@ -428,7 +428,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                       className="flex-1 text-xs border border-neutral-300 p-2 rounded-xs"
                     />
                   </div>
-                  {uploading && <span className="text-[10px] text-[#C5A880]">Görsel yükleniyor...</span>}
+                  {uploading && <span className="text-[10px] text-wood">Görsel yükleniyor...</span>}
                 </div>
 
                 <div>
@@ -440,7 +440,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     placeholder="https://maps.google.com/..."
                     value={formData.mapUrl}
                     onChange={(e) => setFormData({ ...formData, mapUrl: e.target.value })}
-                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none"
+                    className="w-full text-xs border border-neutral-300 p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
 
@@ -450,7 +450,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                       type="checkbox"
                       checked={formData.isActive}
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="h-4 w-4 text-[#C5A880] rounded-xs border-neutral-300 focus:ring-[#C5A880]"
+                      className="h-4 w-4 text-wood rounded-xs border-neutral-300 focus:ring-wood"
                     />
                     <span className="text-xs font-bold text-neutral-800">Mağaza Aktif ve Müşteri Ziyaretine Açık</span>
                   </label>
@@ -469,7 +469,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
                 <button
                   type="submit"
-                  className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-3 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
+                  className="bg-wood hover:bg-wood-dark text-white text-xs font-bold uppercase tracking-wider py-3 px-8 rounded-xs transition-colors cursor-pointer shadow-xs"
                 >
                   {editingStoreId ? 'Değişiklikleri Güncelle' : 'Mağazayı Kaydet'}
                 </button>

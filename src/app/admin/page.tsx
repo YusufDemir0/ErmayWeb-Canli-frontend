@@ -208,7 +208,7 @@ export default function AdminPage() {
       <div className="min-h-[85vh] bg-neutral-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white border border-neutral-200 shadow-md rounded-sm p-8 space-y-6">
           <div className="text-center space-y-2">
-            <div className="inline-flex p-3 bg-brand-camel/10 text-brand-camel rounded-full mb-2">
+            <div className="inline-flex p-3 bg-wood/10 text-wood rounded-full mb-2">
               <Lock className="h-6 w-6" />
             </div>
             <h1 className="text-xl font-bold tracking-wide uppercase text-neutral-900">
@@ -238,7 +238,7 @@ export default function AdminPage() {
                   value={loginUser}
                   onChange={(e) => setLoginUser(e.target.value)}
                   placeholder="admin@ermaymobilya.com"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                 />
                 <User className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
               </div>
@@ -255,7 +255,7 @@ export default function AdminPage() {
                   value={loginPass}
                   onChange={(e) => setLoginPass(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-brand-camel focus:outline-none"
+                  className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                 />
                 <KeyRound className="absolute left-3 top-3 h-3.5 w-3.5 text-neutral-400" />
               </div>
@@ -263,7 +263,7 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              className="w-full bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold uppercase tracking-widest py-3.5 rounded-xs transition-colors cursor-pointer"
+              className="w-full bg-ink hover:bg-wood text-white text-xs font-semibold uppercase tracking-widest py-3.5 rounded-xs transition-colors cursor-pointer"
             >
               Güvenli Giriş Yap
             </button>
@@ -272,7 +272,7 @@ export default function AdminPage() {
           <div className="pt-4 border-t border-neutral-100 text-center">
             <Link
               href="/"
-              className="text-xs text-neutral-500 hover:text-brand-camel transition-colors"
+              className="text-xs text-neutral-500 hover:text-wood transition-colors"
             >
               ← Ana Sayfaya Dön
             </Link>

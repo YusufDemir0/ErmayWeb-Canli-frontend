@@ -4,27 +4,12 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { 
-  SlidersHorizontal, Star, ShoppingBag, Eye, Heart, 
   ChevronRight, X, Check, Filter, RotateCcw 
 } from 'lucide-react';
-import type { Product, ProductImages } from '../types';
+import type { Product } from '../types';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useUIStore } from '../stores/useUIStore';
-import { useCartStore } from '../stores/useCartStore';
-import { useFavoritesStore } from '../stores/useFavoritesStore';
-import { OptimizedImage } from './OptimizedImage';
-import { useWhatsappNumber } from '../lib/whatsapp';
-
-// Module-level cached price formatter
-const categoryCurrencyFormatter = new Intl.NumberFormat('tr-TR', {
-  style: 'currency',
-  currency: 'TRY',
-  maximumFractionDigits: 0
-});
-
-const formatPrice = (price: number): string => {
-  return categoryCurrencyFormatter.format(price).replace('TRY', 'TL');
-};
+import ProductCard from './ProductCard';
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -38,7 +23,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   initialProducts = [],
   initialCategoryName,
 }) => {
-  const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -47,10 +31,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   const firebaseProducts = useCMSStore((state) => state.products);
   const firebaseCategories = useCMSStore((state) => state.categories);
   const allProducts = firebaseProducts.length > 0 ? firebaseProducts : initialProducts;
-
-  const isFavorite = useFavoritesStore((state) => state.isFavorite);
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
-  const addToCart = useCartStore((state) => state.addToCart);
 
   // --- URL-DRIVEN FILTER STATE ---
   const urlSearch = searchParams ? searchParams.get('search') : null;
@@ -343,16 +323,6 @@ const MATERIAL_GROUPS = [
     router.push(basePath, { scroll: false });
   };
 
-  const getProductImage = (product: Product): string => {
-    if (product.images && typeof product.images === 'object' && 'main' in product.images) {
-      return (product.images as ProductImages).main;
-    }
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images[0];
-    }
-    return product.image || '';
-  };
-
   // True ONLY when actual filters are applied (Category is the route, never counted as a filter)
   const hasActiveFilters = 
     appliedMinPrice !== '' || 
@@ -364,19 +334,19 @@ const MATERIAL_GROUPS = [
     Boolean(effectiveSearch);
 
   return (
-    <div className="w-full bg-[#FBF9F5] min-h-screen text-neutral-800">
+    <div className="w-full bg-paper min-h-screen text-neutral-800">
       
       {/* Breadcrumbs & Header */}
-      <div className="bg-white border-b border-[#E5DEC9] py-4">
+      <div className="bg-white border-b border-line-strong py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="text-xs text-neutral-500 flex items-center gap-2 mb-1.5">
-            <Link href="/anasayfa" className="hover:text-[#C5A880] transition-colors">Ana Sayfa</Link>
+            <Link href="/anasayfa" className="hover:text-wood transition-colors">Ana Sayfa</Link>
             <span>/</span>
             <span className="text-neutral-800 font-semibold">{categoryName}</span>
           </nav>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-neutral-900 uppercase">
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-neutral-900">
                 {categoryName}
               </h1>
               <p className="text-xs text-neutral-500 mt-0.5">Doğrudan Fabrika Satış • Kendi Üretimimiz Standart Seri Ofis Mobilyaları</p>
@@ -385,8 +355,8 @@ const MATERIAL_GROUPS = [
 
           {/* Hiyerarşik Alt Kategori Çipleri (Varsa) */}
           {currentSubcategories.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-neutral-100 mt-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mr-1">
+            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-line mt-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 mr-1">
                 Alt Kategoriler:
               </span>
               {currentSubcategories.map((sub) => {
@@ -397,8 +367,8 @@ const MATERIAL_GROUPS = [
                     href={`/kategori/${sub.slug}`}
                     className={`px-3 py-1 text-xs rounded-full font-semibold transition-all ${
                       isSubActive
-                        ? 'bg-[#C5A880] text-white shadow-2xs'
-                        : 'bg-neutral-100 hover:bg-[#FAF8F5] text-neutral-700 hover:text-[#C5A880] border border-neutral-200/80'
+                        ? 'bg-wood text-white'
+                        : 'bg-neutral-100 hover:bg-paper text-neutral-700 hover:text-wood border border-line'
                     }`}
                   >
                     ↳ {sub.name}
@@ -414,17 +384,17 @@ const MATERIAL_GROUPS = [
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* DESKTOP SIDEBAR FILTER PANEL */}
-        <aside className="hidden lg:block lg:col-span-1 bg-white p-5 rounded-2xl border border-[#E5DEC9] shadow-xs space-y-6 h-fit">
+        <aside className="hidden lg:block lg:col-span-1 bg-white p-5 rounded-xs border border-line-strong space-y-6 h-fit">
           
-          <div className="flex items-center justify-between border-b border-[#E5DEC9] pb-4">
+          <div className="flex items-center justify-between border-b border-line-strong pb-4">
             <span className="text-sm font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
-              <Filter className="h-4 w-4 text-[#C5A880]" />
+              <Filter className="h-4 w-4 text-wood" />
               Fabrika Filtreleri
             </span>
             {hasActiveFilters && (
               <button 
                 onClick={handleResetFilters}
-                className="text-xs text-[#C5A880] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs text-wood font-semibold hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <RotateCcw className="h-3 w-3" />
                 <span>Filtreleri Temizle</span>
@@ -433,8 +403,8 @@ const MATERIAL_GROUPS = [
           </div>
 
           {/* 1. Category Navigation (URL-Based Navigation, NOT a local filter) */}
-          <div className="border-b border-[#E5DEC9] pb-5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900 mb-3">
+          <div className="border-b border-line-strong pb-5">
+            <h3 className="text-xs font-bold text-neutral-900 mb-3">
               Kategoriler
             </h3>
             <div className="space-y-1.5 text-xs">
@@ -442,8 +412,8 @@ const MATERIAL_GROUPS = [
                 href="/kategori"
                 className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
                   categorySlug === 'hepsi' || categorySlug === 'all'
-                    ? 'bg-[#C5A880] text-white font-bold'
-                    : 'text-neutral-700 hover:bg-[#FBF9F5]'
+                    ? 'bg-wood text-white font-bold'
+                    : 'text-neutral-700 hover:bg-paper'
                 }`}
               >
                 <span>Tüm Kategoriler</span>
@@ -460,10 +430,10 @@ const MATERIAL_GROUPS = [
                       href={`/kategori/${rootCat.slug}`}
                       className={`w-full text-left py-1.5 px-2.5 rounded-xs transition-colors flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? 'bg-[#C5A880] text-white font-bold'
+                          ? 'bg-wood text-white font-bold'
                           : hasSelectedChild
-                          ? 'text-[#C5A880] font-semibold bg-[#FAF8F5]'
-                          : 'text-neutral-700 hover:bg-[#FBF9F5]'
+                          ? 'text-wood font-semibold bg-paper'
+                          : 'text-neutral-700 hover:bg-paper'
                       }`}
                     >
                       <span>{rootCat.name}</span>
@@ -471,17 +441,17 @@ const MATERIAL_GROUPS = [
                     </Link>
 
                     {children.length > 0 && (
-                      <div className="pl-4 space-y-0.5 border-l border-[#E5DEC9] ml-2 py-0.5">
+                      <div className="pl-4 space-y-0.5 border-l border-line-strong ml-2 py-0.5">
                         {children.map((subCat) => {
                           const isSubSelected = categorySlug === subCat.slug || categorySlug === subCat.id;
                           return (
                             <Link
                               key={subCat.id}
                               href={`/kategori/${subCat.slug}`}
-                              className={`w-full text-left py-1 px-2 rounded-xs transition-colors flex items-center justify-between text-[11px] cursor-pointer ${
+                              className={`w-full text-left py-1 px-2 rounded-xs transition-colors flex items-center justify-between text-xs cursor-pointer ${
                                 isSubSelected
-                                  ? 'bg-[#C5A880] text-white font-bold'
-                                  : 'text-neutral-600 hover:text-[#C5A880] hover:bg-[#FAF8F5]'
+                                  ? 'bg-wood text-white font-bold'
+                                  : 'text-neutral-600 hover:text-wood hover:bg-paper'
                               }`}
                             >
                               <span>↳ {subCat.name}</span>
@@ -498,15 +468,15 @@ const MATERIAL_GROUPS = [
           </div>
 
           {/* 2. Color Filter (URL Based) */}
-          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+          <div className="border-b border-line-strong pb-5 space-y-2.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              <h3 className="text-xs font-bold text-neutral-900">
                 Renk Seçenekleri
               </h3>
               {selectedColors.length > 0 && (
                 <button 
                   onClick={() => updateFilters({ color: null })} 
-                  className="text-[10px] text-amber-700 hover:underline cursor-pointer"
+                  className="text-xs text-wood-dark hover:underline cursor-pointer"
                 >
                   Temizle
                 </button>
@@ -517,15 +487,15 @@ const MATERIAL_GROUPS = [
                 const isChecked = selectedColors.some((sc) => sc.toLowerCase() === col.toLowerCase());
                 return (
                   <label key={col} className={`flex items-center gap-2 p-1.5 rounded border cursor-pointer transition-all ${
-                    isChecked ? 'border-amber-700 bg-amber-50/50 font-bold text-neutral-900' : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
+                    isChecked ? 'border-line bg-paper font-bold text-neutral-900' : 'border-line hover:border-line-strong text-neutral-700'
                   }`}>
                     <input
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleColor(col)}
-                      className="h-3.5 w-3.5 accent-[#C5A880] rounded-xs cursor-pointer"
+                      className="h-3.5 w-3.5 accent-wood rounded-xs cursor-pointer"
                     />
-                    <span className="text-[11px] truncate">{col}</span>
+                    <span className="text-xs truncate">{col}</span>
                   </label>
                 );
               })}
@@ -533,15 +503,15 @@ const MATERIAL_GROUPS = [
           </div>
 
           {/* 3. Width Filter (URL Based) */}
-          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+          <div className="border-b border-line-strong pb-5 space-y-2.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              <h3 className="text-xs font-bold text-neutral-900">
                 Genişlik Ölçüsü
               </h3>
               {selectedWidthRange !== 'all' && (
                 <button 
                   onClick={() => updateFilters({ width: null })} 
-                  className="text-[10px] text-amber-700 hover:underline cursor-pointer"
+                  className="text-xs text-wood-dark hover:underline cursor-pointer"
                 >
                   Temizle
                 </button>
@@ -558,20 +528,20 @@ const MATERIAL_GROUPS = [
                   key={opt.id}
                   onClick={() => updateFilters({ width: opt.id === 'all' ? null : opt.id })}
                   className={`w-full text-left py-1.5 px-2 rounded-xs flex items-center justify-between transition-colors cursor-pointer ${
-                    selectedWidthRange === opt.id ? 'bg-[#FBF9F5] border border-[#C5A880] font-bold text-[#C5A880]' : 'hover:bg-[#FBF9F5] text-neutral-700'
+                    selectedWidthRange === opt.id ? 'bg-paper border border-wood font-bold text-wood' : 'hover:bg-paper text-neutral-700'
                   }`}
                 >
                   <span>{opt.label}</span>
-                  {selectedWidthRange === opt.id && <Check className="h-3.5 w-3.5 text-[#C5A880]" />}
+                  {selectedWidthRange === opt.id && <Check className="h-3.5 w-3.5 text-wood" />}
                 </button>
               ))}
             </div>
           </div>
 
           {/* 4. Price Range Filter (URL Based) */}
-          <div className="border-b border-[#E5DEC9] pb-5 space-y-3">
+          <div className="border-b border-line-strong pb-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+              <h3 className="text-xs font-bold text-neutral-900">
                 Fabrika Fiyat Aralığı (TL)
               </h3>
               {(appliedMinPrice !== '' || appliedMaxPrice !== '') && (
@@ -581,7 +551,7 @@ const MATERIAL_GROUPS = [
                     setMaxPriceInput('');
                     updateFilters({ minPrice: null, maxPrice: null });
                   }} 
-                  className="text-[10px] text-amber-700 hover:underline cursor-pointer"
+                  className="text-xs text-wood-dark hover:underline cursor-pointer"
                 >
                   Temizle
                 </button>
@@ -589,25 +559,25 @@ const MATERIAL_GROUPS = [
             </div>
             
             {/* Quick Price Range Pills */}
-            <div className="flex flex-wrap gap-1.5 text-[10px]">
+            <div className="flex flex-wrap gap-1.5 text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickPrice('', 15000)}
-                className="px-2.5 py-1 rounded-xs bg-[#FBF9F5] border border-[#E5DEC9] text-neutral-700 hover:border-[#C5A880] cursor-pointer"
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
               >
                 0 - 15.000 TL
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickPrice(15000, 35000)}
-                className="px-2.5 py-1 rounded-xs bg-[#FBF9F5] border border-[#E5DEC9] text-neutral-700 hover:border-[#C5A880] cursor-pointer"
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
               >
                 15.000 - 35.000 TL
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickPrice(35000, '')}
-                className="px-2.5 py-1 rounded-xs bg-[#FBF9F5] border border-[#E5DEC9] text-neutral-700 hover:border-[#C5A880] cursor-pointer"
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
               >
                 35.000 TL +
               </button>
@@ -620,20 +590,20 @@ const MATERIAL_GROUPS = [
                   placeholder="En az"
                   value={minPriceInput}
                   onChange={(e) => setMinPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-[#E5DEC9] p-2 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-[#FBF9F5]"
+                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
                 />
-                <span className="text-neutral-400">-</span>
+                <span className="text-neutral-500">-</span>
                 <input
                   type="number"
                   placeholder="En çok"
                   value={maxPriceInput}
                   onChange={(e) => setMaxPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-[#E5DEC9] p-2 rounded-xs focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-[#FBF9F5]"
+                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
+                className="w-full bg-wood hover:bg-wood-dark text-white text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
               >
                 Fiyat Uygula
               </button>
@@ -641,15 +611,15 @@ const MATERIAL_GROUPS = [
           </div>
 
           {/* 5. Material Checkboxes (URL Based) */}
-          <div className="border-b border-[#E5DEC9] pb-5 space-y-2.5">
+          <div className="border-b border-line-strong pb-5 space-y-2.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                Malzeme & Gövde
+              <h3 className="text-xs font-bold text-neutral-900">
+                Malzeme
               </h3>
               {selectedMaterials.length > 0 && (
                 <button 
                   onClick={() => updateFilters({ material: null })} 
-                  className="text-[10px] text-amber-700 hover:underline cursor-pointer"
+                  className="text-xs text-wood-dark hover:underline cursor-pointer"
                 >
                   Temizle
                 </button>
@@ -664,7 +634,7 @@ const MATERIAL_GROUPS = [
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMaterial(mat)}
-                      className="h-4 w-4 accent-[#C5A880] rounded-xs cursor-pointer"
+                      className="h-4 w-4 accent-wood rounded-xs cursor-pointer"
                     />
                     <span>{mat}</span>
                   </label>
@@ -681,7 +651,7 @@ const MATERIAL_GROUPS = [
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={() => updateFilters({ stock: !inStockOnly ? 'true' : null })}
-                className="h-4 w-4 accent-[#C5A880] rounded-xs cursor-pointer"
+                className="h-4 w-4 accent-wood rounded-xs cursor-pointer"
               />
             </label>
           </div>
@@ -694,19 +664,19 @@ const MATERIAL_GROUPS = [
         <main className="col-span-1 lg:col-span-3 space-y-6">
           
           {/* Mobile Filter & Quick Sort Bar */}
-          <div className="lg:hidden flex items-center justify-between gap-2.5 bg-white p-3 rounded-xl border border-[#E5DEC9] shadow-xs">
+          <div className="lg:hidden flex items-center justify-between gap-2.5 bg-white p-3 rounded-xs border border-line-strong">
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 bg-[#FAF8F5] border border-[#E5DEC9] rounded-lg text-xs font-bold text-neutral-800 hover:bg-[#F0EDE6] transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 bg-paper border border-line-strong rounded-xs text-xs font-bold text-neutral-800 hover:bg-paper transition-colors cursor-pointer"
             >
-              <Filter className="h-4 w-4 text-[#C5A880]" />
+              <Filter className="h-4 w-4 text-wood" />
               <span>Filtrele {hasActiveFilters ? `(Aktif)` : ''}</span>
             </button>
             <div className="flex-1">
               <select
                 value={sortBy}
                 onChange={(e) => updateFilters({ sort: e.target.value === 'default' ? null : e.target.value })}
-                className="w-full text-xs border border-[#E5DEC9] py-2 px-2 rounded-lg bg-white font-semibold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#C5A880] cursor-pointer"
+                className="w-full text-xs border border-line-strong py-2 px-2 rounded-xs bg-white font-semibold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-wood cursor-pointer"
               >
                 <option value="default">Önerilen Sıralama</option>
                 <option value="price-asc">Fiyat: Artan</option>
@@ -722,11 +692,11 @@ const MATERIAL_GROUPS = [
           {isMobileFilterOpen && (
             <div className="fixed inset-0 z-50 flex lg:hidden">
               <div 
-                className="fixed inset-0 bg-neutral-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+                className="fixed inset-0 bg-neutral-950/60 transition-opacity animate-fade-in"
                 onClick={() => setIsMobileFilterOpen(false)}
               />
               <div className="relative w-5/6 max-w-sm bg-white h-full shadow-2xl z-10 flex flex-col justify-between p-5 overflow-y-auto animate-slide-in">
-                <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
+                <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
                   <span className="font-bold text-sm text-neutral-900 uppercase tracking-wider">Fabrika Filtreleri</span>
                   <button 
                     onClick={() => setIsMobileFilterOpen(false)}
@@ -737,14 +707,14 @@ const MATERIAL_GROUPS = [
                 </div>
                 <div className="space-y-6 flex-1 overflow-y-auto pr-1 text-xs">
                   {/* Category Navigation (URL Based) */}
-                  <div className="border-b border-[#E5DEC9] pb-4">
-                    <h3 className="font-bold uppercase tracking-wider text-neutral-900 mb-2">Kategoriler</h3>
+                  <div className="border-b border-line-strong pb-4">
+                    <h3 className="font-bold text-neutral-900 mb-2">Kategoriler</h3>
                     <div className="space-y-1">
                       <Link
                         href="/kategori"
                         onClick={() => setIsMobileFilterOpen(false)}
                         className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
-                          categorySlug === 'hepsi' || categorySlug === 'all' ? 'bg-[#C5A880] text-white font-bold' : 'text-neutral-700'
+                          categorySlug === 'hepsi' || categorySlug === 'all' ? 'bg-wood text-white font-bold' : 'text-neutral-700'
                         }`}
                       >
                         <span>Tüm Kategoriler</span>
@@ -763,9 +733,9 @@ const MATERIAL_GROUPS = [
                               onClick={() => setIsMobileFilterOpen(false)}
                               className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between text-xs ${
                                 isSelected 
-                                  ? 'bg-[#C5A880] text-white font-bold' 
+                                  ? 'bg-wood text-white font-bold' 
                                   : hasSelectedChild
-                                  ? 'text-[#C5A880] font-semibold bg-[#FAF8F5]'
+                                  ? 'text-wood font-semibold bg-paper'
                                   : 'text-neutral-700'
                               }`}
                             >
@@ -774,7 +744,7 @@ const MATERIAL_GROUPS = [
                             </Link>
 
                             {children.length > 0 && (
-                              <div className="pl-4 space-y-0.5 border-l border-[#E5DEC9] ml-2 py-0.5">
+                              <div className="pl-4 space-y-0.5 border-l border-line-strong ml-2 py-0.5">
                                 {children.map((subCat) => {
                                   const isSubSelected = categorySlug === subCat.slug || categorySlug === subCat.id;
                                   return (
@@ -782,10 +752,10 @@ const MATERIAL_GROUPS = [
                                       key={subCat.id}
                                       href={`/kategori/${subCat.slug}`}
                                       onClick={() => setIsMobileFilterOpen(false)}
-                                      className={`w-full text-left py-1 px-2 rounded transition-colors flex items-center justify-between text-[11px] ${
+                                      className={`w-full text-left py-1 px-2 rounded transition-colors flex items-center justify-between text-xs ${
                                         isSubSelected
-                                          ? 'bg-[#C5A880] text-white font-bold'
-                                          : 'text-neutral-600 hover:text-[#C5A880]'
+                                          ? 'bg-wood text-white font-bold'
+                                          : 'text-neutral-600 hover:text-wood'
                                       }`}
                                     >
                                       <span>↳ {subCat.name}</span>
@@ -802,8 +772,8 @@ const MATERIAL_GROUPS = [
                   </div>
 
                   {/* Dimension (Width) Filter */}
-                  <div className="border-b border-[#E5DEC9] pb-4 space-y-2">
-                    <h3 className="font-bold uppercase tracking-wider text-neutral-900">Genişlik Ölçüsü</h3>
+                  <div className="border-b border-line-strong pb-4 space-y-2">
+                    <h3 className="font-bold text-neutral-900">Genişlik Ölçüsü</h3>
                     <div className="space-y-1">
                       {[
                         { id: 'all', label: 'Tüm Ölçüler' },
@@ -818,11 +788,11 @@ const MATERIAL_GROUPS = [
                             setIsMobileFilterOpen(false);
                           }}
                           className={`w-full text-left py-1.5 px-2 rounded flex items-center justify-between ${
-                            selectedWidthRange === opt.id ? 'bg-[#FBF9F5] border border-[#C5A880] font-bold text-[#C5A880]' : 'text-neutral-700'
+                            selectedWidthRange === opt.id ? 'bg-paper border border-wood font-bold text-wood' : 'text-neutral-700'
                           }`}
                         >
                           <span>{opt.label}</span>
-                          {selectedWidthRange === opt.id && <Check className="h-3.5 w-3.5 text-[#C5A880]" />}
+                          {selectedWidthRange === opt.id && <Check className="h-3.5 w-3.5 text-wood" />}
                         </button>
                       ))}
                     </div>
@@ -838,15 +808,15 @@ const MATERIAL_GROUPS = [
                         onChange={() => {
                           updateFilters({ stock: !inStockOnly ? 'true' : null });
                         }}
-                        className="h-4 w-4 accent-[#C5A880] rounded"
+                        className="h-4 w-4 accent-wood rounded"
                       />
                     </label>
                   </div>
                 </div>
-                <div className="pt-4 border-t border-neutral-200 mt-4">
+                <div className="pt-4 border-t border-line mt-4">
                   <button
                     onClick={() => setIsMobileFilterOpen(false)}
-                    className="w-full py-3 bg-neutral-900 hover:bg-[#C5A880] text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-sm transition-colors cursor-pointer"
+                    className="w-full py-3 bg-neutral-900 hover:bg-wood text-white font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
                   >
                     Sonuçları Göster ({totalItems} Ürün)
                   </button>
@@ -856,7 +826,7 @@ const MATERIAL_GROUPS = [
           )}
 
           {/* Desktop Top Sort & Active Filter Bar */}
-          <div className="hidden lg:flex bg-white p-4 rounded-xl border border-[#E5DEC9] shadow-xs items-center justify-between gap-4">
+          <div className="hidden lg:flex bg-white p-4 rounded-xs border border-line-strong items-center justify-between gap-4">
             
             <div className="text-left">
               <span className="text-xs text-neutral-500 block">Katalog Sonuçları</span>
@@ -869,7 +839,7 @@ const MATERIAL_GROUPS = [
               <select
                 value={sortBy}
                 onChange={(e) => updateFilters({ sort: e.target.value === 'default' ? null : e.target.value })}
-                className="text-xs border border-[#E5DEC9] p-2.5 rounded-lg focus:ring-1 focus:ring-[#C5A880] focus:outline-none bg-white font-semibold text-neutral-800 cursor-pointer"
+                className="text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white font-semibold text-neutral-800 cursor-pointer"
               >
                 <option value="default">Önerilen Sıralama</option>
                 <option value="price-asc">Fiyata Göre: Artan</option>
@@ -884,12 +854,12 @@ const MATERIAL_GROUPS = [
 
           {/* Active Filter Pills Bar (Category is NEVER a filter pill) */}
           {hasActiveFilters && (
-            <div className="flex flex-wrap items-center gap-2 bg-[#FBF9F5] p-3 rounded-xs border border-[#E5DEC9]">
-              <span className="text-[11px] font-bold text-neutral-500 uppercase mr-1">Aktif Filtreler:</span>
+            <div className="flex flex-wrap items-center gap-2 bg-paper p-3 rounded-xs border border-line-strong">
+              <span className="text-xs font-bold text-neutral-500 uppercase mr-1">Aktif Filtreler:</span>
 
               {/* Price Range Pill */}
               {(appliedMinPrice !== '' || appliedMaxPrice !== '') && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-[#C5A880] text-[#B4966E] px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-wood text-wood-dark px-2.5 py-1 rounded-xs">
                   <span>{appliedMinPrice || 0} TL - {appliedMaxPrice || '∞'} TL</span>
                   <button
                     onClick={() => {
@@ -897,7 +867,7 @@ const MATERIAL_GROUPS = [
                       setMaxPriceInput('');
                       updateFilters({ minPrice: null, maxPrice: null });
                     }}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title="Fiyat filtresini kaldır"
                   >
                     <X className="h-3 w-3" />
@@ -907,11 +877,11 @@ const MATERIAL_GROUPS = [
 
               {/* Color Pills */}
               {selectedColors.map(col => (
-                <span key={col} className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                <span key={col} className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-line text-wood-dark px-2.5 py-1 rounded-xs">
                   <span>Renk: {col}</span>
                   <button
                     onClick={() => toggleColor(col)}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title={`${col} filtresini kaldır`}
                   >
                     <X className="h-3 w-3" />
@@ -921,11 +891,11 @@ const MATERIAL_GROUPS = [
 
               {/* Width Pill */}
               {selectedWidthRange !== 'all' && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-amber-600 text-amber-900 px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-line text-wood-dark px-2.5 py-1 rounded-xs">
                   <span>Genişlik: {selectedWidthRange === 'compact' ? '< 150 cm' : selectedWidthRange === 'medium' ? '150-210 cm' : '> 210 cm'}</span>
                   <button
                     onClick={() => updateFilters({ width: null })}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title="Genişlik filtresini kaldır"
                   >
                     <X className="h-3 w-3" />
@@ -935,11 +905,11 @@ const MATERIAL_GROUPS = [
 
               {/* Material Pills */}
               {selectedMaterials.map(mat => (
-                <span key={mat} className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-[#C5A880] text-[#B4966E] px-2.5 py-1 rounded-xs shadow-xs">
+                <span key={mat} className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-wood text-wood-dark px-2.5 py-1 rounded-xs">
                   <span>{mat}</span>
                   <button
                     onClick={() => toggleMaterial(mat)}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title={`${mat} filtresini kaldır`}
                   >
                     <X className="h-3 w-3" />
@@ -949,11 +919,11 @@ const MATERIAL_GROUPS = [
 
               {/* Stock Pill */}
               {inStockOnly && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-[#C5A880] text-[#B4966E] px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-wood text-wood-dark px-2.5 py-1 rounded-xs">
                   <span>Sadece Stoktakiler</span>
                   <button
                     onClick={() => updateFilters({ stock: null })}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title="Stok filtresini kaldır"
                   >
                     <X className="h-3 w-3" />
@@ -963,11 +933,11 @@ const MATERIAL_GROUPS = [
 
               {/* Search Pill */}
               {effectiveSearch && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white border border-neutral-400 text-neutral-800 px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-neutral-400 text-neutral-800 px-2.5 py-1 rounded-xs">
                   <span>Arama: &quot;{effectiveSearch}&quot;</span>
                   <button
                     onClick={() => updateFilters({ search: null })}
-                    className="hover:text-rose-500 cursor-pointer"
+                    className="hover:text-signal cursor-pointer"
                     title="Arama filtresini kaldır"
                   >
                     <X className="h-3 w-3" />
@@ -978,7 +948,7 @@ const MATERIAL_GROUPS = [
               {/* Reset All Filters Button */}
               <button
                 onClick={handleResetFilters}
-                className="text-[11px] font-bold text-rose-600 hover:underline ml-auto cursor-pointer"
+                className="text-xs font-bold text-signal hover:underline ml-auto cursor-pointer"
               >
                 Tümünü Temizle
               </button>
@@ -987,124 +957,24 @@ const MATERIAL_GROUPS = [
 
           {/* Product Grid */}
           {currentProducts.length === 0 ? (
-            <div className="bg-white rounded-xs border border-[#E5DEC9] p-12 text-center space-y-4 shadow-xs">
+            <div className="bg-white rounded-xs border border-line-strong p-12 text-center space-y-4">
               <Filter className="h-12 w-12 text-neutral-300 mx-auto" />
-              <h3 className="text-base font-bold text-neutral-800 uppercase">Aramanıza Uygun Ürün Bulunamadı</h3>
-              <p className="text-xs text-neutral-500 max-w-sm mx-auto font-light">
+              <h3 className="text-base font-semibold text-ink">Bu filtrelere uyan ürün yok</h3>
+              <p className="text-xs text-neutral-500 max-w-sm mx-auto">
                 Filtre parametrelerini değiştirebilir veya temizleyerek tüm ürünleri inceleyebilirsiniz.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="inline-block bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-widest py-3 px-6 rounded-xs transition-colors cursor-pointer"
+                className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-5 rounded-xs transition-colors cursor-pointer"
               >
-                Filtreleri Temizle
+                Filtreleri temizle
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentProducts.map((product) => {
-                const origPrice = product.originalPrice;
-                const isDiscounted = !!origPrice && origPrice > product.price;
-                const fav = isFavorite(product.id);
-
-                return (
-                  <div 
-                    key={product.id}
-                    className="group relative flex flex-col bg-white border border-[#E5DEC9] rounded-2xl overflow-hidden transition-[box-shadow,border-color] duration-300 hover:shadow-md hover:border-[#C5A880]"
-                  >
-                    {/* Image */}
-                    <Link href={`/urun/${product.id}`} className="relative aspect-[4/3] bg-[#FBF9F5] overflow-hidden block">
-                      <OptimizedImage
-                        src={getProductImage(product)}
-                        alt={product.name}
-                        fill
-                        className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
-                      />
-
-                      {/* Favorite Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleFavorite(product);
-                        }}
-                        className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5DEC9] shadow-xs transition-transform duration-200 hover:scale-110 cursor-pointer transform-gpu ${
-                          fav ? 'text-rose-500' : 'text-neutral-400 hover:text-[#C5A880]'
-                        }`}
-                      >
-                        <Heart className={`h-4 w-4 ${fav ? 'fill-current' : ''}`} />
-                      </button>
-                    </Link>
-
-                    {/* Details */}
-                    <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                      <div>
-                        <div className="flex items-center justify-between gap-1 mb-1">
-                          <span className="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest truncate">
-                            {product.material || 'Fabrika Standart Seri'}
-                          </span>
-                          {product.widthCm && (
-                            <span className="text-[10px] bg-neutral-100 text-neutral-700 font-semibold px-1.5 py-0.5 rounded">
-                              {product.widthCm} cm
-                            </span>
-                          )}
-                        </div>
-                        <Link 
-                          href={`/urun/${product.id}`}
-                          className="font-bold text-sm text-neutral-900 hover:text-[#C5A880] transition-colors line-clamp-1 block"
-                        >
-                          {product.name}
-                        </Link>
-
-                        {/* Specs mini tags */}
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {((product.colorOptions && product.colorOptions.length > 0) || (product.colors && product.colors.length > 0)) && (
-                            <span className="text-[10px] text-neutral-500 font-normal">
-                              Renk: {((product.colorOptions || product.colors) || []).slice(0, 3).join(', ')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="pt-2 border-t border-[#F4EFE6] space-y-2">
-                        <div className="flex items-end justify-between">
-                          <div>
-                            {isDiscounted && (
-                              <span className="text-xs text-neutral-400 line-through block">
-                                {formatPrice(origPrice)}
-                              </span>
-                            )}
-                            <span className="text-base font-extrabold text-[#C87A53]">
-                              {formatPrice(product.price)}
-                            </span>
-                          </div>
-
-                          <button
-                            onClick={() => addToCart(product, 1)}
-                            className="bg-[#C5A880] hover:bg-[#B4966E] text-white text-xs font-bold uppercase tracking-wider py-2 px-3 rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                          >
-                            <ShoppingBag className="h-3.5 w-3.5" />
-                            <span>Sepete Ekle</span>
-                          </button>
-                        </div>
-
-                        {/* WhatsApp quick contact */}
-                        <a
-                          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında doğrudan fabrika fiyatı ve teslimat bilgisi almak istiyorum.`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full text-center py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded flex items-center justify-center gap-1.5 transition-colors"
-                        >
-                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
-                          </svg>
-                          <span>WhatsApp ile Bilgi / Teklif Al</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {currentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} showWhatsapp />
+              ))}
             </div>
           )}
 
@@ -1117,8 +987,8 @@ const MATERIAL_GROUPS = [
                   onClick={() => updateFilters({ page: page > 1 ? page : null })}
                   className={`w-9 h-9 rounded-xs text-xs font-bold transition-all cursor-pointer ${
                     currentPage === page
-                      ? 'bg-[#C5A880] text-white shadow-xs'
-                      : 'bg-white text-neutral-700 border border-[#E5DEC9] hover:bg-[#FBF9F5]'
+                      ? 'bg-wood text-white'
+                      : 'bg-white text-neutral-700 border border-line-strong hover:bg-paper'
                   }`}
                 >
                   {page}

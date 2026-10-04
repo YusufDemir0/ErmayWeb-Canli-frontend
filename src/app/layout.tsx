@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import AppInitializer from '../providers/AppInitializer';
 import Navbar from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -11,18 +11,26 @@ import '../index.css';
 
 // Fontlar build anında indirilip kendi sunucumuzdan servis edilir: render'ı bloklayan harici CSS yok,
 // ziyaretçi IP'si Google'a gitmez (KVKK) ve layout kayması (CLS) önlenir.
-const inter = Inter({
+// Gövde: IBM Plex Sans (teknik, Türkçe glifleri tam). Ölçü/kod/fiyat: IBM Plex Mono. Başlık: Archivo.
+const plexSans = IBM_Plex_Sans({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-plex-sans',
+  weight: ['400', '500', '600', '700'],
 });
 
-const playfair = Playfair_Display({
+const plexMono = IBM_Plex_Mono({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
-  variable: '--font-playfair',
-  weight: ['400', '500', '600', '700', '800'],
-  style: ['normal', 'italic'],
+  variable: '--font-plex-mono',
+  weight: ['400', '500', '600'],
+});
+
+const archivo = Archivo({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-archivo',
+  weight: ['500', '600', '700', '800'],
 });
 
 export const metadata: Metadata = {
@@ -43,8 +51,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans flex flex-col min-h-screen bg-white text-neutral-800 antialiased selection:bg-[#C5A880] selection:text-white">
+    <html lang="tr" className={`${plexSans.variable} ${plexMono.variable} ${archivo.variable}`}>
+      <body className="font-sans flex flex-col min-h-screen bg-white text-ink antialiased">
         <AppInitializer>
           <Navbar />
           <main className="flex-1">{children}</main>

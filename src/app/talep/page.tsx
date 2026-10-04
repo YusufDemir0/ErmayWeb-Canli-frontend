@@ -10,8 +10,6 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Loader2, 
-  ShieldCheck, 
-  Sparkles, 
   MapPin, 
   ArrowRight,
   Info,
@@ -22,6 +20,30 @@ import { requestService, QuoteResponseItem } from '../../services/requestService
 import apiClient from '../../services/api';
 import { TURKEY_CITIES, getDistrictsByCityName } from '../../lib/turkeyData';
 import type { StoreItem } from '../../types';
+
+type FieldKey = 'name' | 'phone' | 'city' | 'district' | 'store' | 'kvkk';
+
+const FIELD_ORDER: { key: FieldKey; id: string }[] = [
+  { key: 'name', id: 'talep-name' },
+  { key: 'phone', id: 'talep-phone' },
+  { key: 'city', id: 'talep-city' },
+  { key: 'district', id: 'talep-district' },
+  { key: 'store', id: 'talep-store' },
+  { key: 'kvkk', id: 'talep-kvkk' },
+];
+
+const inputClass = (hasError?: boolean) =>
+  `w-full bg-white border rounded-xs px-3.5 py-2.5 text-base sm:text-sm text-ink placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-wood/30 focus:border-wood transition-colors disabled:bg-paper disabled:text-neutral-500 ${
+    hasError ? 'border-signal' : 'border-line-strong'
+  }`;
+
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} className="text-sm text-signal mt-1.5 flex items-start gap-1.5">
+      <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+      <span>{message}</span>
+    </p>
+  ) : null;
 
 export default function OrderRequestPage() {
   const router = useRouter();
@@ -53,6 +75,15 @@ export default function OrderRequestPage() {
   const [disabledCities, setDisabledCities] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  // Alan bazlı doğrulama hataları: mesaj ilgili alanın altında gösterilir, ilk hatalı alana odaklanılır
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({});
+  const clearFieldError = (key: FieldKey) =>
+    setFieldErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
   const [showKvkkModal, setShowKvkkModal] = useState(false);
 
   // Stable session idempotency key
@@ -131,7 +162,7 @@ export default function OrderRequestPage() {
           setVerifiedSubtotal(quoteRes.quote.subtotal);
 
           if (Math.abs(quoteRes.quote.subtotal - totalCartAmount) > 0.01) {
-            setQuoteWarning('Bazı ürünlerin güncel katalog fiyatları yenilenmiştir.');
+            setQuoteWarning('Sepetinizdeki bazı ürünlerin katalog fiyatı güncellenmiş. Özetteki satırlar güncel fiyatla gösteriliyor.');
           }
         }
       } catch (err: unknown) {
@@ -176,6 +207,7 @@ export default function OrderRequestPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setFieldErrors({});
 
     // Bot trap check
     if (honeypot.trim().length > 0) {
@@ -184,39 +216,36 @@ export default function OrderRequestPage() {
     }
 
     if (cartItems.length === 0) {
-      setFormError('Sepetinizde ürün bulunmamaktadır.');
+      setFormError('Talep sepetinizde ürün yok.');
       return;
     }
 
+    const errors: Partial<Record<FieldKey, string>> = {};
     if (!customerName.trim() || customerName.trim().length < 2) {
-      setFormError('Lütfen ad ve soyadınızı eksiksiz giriniz.');
-      return;
+      errors.name = 'Ad ve soyadınızı eksiksiz yazın.';
     }
-
     // Phone validation
     const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
     if (cleanPhone.length < 10) {
-      setFormError('Lütfen geçerli bir cep telefonu numarası giriniz (05XX XXX XX XX).');
-      return;
+      errors.phone = 'Geçerli bir cep telefonu numarası yazın (05XX XXX XX XX).';
     }
-
-    if (!city || !district) {
-      setFormError('Lütfen il ve ilçe seçiniz.');
-      return;
-    }
-
+    if (!city) errors.city = 'İl seçin.';
+    if (city && !district) errors.district = 'İlçe seçin.';
     if (isCityDisabled) {
-      setFormError(`Üzgünüz, geçici olarak ${city} iline teslimat ve kurulum hizmetimiz bulunmamaktadır.`);
-      return;
+      errors.city = `Şu anda ${city} iline teslimat ve kurulum hizmetimiz yok.`;
     }
-
     if (preference === 'STORE_VISIT' && !preferredStoreId) {
-      setFormError('Lütfen ziyaret etmek istediğiniz showroom/mağazayı seçiniz.');
-      return;
+      errors.store = 'Ziyaret etmek istediğiniz showroom’u seçin.';
     }
-
     if (!kvkkAccepted) {
-      setFormError('Lütfen KVKK Aydınlatma Metni\'ni okuduğunuzu işaretleyiniz.');
+      errors.kvkk = 'Devam etmek için KVKK aydınlatma metnini okuduğunuzu onaylayın.';
+    }
+    setFieldErrors(errors);
+    const firstInvalid = FIELD_ORDER.find((f) => errors[f.key]);
+    if (firstInvalid) {
+      const el = document.getElementById(firstInvalid.id);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el?.focus({ preventScroll: true });
       return;
     }
 
@@ -266,19 +295,19 @@ export default function OrderRequestPage() {
   // If cart is completely empty
   if (!isQuoting && cartItems.length === 0) {
     return (
-      <div className="w-full bg-neutral-50 min-h-screen py-20">
+      <div className="w-full bg-white min-h-screen py-20">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <div className="bg-white border border-neutral-200/80 rounded-sm p-10 shadow-sm">
+          <div className="bg-paper border border-line rounded-xs p-10">
             <ShoppingBag className="h-16 w-16 text-neutral-300 stroke-[1.5] mx-auto mb-4" />
-            <h2 className="text-xl font-normal text-neutral-800 mb-2">Sepetiniz Boş</h2>
-            <p className="text-neutral-500 font-light text-sm mb-6">
-              Sipariş talebi oluşturabilmek için sepetinize en az bir ürün eklemeniz gerekmektedir.
+            <h2 className="text-xl font-semibold text-ink mb-2">Talep sepetiniz boş</h2>
+            <p className="text-neutral-500 text-sm mb-6">
+              Sipariş talebi için sepete en az bir ürün ekleyin.
             </p>
             <Link
               href="/"
-              className="inline-block bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold tracking-widest uppercase py-3.5 px-8 rounded-sm transition-colors"
+              className="inline-block bg-ink hover:bg-wood text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
             >
-              Koleksiyonları İncele
+              Ürünlere göz atın
             </Link>
           </div>
         </div>
@@ -287,36 +316,37 @@ export default function OrderRequestPage() {
   }
 
   return (
-    <div className="w-full bg-neutral-50 min-h-screen py-10 md:py-16">
+    <div className="w-full bg-white min-h-screen py-10 md:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Navigation Breadcrumb */}
-        <nav className="text-xs text-neutral-400 font-light flex items-center gap-2 mb-6">
-          <Link href="/" className="hover:text-brand-camel transition-colors">Ana Sayfa</Link>
+        <nav className="text-xs text-neutral-500 flex items-center gap-2 mb-6">
+          <Link href="/" className="hover:text-wood transition-colors">Ana Sayfa</Link>
           <span>/</span>
-          <Link href="/sepet" className="hover:text-brand-camel transition-colors">Sepetim</Link>
+          <Link href="/sepet" className="hover:text-wood transition-colors">Talep sepeti</Link>
           <span>/</span>
           <span className="text-neutral-700 font-normal">Sipariş Talebi</span>
         </nav>
 
         {/* Page Header */}
-        <div className="border-b border-neutral-200/80 pb-6 mb-10">
-          <h1 className="text-2xl md:text-3xl font-light text-brand-dark tracking-wide uppercase">
-            Sipariş Talebi Oluştur
+        <div className="border-b border-line pb-6 mb-8">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight">
+            Sipariş talebi
           </h1>
-          <p className="text-xs md:text-sm text-neutral-500 font-light mt-1.5">
-            Sitemiz üzerinden kredi kartı tahsilatı yapılmaz. Talebinizi oluşturduktan sonra uzman danışmanımız sizinle iletişime geçer.
+          <p className="text-sm text-neutral-600 mt-1.5 max-w-2xl">
+            Online ödeme alınmaz. Talebinizi gönderdikten sonra temsilcimiz teslimat, kurulum ve ödemeyi sizinle netleştirir;
+            size takip edebileceğiniz bir talep fişi verilir.
           </p>
         </div>
 
         {quoteWarning && (
-          <div className="mb-8 p-4 bg-amber-50/90 border border-amber-200/80 rounded-sm flex items-center gap-3 text-amber-900 text-xs">
-            <Info className="h-5 w-5 text-amber-700 flex-shrink-0" />
+          <div role="status" className="mb-8 p-4 bg-paper border-l-4 border-signal flex items-center gap-3 text-ink text-sm">
+            <Info className="h-5 w-5 text-signal flex-shrink-0" />
             <span>{quoteWarning}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
           {/* Honeypot Input for Bot Suppression */}
           <input
@@ -331,18 +361,25 @@ export default function OrderRequestPage() {
           />
 
           {/* LEFT COLUMN: Customer Info, Location, Preference (8 Cols) */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-6">
+            {/* Mobil: kısa özet; tam özet ve gönder düğmesi formun sonunda */}
+            <a href="#talep-ozet" className="lg:hidden flex items-center justify-between gap-3 bg-paper border border-line rounded-xs px-4 py-3 text-sm">
+              <span className="text-neutral-700">{cartItems.length} kalem · tahmini</span>
+              <span className="font-mono font-semibold text-ink tabular-nums-all">{formatPrice(verifiedSubtotal)}</span>
+            </a>
             
             {/* 1. İletişim Bilgileri */}
-            <div className="bg-white rounded-sm border border-neutral-200/80 shadow-sm p-6 sm:p-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-800 border-b border-neutral-100 pb-3 mb-6 flex items-center gap-2">
-                <span>1. İletişim Bilgileriniz</span>
+            <fieldset className="bg-white rounded-xs border border-line p-5 sm:p-7">
+              <legend className="sr-only">İletişim bilgileri</legend>
+              <h2 className="flex items-baseline gap-3 text-base font-semibold text-ink border-b border-line pb-3 mb-5">
+                <span className="font-mono text-sm text-wood tabular-nums-all">01</span>
+                <span>İletişim bilgileri</span>
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="talep-name" className="block text-xs font-medium text-neutral-700 mb-1">
-                    Ad Soyad <span className="text-rose-500">*</span>
+                  <label htmlFor="talep-name" className="block text-sm font-medium text-ink mb-1.5">
+                    Ad Soyad <span className="text-signal" aria-hidden="true">*</span>
                   </label>
                   <input
                     id="talep-name"
@@ -351,16 +388,22 @@ export default function OrderRequestPage() {
                     autoComplete="name"
                     required
                     value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      clearFieldError('name');
+                    }}
                     placeholder="Örn: Ahmet Yılmaz"
-                    className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                    aria-invalid={!!fieldErrors.name}
+                    aria-describedby={fieldErrors.name ? 'talep-name-error' : undefined}
+                    className={inputClass(!!fieldErrors.name)}
                   />
+                  <FieldError id="talep-name-error" message={fieldErrors.name} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="talep-phone" className="block text-xs font-medium text-neutral-700 mb-1">
-                      Telefon Numarası <span className="text-rose-500">*</span>
+                    <label htmlFor="talep-phone" className="block text-sm font-medium text-ink mb-1.5">
+                      Telefon Numarası <span className="text-signal" aria-hidden="true">*</span>
                     </label>
                     <input
                       id="talep-phone"
@@ -370,16 +413,22 @@ export default function OrderRequestPage() {
                       autoComplete="tel"
                       required
                       value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      onChange={(e) => {
+                        setCustomerPhone(e.target.value);
+                        clearFieldError('phone');
+                      }}
                       placeholder="05XX XXX XX XX"
-                      className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                      aria-invalid={!!fieldErrors.phone}
+                    aria-describedby={fieldErrors.phone ? 'talep-phone-error' : undefined}
+                    className={inputClass(!!fieldErrors.phone)}
                     />
-                    <p className="text-[10px] text-neutral-400 mt-1">WhatsApp veya telefon görüşmesi için kullanılır.</p>
+                  <FieldError id="talep-phone-error" message={fieldErrors.phone} />
+                    <p className="text-xs text-neutral-500 mt-1">WhatsApp veya telefon görüşmesi için kullanılır.</p>
                   </div>
 
                   <div>
-                    <label htmlFor="talep-email" className="block text-xs font-medium text-neutral-700 mb-1">
-                      E-posta Adresi <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
+                    <label htmlFor="talep-email" className="block text-sm font-medium text-ink mb-1.5">
+                      E-posta Adresi <span className="text-neutral-500 font-normal">(isteğe bağlı)</span>
                     </label>
                     <input
                       id="talep-email"
@@ -389,24 +438,26 @@ export default function OrderRequestPage() {
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="ahmet@ornek.com"
-                      className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                      className={inputClass()}
                     />
                   </div>
                 </div>
               </div>
-            </div>
+            </fieldset>
 
             {/* 2. Teslimat & Lokasyon Bilgileri */}
-            <div className="bg-white rounded-sm border border-neutral-200/80 shadow-sm p-6 sm:p-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-800 border-b border-neutral-100 pb-3 mb-6">
-                2. Teslimat & Lokasyon
+            <fieldset className="bg-white rounded-xs border border-line p-5 sm:p-7">
+              <legend className="sr-only">Teslimat yeri</legend>
+              <h2 className="flex items-baseline gap-3 text-base font-semibold text-ink border-b border-line pb-3 mb-5">
+                <span className="font-mono text-sm text-wood tabular-nums-all">02</span>
+                <span>Teslimat yeri</span>
               </h2>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="talep-city" className="block text-xs font-medium text-neutral-700 mb-1">
-                      İl <span className="text-rose-500">*</span>
+                    <label htmlFor="talep-city" className="block text-sm font-medium text-ink mb-1.5">
+                      İl <span className="text-signal" aria-hidden="true">*</span>
                     </label>
                     <select
                       id="talep-city"
@@ -414,8 +465,13 @@ export default function OrderRequestPage() {
                       autoComplete="address-level1"
                       required
                       value={city}
-                      onChange={(e) => handleCityChange(e.target.value)}
-                      className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                      onChange={(e) => {
+                        handleCityChange(e.target.value);
+                        clearFieldError('city');
+                      }}
+                      aria-invalid={!!fieldErrors.city}
+                    aria-describedby={fieldErrors.city ? 'talep-city-error' : undefined}
+                    className={inputClass(!!fieldErrors.city)}
                     >
                       <option value="" disabled>İl seçiniz</option>
                       {sortedCities.map((c) => (
@@ -424,11 +480,12 @@ export default function OrderRequestPage() {
                         </option>
                       ))}
                     </select>
+                  <FieldError id="talep-city-error" message={fieldErrors.city} />
                   </div>
 
                   <div>
-                    <label htmlFor="talep-district" className="block text-xs font-medium text-neutral-700 mb-1">
-                      İlçe <span className="text-rose-500">*</span>
+                    <label htmlFor="talep-district" className="block text-sm font-medium text-ink mb-1.5">
+                      İlçe <span className="text-signal" aria-hidden="true">*</span>
                     </label>
                     <select
                       id="talep-district"
@@ -437,8 +494,13 @@ export default function OrderRequestPage() {
                       required
                       disabled={!city}
                       value={district}
-                      onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                      onChange={(e) => {
+                        setDistrict(e.target.value);
+                        clearFieldError('district');
+                      }}
+                      aria-invalid={!!fieldErrors.district}
+                    aria-describedby={fieldErrors.district ? 'talep-district-error' : undefined}
+                    className={inputClass(!!fieldErrors.district)}
                     >
                       <option value="" disabled>{city ? 'İlçe seçiniz' : 'Önce il seçiniz'}</option>
                       {availableDistricts.map((d) => (
@@ -447,18 +509,19 @@ export default function OrderRequestPage() {
                         </option>
                       ))}
                     </select>
+                  <FieldError id="talep-district-error" message={fieldErrors.district} />
                   </div>
                 </div>
 
                 {isCityDisabled && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xs text-rose-700 text-xs">
-                    Üzgünüz, geçici olarak {city} iline mobilya sevkiyat hizmetimiz bulunmamaktadır.
+                  <div className="p-3 bg-paper border-l-4 border-signal text-ink text-sm">
+                    Şu anda {city} iline teslimat ve kurulum hizmetimiz yok. Showroom ziyareti için bizimle iletişime geçebilirsiniz.
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor="talep-address" className="block text-xs font-medium text-neutral-700 mb-1">
-                    Açık Adres / Semt <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
+                  <label htmlFor="talep-address" className="block text-sm font-medium text-ink mb-1.5">
+                    Açık Adres / Semt <span className="text-neutral-500 font-normal">(isteğe bağlı)</span>
                   </label>
                   <input
                     id="talep-address"
@@ -467,91 +530,84 @@ export default function OrderRequestPage() {
                     autoComplete="street-address"
                     value={addressLine}
                     onChange={(e) => setAddressLine(e.target.value)}
-                    placeholder="Mahalle, Cadde, Sokak veya site adı..."
-                    className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors"
+                    placeholder="Mahalle, cadde, sokak veya site adı"
+                    className={inputClass()}
                   />
-                  <p className="text-[10px] text-neutral-400 mt-1">Nakliye planlaması ve kat uygunluğu için kullanılır.</p>
+                  <p className="text-xs text-neutral-500 mt-1">Nakliye planlaması ve kat uygunluğu için kullanılır.</p>
                 </div>
               </div>
-            </div>
+            </fieldset>
 
             {/* 3. Talep Tamamlama Tercihi */}
-            <div className="bg-white rounded-sm border border-neutral-200/80 shadow-sm p-6 sm:p-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-800 border-b border-neutral-100 pb-3 mb-6">
-                3. İşlem Tercihiniz <span className="text-rose-500">*</span>
+            <fieldset className="bg-white rounded-xs border border-line p-5 sm:p-7">
+              <legend className="sr-only">Sizinle nasıl ilerleyelim?</legend>
+              <h2 className="flex items-baseline gap-3 text-base font-semibold text-ink border-b border-line pb-3 mb-5">
+                <span className="font-mono text-sm text-wood tabular-nums-all">03</span>
+                <span>Sizinle nasıl ilerleyelim?</span>
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                {/* Option 1: WhatsApp */}
-                <div
-                  onClick={() => setPreference('WHATSAPP')}
-                  className={`p-5 rounded-sm border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
-                    preference === 'WHATSAPP'
-                      ? 'border-emerald-600 bg-emerald-50/30 shadow-xs'
-                      : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare className={`h-5 w-5 ${preference === 'WHATSAPP' ? 'text-emerald-600' : 'text-neutral-400'}`} />
-                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-800">WhatsApp ile İletişim</span>
-                      </div>
-                      <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
-                        preference === 'WHATSAPP' ? 'border-emerald-600 bg-emerald-600' : 'border-neutral-300'
-                      }`}>
-                        {preference === 'WHATSAPP' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                      </div>
-                    </div>
-                    <p className="text-xs text-neutral-500 font-light leading-relaxed">
-                      Satış temsilcimiz kumaş kartelası, teslim süresi ve ödeme koşullarını WhatsApp üzerinden sizinle netleştirir.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Option 2: Store Visit */}
-                <div
-                  onClick={() => setPreference('STORE_VISIT')}
-                  className={`p-5 rounded-sm border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
-                    preference === 'STORE_VISIT'
-                      ? 'border-brand-dark bg-neutral-50/70 shadow-xs'
-                      : 'border-neutral-200 hover:border-neutral-300 bg-white'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <StoreIcon className={`h-5 w-5 ${preference === 'STORE_VISIT' ? 'text-brand-dark' : 'text-neutral-400'}`} />
-                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-800">Mağazaya Geleceğim</span>
-                      </div>
-                      <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
-                        preference === 'STORE_VISIT' ? 'border-brand-dark bg-brand-dark' : 'border-neutral-300'
-                      }`}>
-                        {preference === 'STORE_VISIT' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                      </div>
-                    </div>
-                    <p className="text-xs text-neutral-500 font-light leading-relaxed">
-                      Showroom veya atölyemizi ziyaret ederek ürünleri yakından incelemek ve mağazada sipariş oluşturmak istiyorum.
-                    </p>
-                  </div>
-                </div>
+              <div role="radiogroup" aria-label="İletişim tercihi" className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                {([
+                  {
+                    value: 'WHATSAPP' as const,
+                    title: 'WhatsApp ile iletişim',
+                    text: 'Temsilcimiz renk, teslim süresi ve ödeme koşullarını WhatsApp üzerinden sizinle netleştirir.',
+                    Icon: MessageSquare,
+                  },
+                  {
+                    value: 'STORE_VISIT' as const,
+                    title: 'Mağazaya geleceğim',
+                    text: 'Showroom veya atölyemizde ürünleri yakından görüp siparişi mağazada tamamlamak istiyorum.',
+                    Icon: StoreIcon,
+                  },
+                ]).map(({ value, title, text, Icon }) => {
+                  const checked = preference === value;
+                  return (
+                    <label
+                      key={value}
+                      className={`relative p-4 rounded-xs border cursor-pointer transition-colors flex gap-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-wood/40 ${
+                        checked ? 'border-ink bg-paper' : 'border-line-strong hover:border-neutral-500 bg-white'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="preference"
+                        value={value}
+                        checked={checked}
+                        onChange={() => setPreference(value)}
+                        className="mt-1 h-4 w-4 accent-ink shrink-0"
+                      />
+                      <span className="space-y-1">
+                        <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+                          <Icon className="h-4 w-4 text-neutral-600" aria-hidden="true" />
+                          {title}
+                        </span>
+                        <span className="block text-sm text-neutral-600 leading-relaxed">{text}</span>
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
 
               {/* Showroom Selector if STORE_VISIT selected */}
               {preference === 'STORE_VISIT' && (
-                <div className="p-4 bg-neutral-50 border border-neutral-200/80 rounded-sm space-y-3">
-                  <label htmlFor="talep-store" className="block text-xs font-semibold text-neutral-800">
-                    Ziyaret Etmek İstediğiniz Showroom / Mağaza <span className="text-rose-500">*</span>
+                <div className="p-4 bg-paper border border-line rounded-xs space-y-2">
+                  <label htmlFor="talep-store" className="block text-sm font-medium text-ink">
+                    Ziyaret etmek istediğiniz showroom <span className="text-signal" aria-hidden="true">*</span>
                   </label>
                   {stores.length === 0 ? (
-                    <p className="text-xs text-neutral-500">Showroom bilgileri yükleniyor...</p>
+                    <p className="text-sm text-neutral-600">Showroom bilgileri yükleniyor…</p>
                   ) : (
                     <select
                       id="talep-store"
                       required
                       value={preferredStoreId}
-                      onChange={(e) => setPreferredStoreId(e.target.value)}
-                      className="w-full bg-white border border-neutral-300 rounded-xs px-3.5 py-2.5 text-xs text-neutral-800 focus:outline-none focus:ring-1 focus:ring-brand-camel"
+                      onChange={(e) => {
+                        setPreferredStoreId(e.target.value);
+                        clearFieldError('store');
+                      }}
+                      aria-invalid={!!fieldErrors.store}
+                      className={inputClass(!!fieldErrors.store)}
                     >
                       <option value="" disabled>Showroom / mağaza seçiniz</option>
                       {stores.map((s) => (
@@ -561,16 +617,17 @@ export default function OrderRequestPage() {
                       ))}
                     </select>
                   )}
-                  <p className="text-[11px] text-neutral-500 font-light">
-                    Talep fişinizde seçtiğiniz mağazanın yol tarifi, açık adresi ve randevu teyit hattı yer alacaktır.
+                  {!!stores.length && <FieldError id="talep-store-error" message={fieldErrors.store} />}
+                  <p className="text-xs text-neutral-600">
+                    Talep fişinizde seçtiğiniz mağazanın adresi, yol tarifi ve telefonu yer alır.
                   </p>
                 </div>
               )}
 
               {/* Note input */}
               <div className="mt-6">
-                <label htmlFor="talep-note" className="block text-xs font-medium text-neutral-700 mb-1">
-                  Özel Not / İstekleriniz <span className="text-neutral-400 font-light">(İsteğe Bağlı)</span>
+                <label htmlFor="talep-note" className="block text-sm font-medium text-ink mb-1.5">
+                  Notunuz <span className="text-neutral-500 font-normal">(isteğe bağlı)</span>
                 </label>
                 <textarea
                   id="talep-note"
@@ -578,83 +635,59 @@ export default function OrderRequestPage() {
                   rows={3}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Varsa kat/asansör durumu, teslimat randevu talebi veya çoklu alım notunuz..."
-                  className="w-full bg-neutral-50/50 border border-neutral-200 rounded-xs p-3 text-xs text-neutral-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-camel focus:border-brand-camel transition-colors resize-none"
+                  placeholder="Kat ve asansör durumu, teslimat günü tercihi veya adetli alım notu"
+                  className={`${inputClass()} resize-none`}
                 />
               </div>
-            </div>
-
-            {/* 4. Yasal Onaylar (KVKK) */}
-            <div className="bg-white rounded-sm border border-neutral-200/80 shadow-sm p-6 space-y-4">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  required
-                  checked={kvkkAccepted}
-                  onChange={(e) => setKvkkAccepted(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded-xs border-neutral-300 text-brand-dark focus:ring-brand-camel cursor-pointer"
-                />
-                <span className="text-xs text-neutral-600 font-light leading-relaxed">
-                  <button
-                    type="button"
-                    onClick={() => setShowKvkkModal(true)}
-                    className="text-brand-dark font-medium underline hover:text-brand-camel cursor-pointer"
-                  >
-                    KVKK Aydınlatma Metni
-                  </button>
-                  &apos;ni okudum; sipariş talebimin değerlendirilmesi ve benimle iletişime geçilmesi için bilgilerimin işleneceği konusunda bilgilendirildim. <span className="text-rose-500">*</span>
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={marketingConsent}
-                  onChange={(e) => setMarketingConsent(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded-xs border-neutral-300 text-brand-dark focus:ring-brand-camel cursor-pointer"
-                />
-                <span className="text-xs text-neutral-500 font-light leading-relaxed">
-                  Ermay Mobilya yeni koleksiyon, kampanya ve duyurulardan haberdar olmak istiyorum (İsteğe bağlı).
-                </span>
-              </label>
-            </div>
+            </fieldset>
 
           </div>
 
           {/* RIGHT COLUMN: Order Summary (5 Cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-sm border border-neutral-200/80 shadow-sm p-6 sticky top-24">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-800 border-b border-neutral-100 pb-4 mb-6">
-                Talep Sepetiniz ({cartItems.length} Kalem)
-              </h3>
+            <div id="talep-ozet" className="bg-paper rounded-xs border border-line p-5 sm:p-6 lg:sticky lg:top-24 scroll-mt-24">
+              <h2 className="flex items-baseline justify-between text-base font-semibold text-ink border-b border-line pb-3 mb-2">
+                <span>Talep özeti</span>
+                <span className="font-mono text-xs font-normal text-neutral-600">{cartItems.length} kalem</span>
+              </h2>
 
               {/* Items List */}
-              <div className="max-h-80 overflow-y-auto divide-y divide-neutral-100 pr-1 mb-6">
+              <div className="max-h-80 overflow-y-auto divide-y divide-line pr-1 mb-4">
                 {cartItems.map((item) => {
                   const key = item.itemKey || item.product.id;
+                  // Sunucunun doğruladığı satır (aynı ürün + renk); yoksa sepet fiyatı gösterilir
+                  const quoted = quoteItems.find(
+                    (q) => q.productId === item.product.id && (q.colorKey || null) === (item.product.selectedColor || null)
+                  );
+                  const unitPrice = quoted ? quoted.unitPrice : item.product.price;
+                  const priceChanged = !!quoted && Math.abs(quoted.unitPrice - item.product.price) > 0.01;
                   return (
-                    <div key={key} className="py-3 flex gap-3 items-center">
-                      <div className="h-16 w-14 rounded-xs overflow-hidden bg-neutral-50 border border-neutral-100 flex-shrink-0">
+                    <div key={key} className="py-3 flex gap-3 items-start">
+                      <div className="h-16 w-14 rounded-xs overflow-hidden bg-white border border-line flex-shrink-0">
                         <img
                           src={item.product.image}
-                          alt={item.product.name}
+                          alt=""
                           className="h-full w-full object-cover"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-medium text-neutral-800 truncate">
+                        <h3 className="text-sm font-medium text-ink line-clamp-2">
                           {item.product.name}
-                        </h4>
+                        </h3>
                         {item.product.selectedColor && (
-                          <p className="text-[11px] text-neutral-500">Renk: {item.product.selectedColor}</p>
+                          <p className="text-xs text-neutral-600">Renk: {item.product.selectedColor}</p>
                         )}
-                        <p className="text-[11px] text-neutral-400 font-light">
-                          {item.quantity} adet x {formatPrice(item.product.price)}
+                        <p className="text-xs text-neutral-600 font-mono tabular-nums-all">
+                          {item.quantity} × {formatPrice(unitPrice)}
+                          {priceChanged && (
+                            <span className="ml-1.5 text-neutral-500 line-through">{formatPrice(item.product.price)}</span>
+                          )}
                         </p>
+                        {priceChanged && <p className="text-xs text-signal">Katalog fiyatı güncellendi</p>}
                       </div>
                       <div className="text-right">
-                        <span className="text-xs font-semibold text-neutral-900">
-                          {formatPrice(item.product.price * item.quantity)}
+                        <span className="text-sm font-mono font-semibold text-ink tabular-nums-all">
+                          {formatPrice(quoted ? quoted.lineTotal : unitPrice * item.quantity)}
                         </span>
                       </div>
                     </div>
@@ -663,27 +696,67 @@ export default function OrderRequestPage() {
               </div>
 
               {/* Calculations */}
-              <div className="border-t border-neutral-100 pt-4 space-y-2 mb-6 text-xs text-neutral-600 font-light">
+              <dl className="border-t border-line pt-4 space-y-2 mb-5 text-sm text-neutral-600">
                 <div className="flex justify-between">
-                  <span>Katalog Ara Toplam</span>
-                  <span className="font-medium text-neutral-800">{formatPrice(verifiedSubtotal)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>KDV (%20)</span>
-                  <span>Dahil</span>
+                  <dt>Katalog ara toplamı</dt>
+                  <dd className="font-mono text-ink tabular-nums-all">{formatPrice(verifiedSubtotal)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <span>Teslimat & Kurulum</span>
-                  <span className="text-neutral-700">Temsilciyle Netleştirilir</span>
+                  <dt>KDV (%20)</dt>
+                  <dd className="text-ink">Dahil</dd>
                 </div>
-                <div className="flex justify-between pt-3 border-t border-neutral-200/60 text-sm font-bold text-neutral-900">
-                  <span>Tahmini Tutar</span>
-                  <span className="text-brand-terracotta">{formatPrice(verifiedSubtotal)}</span>
+                <div className="flex justify-between">
+                  <dt>Teslimat ve kurulum</dt>
+                  <dd className="text-ink">Temsilciyle netleşir</dd>
                 </div>
-              </div>
+                <div className="flex justify-between pt-3 border-t border-line text-base font-semibold text-ink">
+                  <dt>Tahmini tutar</dt>
+                  <dd className="font-mono tabular-nums-all">{isQuoting ? '…' : formatPrice(verifiedSubtotal)}</dd>
+                </div>
+              </dl>
+
+            <div className="space-y-3 mb-5">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  id="talep-kvkk"
+                  type="checkbox"
+                  aria-invalid={!!fieldErrors.kvkk}
+                  aria-describedby={fieldErrors.kvkk ? 'talep-kvkk-error' : undefined}
+                  checked={kvkkAccepted}
+                  onChange={(e) => {
+                    setKvkkAccepted(e.target.checked);
+                    clearFieldError('kvkk');
+                  }}
+                  className="mt-0.5 h-4 w-4 accent-ink shrink-0 cursor-pointer"
+                />
+                <span className="text-sm text-neutral-700 leading-relaxed">
+                  <button
+                    type="button"
+                    onClick={() => setShowKvkkModal(true)}
+                    className="text-ink font-medium underline hover:text-wood cursor-pointer"
+                  >
+                    KVKK aydınlatma metnini
+                  </button>
+                   okudum; sipariş talebimin değerlendirilmesi ve benimle iletişime geçilmesi için bilgilerimin işleneceği konusunda bilgilendirildim. <span className="text-signal" aria-hidden="true">*</span>
+                </span>
+              </label>
+              <FieldError id="talep-kvkk-error" message={fieldErrors.kvkk} />
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingConsent}
+                  onChange={(e) => setMarketingConsent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-ink shrink-0 cursor-pointer"
+                />
+                <span className="text-sm text-neutral-600 leading-relaxed">
+                  Yeni ürün ve kampanyalardan haberdar olmak istiyorum (isteğe bağlı).
+                </span>
+              </label>
+            </div>
 
               {formError && (
-                <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-xs text-rose-700 text-xs flex items-start gap-2">
+                <div role="alert" className="mb-4 p-3.5 bg-white border-l-4 border-signal text-ink text-sm flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>{formError}</span>
                 </div>
@@ -693,33 +766,31 @@ export default function OrderRequestPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || isQuoting || isCityDisabled}
-                className="w-full flex items-center justify-center gap-2 bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold tracking-widest uppercase py-4 transition-colors duration-300 rounded-sm shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-ink hover:bg-wood text-white text-sm font-semibold transition-colors rounded-xs cursor-pointer disabled:bg-neutral-400 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Talep İletiliyor...</span>
+                    <span>Talep gönderiliyor…</span>
                   </>
+                ) : isQuoting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Fiyatlar doğrulanıyor…</span>
+                  </>
+                ) : isCityDisabled ? (
+                  <span>Seçilen ile teslimat yapılamıyor</span>
                 ) : (
                   <>
-                    <span>Talebi Gönder ve Fiş Al</span>
+                    <span>Talebi gönder ve fişi al</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
               </button>
 
-              {/* Safe & Transparent Furniture Guarantees */}
-              <div className="mt-6 pt-6 border-t border-neutral-100 space-y-3">
-                <div className="flex items-start gap-2 text-neutral-500 text-[11px] font-light">
-                  <ShieldCheck className="h-4 w-4 text-brand-camel flex-shrink-0 mt-0.5" />
-                  <span>Ödemeler yalnızca şirketimizin resmi banka hesabına veya showroom'da kabul edilir.</span>
-                </div>
-                <div className="flex items-start gap-2 text-neutral-500 text-[11px] font-light">
-                  <Sparkles className="h-4 w-4 text-brand-camel flex-shrink-0 mt-0.5" />
-                  <span>Kumaş ve ahşap numuneleri için satış temsilcimiz veya atölyemiz tam destek sağlar.</span>
-                </div>
-              </div>
-
+              <p className="mt-4 text-xs text-neutral-600 leading-relaxed">
+                Ödemeler yalnız şirketimizin resmi banka hesabına veya showroom&apos;da alınır. Renk ve malzeme numuneleri için temsilcimiz destek olur.
+              </p>
             </div>
           </div>
 
@@ -728,18 +799,19 @@ export default function OrderRequestPage() {
 
       {/* KVKK Modal */}
       {showKvkkModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-sm max-w-2xl w-full p-6 sm:p-8 max-h-[85vh] overflow-y-auto relative shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xs max-w-2xl w-full p-6 sm:p-8 max-h-[85vh] overflow-y-auto relative shadow-2xl">
             <button
               onClick={() => setShowKvkkModal(false)}
-              className="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              aria-label="Kapat"
+              className="absolute top-3 right-3 h-11 w-11 flex items-center justify-center text-neutral-500 hover:text-ink cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
-            <h3 className="text-base font-bold text-neutral-900 mb-4 uppercase tracking-wider">
-              KVKK Aydınlatma Metni
+            <h3 className="text-lg font-semibold text-ink mb-4">
+              KVKK aydınlatma metni
             </h3>
-            <div className="text-xs text-neutral-600 font-light space-y-3 leading-relaxed">
+            <div className="text-sm text-neutral-700 space-y-3 leading-relaxed">
               <p>
                 <strong>Ermay Mobilya San. Tic. Ltd. Şti.</strong> olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca, veri sorumlusu sıfatıyla kişisel verilerinizin güvenliğine en üst seviyede önem veriyoruz.
               </p>
@@ -758,11 +830,12 @@ export default function OrderRequestPage() {
                 type="button"
                 onClick={() => {
                   setKvkkAccepted(true);
+                  clearFieldError('kvkk');
                   setShowKvkkModal(false);
                 }}
-                className="bg-brand-dark hover:bg-brand-camel text-white text-xs font-semibold px-6 py-2.5 rounded-xs uppercase tracking-wider cursor-pointer"
+                className="bg-ink hover:bg-wood text-white text-sm font-semibold px-5 py-2.5 rounded-xs cursor-pointer"
               >
-                Okudum, Onaylıyorum
+                Okudum, onaylıyorum
               </button>
             </div>
           </div>
