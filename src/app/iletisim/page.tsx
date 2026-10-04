@@ -40,11 +40,11 @@ function toE164(phone: string): string {
 export const revalidate = 60; // ISR
 
 export const metadata: Metadata = {
-  title: 'İletişim & Fabrikadan Satış Talebi | Ermay Mobilya Modoko',
+  title: 'İletişim | Ermay Mobilya',
   description: 'Ermay Mobilya Modoko showroom ve atölye iletişim bilgileri. Özel imalat talepleri, kurumsal projeler ve bayilik için bize ulaşın: 0532 419 41 51.',
   keywords: 'ermay mobilya iletişim, modoko mobilya telefon, mobilya sipariş iletişim, özel imalat mobilya teklif',
   openGraph: {
-    title: 'İletişim & Ulaşım | Ermay Mobilya',
+    title: 'İletişim | Ermay Mobilya',
     description: 'Modoko merkez mağazamız ve atölyemiz ile doğrudan iletişime geçin.',
     url: 'https://ermaymobilya.com/iletisim',
     siteName: 'Ermay Mobilya',

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, User, ArrowLeft, Share2, Tag, ChevronRight, MessageSquare } from 'lucide-react';
 import apiClient from '../../../services/api';
+import { cmsService } from '../../../services/cmsService';
 import type { BlogPost } from '../../../types';
 
 export const revalidate = 60;
@@ -47,6 +48,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostDetailPage({ params }: Props) {
+  // WhatsApp numarası CMS'teki iletişim bilgisinden (Admin > İletişim bilgileri); uluslararası rakam biçimine çevrilir
+  const contact = await cmsService.getContactConfig();
+  const waDigits = String(contact.whatsapp || '').replace(/\D/g, '');
+  const waNumber = waDigits.startsWith('0') ? `90${waDigits.slice(1)}` : waDigits.length === 10 ? `90${waDigits}` : waDigits || '905324194151';
+
   const { slug } = await params;
   let post: BlogPost | null = null;
 
@@ -180,13 +186,13 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
             <div className="flex items-center gap-2">
               <a
-                href={`https://wa.me/905324194151?text=${encodeURIComponent(`Merhaba, "${post.title}" başlıklı blog yazınızı okudum, bilgi almak istiyorum.`)}`}
+                href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba, "${post.title}" başlıklı blog yazınızı okudum, bilgi almak istiyorum.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-whatsapp hover:bg-whatsapp-dark text-white rounded-xs transition-colors font-bold text-xs"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
-                <span>Mimara Danış</span>
+                <span>WhatsApp’tan sorun</span>
               </a>
             </div>
           </div>

@@ -35,7 +35,7 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ermaymobilya.com'),
-  title: 'ERMAY Mobilya | Doğrudan Fabrikadan Ofis Mobilyaları',
+  title: 'Ermay Mobilya | Fabrikadan Ofis Mobilyaları',
   description: 'Ermay Mobilya - Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları. Aracısız doğrudan fabrika satışı, İstanbul içi kendi personelimizle teslimat & montaj.',
   keywords: 'ermay mobilya, ofis mobilyası, makam takımı, toplantı masası, çalışma masası, ofis koltukları, banko modelleri, doğrudan fabrikadan satış, toptan ofis mobilyası',
   icons: {

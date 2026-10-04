@@ -11,11 +11,11 @@ import type { Product } from '../types';
 export const revalidate = 60; // Incremental Static Regeneration (ISR) every 60s
 
 export const metadata: Metadata = {
-  title: 'ERMAY Ofis & Fabrika Satış | Doğrudan Üreticiden Standart Seri Mobilyalar',
+  title: 'Ermay Mobilya | Fabrikadan Ofis Mobilyaları',
   description: 'Doğrudan üreticiden standart seri ofis mobilyaları ve fabrika satış mağazası. Makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları.',
   keywords: 'ermay mobilya, ofis mobilyası, makam takımı, toplantı masası, çalışma masası, ofis koltukları, doğrudan fabrikadan satış, toptan ofis mobilyası',
   openGraph: {
-    title: 'ERMAY Mobilya | Doğrudan Fabrika Satış',
+    title: 'Ermay Mobilya | Fabrikadan Ofis Mobilyaları',
     description: 'Kendi üretim tesislerimizde imal edilen standart seri ofis mobilyaları.',
     url: 'https://ermaymobilya.com',
     siteName: 'Ermay Mobilya',

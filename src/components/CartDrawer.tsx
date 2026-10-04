@@ -8,6 +8,7 @@ import { useCartStore } from '../stores/useCartStore';
 import { OptimizedImage } from './OptimizedImage';
 import { useWhatsappNumber } from '../lib/whatsapp';
 import LeadTimeBadge from './LeadTimeBadge';
+import { useModalDismiss } from '../lib/useModalDismiss';
 
 export const CartDrawer: React.FC = () => {
   const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
@@ -26,6 +27,8 @@ export const CartDrawer: React.FC = () => {
       maximumFractionDigits: 0
     }).format(price).replace('TRY', 'TL');
   };
+
+  useModalDismiss(isOpen, onClose);
 
   if (!isOpen) return null;
 

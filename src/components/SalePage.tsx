@@ -370,7 +370,7 @@ export const SalePage: React.FC<SalePageProps> = ({
           ) : viewMode === 'grid' ? (
             /* GRID LAYOUT */
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {currentProducts.map((product) => {
+              {currentProducts.map((product, gridIdx) => {
                 const discount = getDiscountRate(product.price, product.originalPrice);
                 const isFav = favorites.some((fav) => fav.id === product.id);
                 return (
@@ -384,6 +384,7 @@ export const SalePage: React.FC<SalePageProps> = ({
                         src={product.image || ''}
                         alt={product.name}
                         fill
+                        priority={gridIdx < 3}
                         className="object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.03] will-change-transform"
                       />
                       {/* Floating Badges */}

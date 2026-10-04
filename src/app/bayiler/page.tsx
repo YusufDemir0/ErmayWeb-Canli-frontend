@@ -7,11 +7,11 @@ import { BayilerContent } from './BayilerContent';
 export const revalidate = 60; // ISR
 
 export const metadata: Metadata = {
-  title: 'Satış Noktaları & Harita | Ermay Mobilya Modoko',
+  title: 'Showroomlar ve Bayiler | Ermay Mobilya',
   description: 'İnteraktif Türkiye haritası üzerinden Ermay Mobilya Modoko merkez mağazası, Kocaeli fabrika satış mağazası ve Sakarya mağazalarımızın adres, telefon ve yol tarifi bilgileri.',
   keywords: 'ermay mobilya harita, türkiye mobilya mağazaları, modoko mobilya mağazası, kocaeli mobilya, sakarya mobilya',
   openGraph: {
-    title: 'Satış Noktaları & Mağazalarımız | Ermay Mobilya',
+    title: 'Showroomlar ve Bayiler | Ermay Mobilya',
     description: 'Ermay Mobilya mağazalarını harita üzerinde keşfedin, yol tarifi alın ve randevu oluşturun.',
     url: 'https://ermaymobilya.com/bayiler',
     siteName: 'Ermay Mobilya',

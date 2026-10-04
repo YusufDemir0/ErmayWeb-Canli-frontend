@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
 import {
   LayoutGrid, Truck, Inbox, Package, FolderTree, RefreshCw, Home, Megaphone, Sliders,
   FileText, BookOpen, Building2, MapPin, Phone, LogOut, ExternalLink, Menu, X,
 } from 'lucide-react';
 import BrandLogo from '../../../components/BrandLogo';
+import { useModalDismiss } from '../../../lib/useModalDismiss';
 
 export type AdminTabId =
   | 'overview'
@@ -89,6 +90,8 @@ interface AdminShellProps {
 
 export const AdminShell: React.FC<AdminShellProps> = ({ activeTab, onSelectTab, onLogout, isStaffOnly, counts, children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+  useModalDismiss(mobileOpen, closeMobile);
   const groups = ADMIN_NAV.map((g) => ({ ...g, items: g.items.filter((i) => !isStaffOnly || i.staff) })).filter(
     (g) => g.items.length > 0
   );

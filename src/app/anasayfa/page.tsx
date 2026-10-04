@@ -7,7 +7,7 @@ import { getLandingPageConfig } from '../../services/landingService';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'ERMAY Ofis & Fabrika Satış | Doğrudan Üreticiden Standart Seri Mobilyalar',
+  title: 'Ermay Mobilya | Fabrikadan Ofis Mobilyaları',
   description: 'Doğrudan üreticiden standart seri ofis mobilyaları ve fabrika satış mağazası. Makam takımları, toplantı masaları, ofis koltukları ve çalışma masaları.',
   alternates: {
     canonical: 'https://ermaymobilya.com/anasayfa',

@@ -227,7 +227,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
         {/* STICKY MAP CONTAINER (OPTIMIZED FOR ALL SCREENS) */}
         <div
           ref={mapSectionRef}
-          className="sticky top-[104px] z-20 mb-12 sm:mb-16 bg-canvas/95 pt-1 pb-3"
+          className="mb-12 sm:mb-16"
         >
           <TurkeyMap
             stores={activeStores}
@@ -275,8 +275,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveRegionId(region.regionId);
-                    mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    selectRegion(region.regionId);
+                    mapSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   }}
                   className="text-xs text-wood-dark hover:text-neutral-900 font-medium transition-colors"
                 >
@@ -326,8 +326,13 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                             <button
                               type="button"
                               onClick={() => {
-                                handleSelectCity(store.city);
-                                mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                // Önce ilin bölgesine geç, sonra o ilin baloncuğunu aç
+                                const prov = TURKEY_PROVINCES.find(
+                                  (p) => p.name.toLocaleLowerCase('tr-TR') === store.city.toLocaleLowerCase('tr-TR')
+                                );
+                                if (prov) selectRegion(prov.region);
+                                handleSelectCity(prov ? prov.name : store.city);
+                                mapSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                               }}
                               className="text-xs text-wood-dark hover:underline shrink-0 font-medium"
                               title="Haritada Göster"

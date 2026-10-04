@@ -6,6 +6,7 @@ import { useUIStore } from '../stores/useUIStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { useCartStore } from '../stores/useCartStore';
 import { OptimizedImage } from './OptimizedImage';
+import { useModalDismiss } from '../lib/useModalDismiss';
 
 export const FavoritesDrawer: React.FC = () => {
   const isOpen = useUIStore((state) => state.isFavoritesOpen);
@@ -22,6 +23,8 @@ export const FavoritesDrawer: React.FC = () => {
       maximumFractionDigits: 0
     }).format(price).replace('TRY', 'TL');
   };
+
+  useModalDismiss(isOpen, onClose);
 
   if (!isOpen) return null;
 

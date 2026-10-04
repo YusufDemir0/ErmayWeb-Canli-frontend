@@ -17,6 +17,8 @@ interface ProductCardProps {
   onAddToCart?: () => void;
   /** Liste sayfalarında ürüne özel WhatsApp sorusu için küçük bağlantı */
   showWhatsapp?: boolean;
+  /** Ekranın üstündeki ilk kartlar: görsel öncelikli yüklenir (LCP) */
+  priority?: boolean;
 }
 
 // Module-level cached formatter to avoid expensive re-allocations on render cycles
@@ -58,6 +60,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
   onToggleFavorite: onToggleFavoriteProp,
   onAddToCart: onAddToCartProp,
   showWhatsapp = false,
+  priority = false,
 }) => {
   const waNumber = useWhatsappNumber();
   const storeIsFavorite = useFavoritesStore((state) => state.isFavorite(product.id));
@@ -96,6 +99,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
           src={mainImage}
           alt={product.name}
           fill
+          priority={priority}
           className="object-cover transform-gpu transition-transform duration-500 ease-out will-change-transform group-hover:scale-[1.04]"
         />
 

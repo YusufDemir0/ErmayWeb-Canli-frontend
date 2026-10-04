@@ -7,6 +7,7 @@ import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { useCartStore } from '../stores/useCartStore';
 import type { ProductImages } from '../types';
 import { useWhatsappNumber } from '../lib/whatsapp';
+import { useModalDismiss } from '../lib/useModalDismiss';
 
 export const ProductQuickView: React.FC = () => {
   const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
@@ -25,6 +26,8 @@ export const ProductQuickView: React.FC = () => {
     setActiveImageIndex(0);
     setQuantity(1);
   }, [product]);
+
+  useModalDismiss(!!product, onClose);
 
   if (!product) return null;
 

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { FavoritesPage } from '../../components/FavoritesPage';
 
 export const metadata: Metadata = {
-  title: 'Beğendiğim Tasarımlar | Ermay Mobilya',
+  title: 'Favorilerim | Ermay Mobilya',
   description: 'Favorilerinize eklediğiniz Ermay Mobilya tasarımlarını inceleyin.',
 };
 

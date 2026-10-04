@@ -14,19 +14,31 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const formattedTitle = slug
+/** Kategorinin gerçek adı (Türkçe karakterleriyle); API erişilemezse slug'dan türetilir */
+async function resolveCategoryName(slug: string): Promise<string> {
+  if (slug === 'hepsi' || slug === 'all') return 'Tüm Ürünler';
+  try {
+    const res = await apiClient.get(`/categories/${slug}`);
+    if (res.data?.category?.name) return res.data.category.name as string;
+  } catch {
+    // slug'a düş
+  }
+  return slug
     .split('-')
     .map((word) => word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1))
     .join(' ');
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const formattedTitle = await resolveCategoryName(slug);
 
   return {
-    title: `${formattedTitle} Modelleri & Doğrudan Fabrika Satış | Ermay Mobilya`,
-    description: `Ermay Mobilya doğrudan fabrika üretimi ${formattedTitle} modelleri. 1. Sınıf E1 melamin, DKP çelik profil ve aracısız üretici fiyatlarıyla hemen keşfedin.`,
+    title: `${formattedTitle} | Ermay Mobilya`,
+    description: `${formattedTitle}: Ermay Mobilya atölyesinde üretilen modeller, fabrika fiyatıyla. E1 melamin, DKP çelik ayak; İstanbul içi teslimat ve kurulum.`,
     openGraph: {
-      title: `${formattedTitle} Modelleri & Fiyatları | Ermay Mobilya`,
-      description: `En yeni ${formattedTitle} tasarımları, modüler takım seçenekleri ve doğrudan üretici fiyat avantajları.`,
+      title: `${formattedTitle} | Ermay Mobilya`,
+      description: `${formattedTitle} modelleri ve fabrika fiyatları.`,
       url: `https://ermaymobilya.com/kategori/${slug}`,
       siteName: 'Ermay Mobilya',
       locale: 'tr_TR',

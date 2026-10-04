@@ -68,8 +68,8 @@ export default function ProductGridClient({
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {displayedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {displayedProducts.map((product, idx) => (
+          <ProductCard key={product.id} product={product} priority={idx < 4} />
         ))}
       </div>
 

@@ -8,10 +8,10 @@ import type { Product } from '../../types';
 export const revalidate = 60; // Incremental Static Regeneration every 60 seconds
 
 export const metadata: Metadata = {
-  title: 'Tüm Ürünler & Fabrika Koleksiyonu | Ermay Mobilya',
+  title: 'Tüm Ürünler | Ermay Mobilya',
   description: 'Ermay Mobilya doğrudan üreticiden standart seri tüm ofis mobilyaları. Makam takımları, masalar, dolaplar, ofis koltukları ve aksesuarlar.',
   openGraph: {
-    title: 'Tüm Ürünler & Fabrika Koleksiyonu | Ermay Mobilya',
+    title: 'Tüm Ürünler | Ermay Mobilya',
     description: 'Kendi üretim tesislerimizde imal edilen doğrudan fabrika satış standart seri ofis mobilyaları.',
     url: 'https://ermaymobilya.com/kategori',
     siteName: 'Ermay Mobilya',

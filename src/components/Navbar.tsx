@@ -81,6 +81,19 @@ export const Navbar: React.FC = () => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
+  // Mobil menü açıkken Esc kapatır ve arka plan kaydırılmaz
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsMobileMenuOpen(false);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isMobileMenuOpen]);
+
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
@@ -247,7 +260,7 @@ export const Navbar: React.FC = () => {
       {/* 5. MOBILE HAMBURGER MENU DRAWER (Full Slide-In Sheet)         */}
       {/* ============================================================ */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
+        <div className="fixed inset-0 z-50 flex lg:hidden" role="dialog" aria-modal="true" aria-label="Menü">
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-neutral-950/60 animate-fade-in"
@@ -264,6 +277,7 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Menüyü kapat"
                   className="p-2 text-neutral-500 hover:text-neutral-900 rounded-full hover:bg-neutral-200 transition-colors"
                 >
                   <X className="h-5 w-5" />

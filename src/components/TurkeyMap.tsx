@@ -271,11 +271,44 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
   }, [activeRegionId]);
 
   // Click on province or pin: open city bubble
+  // Önce bölge (gerekirse) değişir, sonra il seçilir; ters sırada bölge değişimi baloncuğu kapatıyordu
   const handleCityClick = useCallback((prov: { name: string; region: string }) => {
+    if (onSelectRegion && prov.region && prov.region !== activeRegionId) onSelectRegion(prov.region);
     setInternalBubbleCity(prov.name);
     if (onSelectCity) onSelectCity(prov.name);
-    if (onSelectRegion && prov.region) onSelectRegion(prov.region);
-  }, [onSelectCity, onSelectRegion]);
+  }, [onSelectCity, onSelectRegion, activeRegionId]);
+
+  // Baloncuk, tıklanan ilin ekrandaki konumuna demirlenir (zoom animasyonu bitince yeniden ölçülür)
+  const canvasRef = React.useRef<HTMLDivElement>(null);
+  const [bubbleAnchor, setBubbleAnchor] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  useEffect(() => {
+    if (!activeBubbleCity) {
+      setBubbleAnchor(null);
+      return;
+    }
+    const measure = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const prov = TURKEY_PROVINCES.find((p) => p.name.toLowerCase() === activeBubbleCity.toLowerCase());
+      const target =
+        (prov && canvas.querySelector<SVGGraphicsElement>(`[data-pin="${prov.id}"]`)) ||
+        (prov && canvas.querySelector<SVGGraphicsElement>(`path#${prov.id}`));
+      const c = canvas.getBoundingClientRect();
+      if (!target) {
+        setBubbleAnchor({ x: c.width / 2, y: c.height / 2, w: c.width, h: c.height });
+        return;
+      }
+      const t = target.getBoundingClientRect();
+      setBubbleAnchor({ x: t.left + t.width / 2 - c.left, y: t.top + t.height / 2 - c.top, w: c.width, h: c.height });
+    };
+    measure();
+    const timer = setTimeout(measure, 760);
+    window.addEventListener('resize', measure);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', measure);
+    };
+  }, [activeBubbleCity, activeRegionId]);
 
   const handleCloseBubble = useCallback(() => {
     setInternalBubbleCity(null);
@@ -369,6 +402,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
       {/* SVG Canvas (Hardware Accelerated, Smooth Transition) */}
       <div
+        ref={canvasRef}
         className="relative w-full aspect-[2.35/1] max-h-[380px] sm:max-h-[440px] select-none"
         onClick={(e) => e.stopPropagation()}
       >
@@ -462,6 +496,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               return (
                 <g
                   key={`pin-${prov.id}`}
+                  data-pin={prov.id}
                   transform={`translate(${center.x}, ${center.y}) scale(${1 / currentTransform.scale})`}
                   className="cursor-pointer"
                   onClick={(e) => {
@@ -543,9 +578,22 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
         */}
         {activeBubbleCity && (
           <div
-            className="absolute z-30 inset-x-2 bottom-2 md:inset-x-auto md:bottom-auto md:top-3 md:right-3 md:w-96 max-h-[88%] bg-white/98 rounded-xs shadow-2xl border border-line flex flex-col overflow-hidden animate-fade-in"
+            role="dialog"
+            aria-label={`${activeBubbleCity} mağazaları`}
+            className="absolute z-30 inset-x-2 bottom-2 sm:inset-x-auto sm:bottom-auto sm:w-80 max-h-[92%] bg-white rounded-xs shadow-2xl border border-line flex flex-col overflow-hidden animate-fade-in"
             onClick={(e) => e.stopPropagation()}
-            style={{ willChange: 'transform' }}
+            style={
+              bubbleAnchor && bubbleAnchor.w >= 640
+                ? {
+                    // İlin sağına açılır; sağda yer yoksa soluna. Dikeyde ile hizalanır, kutu dışına taşmaz.
+                    left:
+                      bubbleAnchor.x + 24 + 320 <= bubbleAnchor.w
+                        ? bubbleAnchor.x + 24
+                        : Math.max(8, bubbleAnchor.x - 24 - 320),
+                    top: Math.min(Math.max(8, bubbleAnchor.y - 60), Math.max(8, bubbleAnchor.h - 260)),
+                  }
+                : undefined
+            }
           >
             {/* Bubble Header */}
             <div className="p-3.5 sm:p-4 border-b border-line flex items-center justify-between bg-neutral-50/80">

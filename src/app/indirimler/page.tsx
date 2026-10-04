@@ -6,7 +6,7 @@ import { productService } from '../../services/productService';
 export const revalidate = 60; // ISR: build anında boş veriyle statik üretilmesin
 
 export const metadata: Metadata = {
-  title: 'İndirimli Ürünler & Kampanyalar | Ermay Mobilya',
+  title: 'İndirimli Ürünler | Ermay Mobilya',
   description: 'Doğrudan üreticiden standart seri ofis mobilyalarında fabrika satış indirimleri: makam takımları, toplantı masaları, ofis koltukları ve daha fazlası.',
 };
 
