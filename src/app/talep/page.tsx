@@ -353,7 +353,7 @@ export default function OrderRequestPage() {
           <input
             type="text"
             name="website"
-            value={honeypot}
+            value={honeypot} maxLength={200}
             onChange={(e) => setHoneypot(e.target.value)}
             style={{ display: 'none' }}
             tabIndex={-1}
@@ -388,7 +388,7 @@ export default function OrderRequestPage() {
                     type="text"
                     autoComplete="name"
                     required
-                    value={customerName}
+                    value={customerName} maxLength={100}
                     onChange={(e) => {
                       setCustomerName(e.target.value);
                       clearFieldError('name');
@@ -413,7 +413,7 @@ export default function OrderRequestPage() {
                       inputMode="tel"
                       autoComplete="tel"
                       required
-                      value={customerPhone}
+                      value={customerPhone} maxLength={25}
                       onChange={(e) => {
                         setCustomerPhone(e.target.value);
                         clearFieldError('phone');
@@ -436,7 +436,7 @@ export default function OrderRequestPage() {
                       name="email"
                       type="email"
                       autoComplete="email"
-                      value={customerEmail}
+                      value={customerEmail} maxLength={150}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="ahmet@ornek.com"
                       className={inputClass()}
@@ -529,7 +529,7 @@ export default function OrderRequestPage() {
                     name="street-address"
                     type="text"
                     autoComplete="street-address"
-                    value={addressLine}
+                    value={addressLine} maxLength={255}
                     onChange={(e) => setAddressLine(e.target.value)}
                     placeholder="Mahalle, cadde, sokak veya site adı"
                     className={inputClass()}
@@ -634,7 +634,7 @@ export default function OrderRequestPage() {
                   id="talep-note"
                   name="note"
                   rows={3}
-                  value={note}
+                  value={note} maxLength={500}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Kat ve asansör durumu, teslimat günü tercihi veya adetli alım notu"
                   className={`${inputClass()} resize-none`}

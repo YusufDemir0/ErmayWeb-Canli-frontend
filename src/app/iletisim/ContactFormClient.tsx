@@ -84,7 +84,7 @@ export default function ContactFormClient() {
             <input
               type="text"
               required
-              value={formData.name}
+              value={formData.name} maxLength={100}
               onChange={(e) => setFormData({ ...formData, name: e.target.value.replace(/[0-9]/g, '') })}
               placeholder="Adınız Soyadınız"
               className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
@@ -99,7 +99,7 @@ export default function ContactFormClient() {
               <input
                 type="email"
                 required
-                value={formData.email}
+                value={formData.email} maxLength={150}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="ornek@domain.com"
                 className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
@@ -113,7 +113,7 @@ export default function ContactFormClient() {
               <input
                 type="tel"
                 required
-                value={formData.phone}
+                value={formData.phone} maxLength={25}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="0532 000 00 00"
                 className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
@@ -145,7 +145,7 @@ export default function ContactFormClient() {
             <textarea
               required
               rows={5}
-              value={formData.message}
+              value={formData.message} maxLength={3000}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Mobilya talebiniz, ölçü detayları veya sorunuz..."
               className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none resize-none"
@@ -155,7 +155,7 @@ export default function ContactFormClient() {
           <div aria-hidden="true" className="absolute -left-[10000px] h-0 w-0 overflow-hidden">
             <label>
               Web siteniz
-              <input type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+              <input type="text" tabIndex={-1} autoComplete="off" value={website} maxLength={200} onChange={(e) => setWebsite(e.target.value)} />
             </label>
           </div>
 

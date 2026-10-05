@@ -5,6 +5,8 @@ import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import { useCMSStore, DEFAULT_TICKER_STYLE, type TickerStyleConfig } from '../../../stores/useCMSStore';
 
 interface TickerTabProps {
+  /** content: duyuru metinleri (CMS > İçerik), design: renk ve hız (CMS > Tasarım) */
+  mode: 'content' | 'design';
   tickerItems: string[];
   onAddTickerItem: (item: string) => void;
   onRemoveTickerItem: (index: number) => void;
@@ -34,7 +36,7 @@ const contrastRatio = (a: string, b: string): number => {
   return (l1 + 0.05) / (l2 + 0.05);
 };
 
-export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerItem, onRemoveTickerItem, onShowSuccess }) => {
+export const TickerTab: React.FC<TickerTabProps> = ({ mode, tickerItems, onAddTickerItem, onRemoveTickerItem, onShowSuccess }) => {
   const tickerStyle = useCMSStore((state) => state.tickerStyle);
   const updateTickerStyle = useCMSStore((state) => state.updateTickerStyle);
   const setTickerItems = useCMSStore((state) => state.setTickerItems);
@@ -101,9 +103,10 @@ export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerIt
         </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="max-w-3xl">
         {/* Metinler */}
-        <section className="lg:col-span-3 bg-white border border-line rounded-xs p-5 space-y-4">
+        {mode === 'content' && (
+        <section className="bg-white border border-line rounded-xs p-5 space-y-4">
           <h2 className="text-base font-semibold text-ink">Duyuru metinleri</h2>
 
           <form
@@ -153,6 +156,7 @@ export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerIt
                       }}
                       className="flex-1 h-9 text-sm border border-wood px-2 rounded-xs focus:outline-none"
                       aria-label="Duyuruyu düzenle"
+                      maxLength={120}
                     />
                   ) : (
                     <button
@@ -191,9 +195,11 @@ export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerIt
           )}
           <p className="text-xs text-neutral-500">Metne tıklayarak düzenleyebilir, oklarla sırasını değiştirebilirsiniz. Değişiklikler hemen kaydedilir.</p>
         </section>
+        )}
 
         {/* Görünüm */}
-        <section className="lg:col-span-2 bg-white border border-line rounded-xs p-5 space-y-5">
+        {mode === 'design' && (
+        <section className="bg-white border border-line rounded-xs p-5 space-y-5">
           <h2 className="text-base font-semibold text-ink">Renk ve hız</h2>
 
           <div className="grid grid-cols-2 gap-2">
@@ -270,6 +276,7 @@ export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerIt
             </button>
           </div>
         </section>
+        )}
       </div>
     </div>
   );

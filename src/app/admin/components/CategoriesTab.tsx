@@ -280,7 +280,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
               <input
                 type="text"
                 required
-                value={catForm.name}
+                value={catForm.name} maxLength={80}
                 onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
                 placeholder="Örn: Çalışma Koltukları"
                 className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
@@ -293,7 +293,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
               </label>
               <input
                 type="text"
-                value={catForm.slug || ''}
+                value={catForm.slug || ''} maxLength={120}
                 onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
                 placeholder="calisma-koltuklari"
                 className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"

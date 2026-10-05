@@ -8,7 +8,7 @@ import apiClient from '../../services/api';
 import { isAxiosError } from 'axios';
 
 // Modular Admin Subcomponents
-import { AdminShell, findNavItem, type AdminTabId } from './components/AdminShell';
+import { AdminShell, findNavItem, LEGACY_TAB_ALIASES, type AdminTabId } from './components/AdminShell';
 import BrandLogo from '../../components/BrandLogo';
 import { requestService } from '../../services/requestService';
 import { OverviewTab } from './components/OverviewTab';
@@ -17,8 +17,7 @@ import { ContactMessagesTab } from './components/ContactMessagesTab';
 import { CategoriesTab } from './components/CategoriesTab';
 import { ProductsTab } from './components/ProductsTab';
 import { ErpSyncTab } from './components/ErpSyncTab';
-import { HomeCMSTab } from './components/HomeCMSTab';
-import { CorporateCMSTab } from './components/CorporateCMSTab';
+import PageEditor from './components/page-editor/PageEditor';
 import { TickerTab } from './components/TickerTab';
 import { ContactTab } from './components/ContactTab';
 import { StoresTab } from './components/StoresTab';
@@ -52,7 +51,8 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get('sekme') as AdminTabId | null;
+    const raw = new URLSearchParams(window.location.search).get('sekme');
+    const fromUrl = (raw && LEGACY_TAB_ALIASES[raw]) || (raw as AdminTabId | null);
     if (fromUrl && findNavItem(fromUrl)) setActiveTabState(fromUrl);
   }, []);
 
@@ -76,12 +76,6 @@ export default function AdminPage() {
   const updateCategory = useCMSStore((state) => state.updateCategory);
   const deleteCategory = useCMSStore((state) => state.deleteCategory);
   const reorderCategories = useCMSStore((state) => state.reorderCategories);
-
-  const homeConfig = useCMSStore((state) => state.homeConfig);
-  const updateHomeConfig = useCMSStore((state) => state.updateHomeConfig);
-
-  const corporateConfig = useCMSStore((state) => state.corporateConfig);
-  const updateCorporateConfig = useCMSStore((state) => state.updateCorporateConfig);
 
   const tickerItems = useCMSStore((state) => state.tickerItems);
   const addTickerItem = useCMSStore((state) => state.addTickerItem);
@@ -226,6 +220,7 @@ export default function AdminPage() {
                   type="text"
                   required
                   autoComplete="username"
+                  maxLength={150}
                   value={loginUser}
                   onChange={(e) => setLoginUser(e.target.value)}
                   className="w-full pl-10 pr-3 h-11 text-base sm:text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
@@ -244,6 +239,7 @@ export default function AdminPage() {
                   type="password"
                   required
                   autoComplete="current-password"
+                  maxLength={200}
                   value={loginPass}
                   onChange={(e) => setLoginPass(e.target.value)}
                   className="w-full pl-10 pr-3 h-11 text-base sm:text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
@@ -331,27 +327,21 @@ export default function AdminPage() {
 
           {activeTab === 'blog' && <BlogTab onShowSuccess={showSaveSuccess} onShowError={showError} />}
 
-          {activeTab === 'homeCMS' && (
-            <HomeCMSTab
-              homeConfig={homeConfig}
-              onUpdateHomeConfig={updateHomeConfig}
+          {(activeTab === 'pageContent' || activeTab === 'pageDesign') && (
+            <PageEditor
+              key={activeTab}
+              mode={activeTab === 'pageDesign' ? 'design' : 'content'}
               onShowSuccess={showSaveSuccess}
               onShowError={showError}
             />
           )}
 
-          {activeTab === 'corporateCMS' && (
-            <CorporateCMSTab
-              corporateConfig={corporateConfig}
-              onUpdateCorporateConfig={updateCorporateConfig}
-              onShowSuccess={showSaveSuccess}
-            />
-          )}
-
           {activeTab === 'stores' && <StoresTab onShowSuccess={showSaveSuccess} />}
 
-          {activeTab === 'ticker' && (
+          {(activeTab === 'ticker' || activeTab === 'tickerStyle') && (
             <TickerTab
+              key={activeTab}
+              mode={activeTab === 'ticker' ? 'content' : 'design'}
               tickerItems={tickerItems}
               onAddTickerItem={addTickerItem}
               onRemoveTickerItem={removeTickerItem}

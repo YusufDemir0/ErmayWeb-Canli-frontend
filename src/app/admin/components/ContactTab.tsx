@@ -117,7 +117,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localContact.phone}
+              value={localContact.phone} maxLength={25}
               onChange={(e) => setLocalContact({ ...localContact, phone: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="0216 420 00 00"
@@ -130,7 +130,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="email"
-              value={localContact.email}
+              value={localContact.email} maxLength={150}
               onChange={(e) => setLocalContact({ ...localContact, email: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="info@ermaymobilya.com"
@@ -143,7 +143,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localContact.address}
+              value={localContact.address} maxLength={300}
               onChange={(e) => setLocalContact({ ...localContact, address: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
@@ -156,7 +156,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localContact.showroom || ''}
+              value={localContact.showroom || ''} maxLength={300}
               onChange={(e) => setLocalContact({ ...localContact, showroom: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
@@ -169,7 +169,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localContact.whatsapp || ''}
+              value={localContact.whatsapp || ''} maxLength={16}
               onChange={(e) => setLocalContact({ ...localContact, whatsapp: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
               placeholder="+90 532 419 41 51"
@@ -201,7 +201,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localSocials.instagram}
+              value={localSocials.instagram} maxLength={500}
               onChange={(e) => setLocalSocials({ ...localSocials, instagram: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://instagram.com/ermaymobilya"
@@ -215,7 +215,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localSocials.youtube}
+              value={localSocials.youtube} maxLength={500}
               onChange={(e) => setLocalSocials({ ...localSocials, youtube: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://youtube.com/@ermaymobilya"
@@ -229,7 +229,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localSocials.telegram}
+              value={localSocials.telegram} maxLength={500}
               onChange={(e) => setLocalSocials({ ...localSocials, telegram: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
               placeholder="https://t.me/ermaymobilya"
@@ -243,7 +243,7 @@ export const ContactTab: React.FC<ContactTabProps> = ({
             </label>
             <input
               type="text"
-              value={localSocials.whatsapp}
+              value={localSocials.whatsapp} maxLength={500}
               onChange={(e) => setLocalSocials({ ...localSocials, whatsapp: e.target.value })}
               className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
               placeholder="+90 532 000 00 00"

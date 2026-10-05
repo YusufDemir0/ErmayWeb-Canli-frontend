@@ -16,7 +16,15 @@ const formatPrice = (amount: number) => currencyFormatter.format(amount).replace
  * Takımlar: katalogda parça listesi (setPieces) tanımlı gerçek ürünler. Koda gömülü set, fiyat veya görsel yok;
  * uygun ürün yoksa bölüm hiç görünmez.
  */
-export const CuratedSets: React.FC = () => {
+interface CuratedSetsProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export const CuratedSets: React.FC<CuratedSetsProps> = ({
+  title = 'Takım halinde üretilenler',
+  subtitle = 'Parçaları aynı seride, birbirine ölçülü üretilen takımlar. Parça listesi ve fiyat katalogdaki güncel kayıttan gelir.',
+}) => {
   const products = useCMSStore((state) => state.products);
   const catalogLoaded = useCMSStore((state) => state.catalogLoaded);
 
@@ -31,7 +39,7 @@ export const CuratedSets: React.FC = () => {
 
   if (!catalogLoaded) {
     return (
-      <section className="py-12 md:py-16 bg-paper border-y border-line" aria-busy="true" aria-label="Takımlar yükleniyor">
+      <section className="py-12 md:py-16" aria-busy="true" aria-label="Takımlar yükleniyor">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="space-y-2">
             <Skeleton className="h-8 w-72" />
@@ -61,14 +69,12 @@ export const CuratedSets: React.FC = () => {
   if (sets.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16 bg-paper border-y border-line">
+    <section className="py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
           <div className="space-y-1">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight">Takım halinde üretilenler</h2>
-            <p className="text-sm text-neutral-600 max-w-xl">
-              Parçaları aynı seride, birbirine ölçülü üretilen takımlar. Parça listesi ve fiyat katalogdaki güncel kayıttan gelir.
-            </p>
+            {title && <h2 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight">{title}</h2>}
+            {subtitle && <p className="text-sm text-neutral-600 max-w-xl">{subtitle}</p>}
           </div>
           <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-semibold text-wood hover:text-ink transition-colors group">
             <span>Tüm katalog</span>

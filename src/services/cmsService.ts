@@ -81,6 +81,19 @@ export const DEFAULT_CATEGORY_LIST_CONFIG: CategoryListConfig = {
 };
 
 export const cmsService = {
+  /** Tüm CMS blokları tek istekte (sayfa düzenleri bunlardan çözülür). Hata olursa boş nesne. */
+  async getAllBlocks(): Promise<Record<string, unknown>> {
+    try {
+      const response = await apiClient.get('/cms');
+      if (response.data?.success && response.data.cms && typeof response.data.cms === 'object') {
+        return response.data.cms as Record<string, unknown>;
+      }
+    } catch {
+      // Sayfa varsayılan düzenle çizilir
+    }
+    return {};
+  },
+
   async getHeroConfig(): Promise<HeroConfig> {
     try {
       const response = await apiClient.get<HeroConfig>('/cms/blocks/hero');

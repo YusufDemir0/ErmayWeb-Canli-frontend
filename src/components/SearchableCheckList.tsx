@@ -61,7 +61,7 @@ export const SearchableCheckList: React.FC<SearchableCheckListProps> = ({
           <input
             id={`${id}-q`}
             type="search"
-            value={query}
+            value={query} maxLength={60}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={searchPlaceholder}
             className="w-full h-9 pl-8 pr-8 text-sm border border-line-strong rounded-xs bg-white focus:outline-none focus:ring-2 focus:ring-wood/30"

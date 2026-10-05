@@ -14,7 +14,7 @@ import { getProductImages } from '../../../lib/productImages';
 import { Pagination } from '../../../components/Pagination';
 import { toast } from '../../../stores/useToastStore';
 import { useCMSStore } from '../../../stores/useCMSStore';
-import { ProductFormModal } from './ProductFormModal';
+import { ProductFormModal, type ProductPayload } from './ProductFormModal';
 import { RowsSkeleton } from '../../../components/Skeleton';
 
 export interface ErpCatalogItem {
@@ -30,8 +30,8 @@ export interface ErpCatalogItem {
 interface ProductsTabProps {
   products: Product[];
   categories: Category[];
-  onAddProduct: (prod: Product) => void;
-  onUpdateProduct: (id: string, prod: Product) => void;
+  onAddProduct: (prod: Product) => Promise<void>;
+  onUpdateProduct: (id: string, prod: Partial<Product>) => Promise<void>;
   onDeleteProduct: (id: string) => void;
   onShowSuccess: (msg: string) => void;
 }
@@ -197,15 +197,14 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
     setIsModalOpen(true);
   };
 
-  const handleSaveProductModal = async (productPayload: any) => {
+  // Hata olursa fırlatılır; form açık kalır ve mesajı alanların yanında gösterir
+  const handleSaveProductModal = async (productPayload: ProductPayload) => {
     if (editingProdId) {
-      await onUpdateProduct(editingProdId, productPayload);
-      toast.success('Ürün Güncellendi', `"${productPayload.name}" başarıyla güncellendi.`);
-      onShowSuccess(`"${productPayload.name}" ürünü başarıyla güncellendi!`);
+      await onUpdateProduct(editingProdId, productPayload as unknown as Partial<Product>);
+      onShowSuccess(`"${productPayload.name}" güncellendi.`);
     } else {
-      await onAddProduct(productPayload);
-      toast.success('Ürün Eklendi', `"${productPayload.name}" kataloğa eklendi.`);
-      onShowSuccess(`"${productPayload.name}" başarıyla kataloğa eklendi!`);
+      await onAddProduct(productPayload as unknown as Product);
+      onShowSuccess(`"${productPayload.name}" kataloğa eklendi.`);
     }
     setIsModalOpen(false);
     setEditingProdId(null);
@@ -294,7 +293,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
           <input
             type="text"
             placeholder="Ürün adı, açıklama veya ERP kodu ile ara"
-            value={searchFilter}
+            value={searchFilter} maxLength={100}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full pl-10 pr-4 h-10 text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-none bg-white"
           />
@@ -545,7 +544,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                     <input
                       type="text"
                       placeholder="Kod veya isim ile filtreleyin (örn: MBL-, MASA, KOLTUK, SEKRETER)..."
-                      value={wizardSearch}
+                      value={wizardSearch} maxLength={100}
                       onChange={(e) => setWizardSearch(e.target.value)}
                       className="w-full text-xs pl-9 pr-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-white font-mono"
                     />

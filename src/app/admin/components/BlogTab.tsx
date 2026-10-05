@@ -188,7 +188,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
         <input
           type="text"
           placeholder="Blog başlığı veya kategori ara..."
-          value={searchQuery}
+          value={searchQuery} maxLength={100}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full text-xs outline-hidden text-neutral-800"
         />
@@ -310,7 +310,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 <input
                   type="text"
                   required
-                  value={formData.title}
+                  value={formData.title} maxLength={200}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Örn: Masif Ahşap Mobilya Bakımı ve 2026 Trendleri"
                   className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
@@ -326,7 +326,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   <input
                     type="text"
                     list="blog-category-options"
-                    value={formData.category}
+                    value={formData.category} maxLength={80}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="Listeden seçin veya yeni yazın"
                     className="w-full px-3 h-10 text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-hidden"
@@ -344,7 +344,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   </label>
                   <input
                     type="text"
-                    value={formData.author}
+                    value={formData.author} maxLength={80}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                     placeholder="Ermay Mobilya"
                     className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
@@ -360,7 +360,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 <div className="flex items-center gap-3">
                   <input
                     type="text"
-                    value={formData.coverImage}
+                    value={formData.coverImage} maxLength={500}
                     onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
                     placeholder="Görsel URL veya dosya yükleyin"
                     className="flex-1 px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
@@ -385,7 +385,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 </label>
                 <textarea
                   rows={2}
-                  value={formData.summary}
+                  value={formData.summary} maxLength={500}
                   onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                   placeholder="Arama motorlarında ve kartlarda görünecek 1-2 cümlelik özet..."
                   className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
@@ -399,7 +399,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 <textarea
                   required
                   rows={10}
-                  value={formData.content}
+                  value={formData.content} maxLength={100000}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Detaylı mimari rehber, ahşap türleri, bakım tüyoları ve dekorasyon detaylarını buraya girin..."
                   className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono text-xs leading-relaxed"
@@ -412,7 +412,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 </label>
                 <input
                   type="text"
-                  value={formData.tags}
+                  value={formData.tags} maxLength={900}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                   placeholder="masif gürgen, modoko, makam takımı, ofis koltuğu"
                   className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden font-mono"

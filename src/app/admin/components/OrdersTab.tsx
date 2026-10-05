@@ -227,7 +227,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
             <input
               type="text"
               placeholder="Kod, müşteri adı veya telefon ara..."
-              value={searchQuery}
+              value={searchQuery} maxLength={100}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
@@ -605,7 +605,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 </label>
                 <textarea
                   rows={3}
-                  value={staffNote}
+                  value={staffNote} maxLength={500}
                   onChange={(e) => setStaffNote(e.target.value)}
                   placeholder="Müşteriyle görüşüldü, Modoko showroom randevusu teyit edildi..."
                   className="w-full p-3 text-xs bg-white border border-line-strong rounded-xs focus:outline-hidden focus:border-wood"

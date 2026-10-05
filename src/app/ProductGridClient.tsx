@@ -9,11 +9,16 @@ import type { Product } from '../types';
 interface ProductGridClientProps {
   initialProducts?: Product[];
   featuredTitle?: string;
+  subtitle?: string;
+  /** Gösterilecek en fazla ürün */
+  limit?: number;
 }
 
 export default function ProductGridClient({
   initialProducts = [],
   featuredTitle = 'Ürünler',
+  subtitle = '',
+  limit = 8,
 }: ProductGridClientProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'new'>('featured');
 
@@ -21,14 +26,14 @@ export default function ProductGridClient({
 
   const displayedProducts = React.useMemo(() => {
     const featuredProducts = products.filter((p) => p.badge?.includes('Öne Çıkan') || p.rating >= 4.8);
-    const newArrivals = products.slice(0, 8);
+    const newArrivals = products.slice(0, limit);
 
-    if (activeTab === 'all') return products.slice(0, 8);
+    if (activeTab === 'all') return products.slice(0, limit);
     if (activeTab === 'featured') {
-      return featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : products.slice(0, 8);
+      return featuredProducts.length > 0 ? featuredProducts.slice(0, limit) : products.slice(0, limit);
     }
     return newArrivals;
-  }, [products, activeTab]);
+  }, [products, activeTab, limit]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -38,6 +43,7 @@ export default function ProductGridClient({
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink tracking-tight">
             {featuredTitle}
           </h2>
+          {subtitle && <p className="text-sm text-neutral-600 max-w-xl">{subtitle}</p>}
         </div>
 
         {/* Showcase Tabs */}

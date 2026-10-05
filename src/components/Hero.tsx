@@ -3,19 +3,30 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { useCMSStore } from '../stores/useCMSStore';
+import { useCMSStore, type HeroSlide } from '../stores/useCMSStore';
 import OptimizedImage from './OptimizedImage';
 import EdgeNav from './EdgeNav';
 import { Skeleton, TextSkeleton } from './Skeleton';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  /** Sayfa düzeninden gelen slaytlar; verilirse CMS deposu beklenmez */
+  slides?: HeroSlide[];
+}
+
+export const Hero: React.FC<HeroProps> = ({ slides: propSlides }) => {
   const homeConfig = useCMSStore((state) => state.homeConfig);
-  const slides = homeConfig?.heroSlides || [];
+  const slides = propSlides ?? (homeConfig?.heroSlides || []);
   const categories = useCMSStore((state) => state.categories);
-  const cmsLoaded = useCMSStore((state) => state.cmsLoaded);
+  const storeLoaded = useCMSStore((state) => state.cmsLoaded);
+  const cmsLoaded = propSlides !== undefined || storeLoaded;
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Önizlemede slayt silinirse sayaç geçerli aralıkta kalsın
+  useEffect(() => {
+    if (currentSlide >= slides.length && slides.length > 0) setCurrentSlide(0);
+  }, [slides.length, currentSlide]);
 
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return;
@@ -53,7 +64,7 @@ export const Hero: React.FC = () => {
 
   if (!slides || slides.length === 0) return null;
 
-  const activeSlide = slides[currentSlide];
+  const activeSlide = slides[currentSlide] || slides[0];
 
   // CMS'te silinmiş bir kategoriye işaret eden buton 404'e düşmesin: tüm ürünler sayfasına yönlendir.
   const resolveButtonLink = (link?: string): string => {

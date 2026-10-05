@@ -16,6 +16,13 @@ export const describeApiError = (err: unknown, fallback: string): string => {
   return data?.message || fallback;
 };
 
+/** Sunucu hatasını, alan hatalarını taşıyan bir Error'a çevirir (formlar alanların yanında gösterir). */
+export const withFieldErrors = (err: unknown, fallback: string): Error & { fieldErrors?: { field: string; message: string }[] } => {
+  const e = new Error(describeApiError(err, fallback)) as Error & { fieldErrors?: { field: string; message: string }[] };
+  if (isAxiosError(err)) e.fieldErrors = (err.response?.data as { errors?: { field: string; message: string }[] } | undefined)?.errors;
+  return e;
+};
+
 const reportCmsSaveError = (label: string) => (err: unknown) => {
   console.warn(`${label} kaydetme hatası:`, err);
   const serverMsg = isAxiosError(err) ? (err.response?.data as { message?: string } | undefined)?.message : undefined;
@@ -434,26 +441,19 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
 
       addProduct: async (product) => {
         try {
-          const res = await apiClient.post('/products', product);
-          if (res.data?.success && res.data.product) {
-            await get().fetchProductsAndCategories({ includeDrafts: true });
-          }
+          await apiClient.post('/products', product);
+          await get().fetchProductsAndCategories({ includeDrafts: true });
         } catch (e: unknown) {
-          const msg = e && typeof e === 'object' && 'response' in e
-            ? ((e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Ürün ekleme hatası.')
-            : (e instanceof Error ? e.message : 'Ürün eklenirken bir hata oluştu.');
-          console.warn('Ürün ekleme hatası:', msg);
+          throw withFieldErrors(e, 'Ürün eklenemedi.');
         }
       },
 
       updateProduct: async (id, product) => {
-        set((state) => ({
-          products: state.products.map((p) => (p.id === id ? { ...p, ...product } : p))
-        }));
         try {
           await apiClient.put(`/products/${id}`, product);
+          await get().fetchProductsAndCategories({ includeDrafts: true });
         } catch (e) {
-          console.warn('Ürün güncelleme hatası:', e);
+          throw withFieldErrors(e, 'Ürün güncellenemedi.');
         }
       },
 

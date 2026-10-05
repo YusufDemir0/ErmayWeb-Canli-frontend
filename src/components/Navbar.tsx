@@ -193,7 +193,7 @@ export const Navbar: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Koleksiyon veya model ara..."
-                    value={searchQuery}
+                    value={searchQuery} maxLength={100}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 text-xs p-2 focus:outline-none"
                     autoFocus

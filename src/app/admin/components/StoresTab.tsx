@@ -22,6 +22,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
   const [editingStoreId, setEditingStoreId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
+  const [legacyDistrict, setLegacyDistrict] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -38,13 +39,14 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
   const openCreateModal = () => {
     setEditingStoreId(null);
+    setLegacyDistrict(null);
     setFormData({
       name: '',
       city: '',
       district: '',
       address: '',
-      phone: '0532 419 41 51',
-      email: 'info@ermaymobilya.com',
+      phone: '',
+      email: '',
       hours: '',
       image: '',
       mapUrl: '',
@@ -56,10 +58,13 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
   const handleEditClick = (store: StoreItem) => {
     setEditingStoreId(store.id);
+    // Resmî ilçe listesinde olmayan eski serbest metin seçenek yapılmaz: alan boşaltılır, admin listeden seçer
+    const validDistrict = store.district && getDistrictsByCityName(store.city).includes(store.district) ? store.district : '';
+    setLegacyDistrict(store.district && !validDistrict ? store.district : null);
     setFormData({
       name: store.name,
       city: store.city,
-      district: store.district || '',
+      district: validDistrict,
       address: store.address,
       phone: store.phone,
       email: store.email || '',
@@ -136,11 +141,10 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
     () => [...TURKEY_CITIES].sort((a, b) => a.name.localeCompare(b.name, 'tr')),
     []
   );
-  const districtOptions = React.useMemo(() => {
-    const list = formData.city ? getDistrictsByCityName(formData.city) : [];
-    // Eski kayıtlarda listede olmayan ilçe metni varsa kaybolmasın diye seçeneklere eklenir
-    return formData.district && !list.includes(formData.district) ? [formData.district, ...list] : list;
-  }, [formData.city, formData.district]);
+  const districtOptions = React.useMemo(
+    () => (formData.city ? getDistrictsByCityName(formData.city) : []),
+    [formData.city]
+  );
 
   const filteredStores = stores.filter((s) => {
     if (!searchFilter) return true;
@@ -183,7 +187,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
           <input
             type="text"
             placeholder="İl, ilçe veya mağaza adı ile ara..."
-            value={searchFilter}
+            value={searchFilter} maxLength={100}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-xs border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper/50"
           />
@@ -338,7 +342,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <input
                     type="text"
                     required
-                    value={formData.name}
+                    value={formData.name} maxLength={120}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Örn: Modoko Fabrika Satış Mağazası"
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
@@ -383,6 +387,11 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                       </option>
                     ))}
                   </select>
+                  {legacyDistrict && !formData.district && (
+                    <p className="mt-1 text-xs text-signal">
+                      Kayıtlı değer &quot;{legacyDistrict}&quot; bir ilçe adı değil. Listeden ilçeyi seçin.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -392,7 +401,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <input
                     type="text"
                     required
-                    value={formData.phone}
+                    value={formData.phone} maxLength={25}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="0532 419 41 51"
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none font-mono"
@@ -407,7 +416,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                 <textarea
                   rows={2}
                   required
-                  value={formData.address}
+                  value={formData.address} maxLength={300}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42..."
                   className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none leading-relaxed"
@@ -421,7 +430,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   </label>
                   <input
                     type="email"
-                    value={formData.email}
+                    value={formData.email} maxLength={150}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="modoko@ermaymobilya.com"
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
@@ -434,7 +443,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   </label>
                   <input
                     type="text"
-                    value={formData.hours}
+                    value={formData.hours} maxLength={200}
                     onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                     placeholder="Örn: Pzt–Cmt 09:00–19:30, Pazar 11:00–18:30"
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
@@ -458,7 +467,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     <input
                       type="text"
                       placeholder="Veya görsel URL yapıştırın"
-                      value={formData.image}
+                      value={formData.image} maxLength={500}
                       onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                       className="flex-1 text-xs border border-line-strong p-2 rounded-xs"
                     />
@@ -473,7 +482,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <input
                     type="url"
                     placeholder="https://maps.google.com/..."
-                    value={formData.mapUrl}
+                    value={formData.mapUrl} maxLength={1000}
                     onChange={(e) => setFormData({ ...formData, mapUrl: e.target.value })}
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />

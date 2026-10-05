@@ -219,7 +219,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            value={noticeMessage}
+            value={noticeMessage} maxLength={300}
             onChange={(e) => setNoticeMessage(e.target.value)}
             placeholder="Örn: Kış mevsimi hava şartları ve lojistik yoğunluğu sebebiyle Doğu Anadolu ve bazı illerimize teslimat geçici olarak yapılamamaktadır."
             className="flex-1 text-xs border border-line-strong rounded-xs px-3.5 py-2.5 bg-white focus:outline-none focus:border-wood"
@@ -244,7 +244,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             <input
               type="text"
               placeholder="Şehir adı veya plaka ara (örn: İzmir, 35)..."
-              value={searchQuery}
+              value={searchQuery} maxLength={50}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-xs border border-line-strong rounded-xs focus:outline-none focus:border-wood"
             />

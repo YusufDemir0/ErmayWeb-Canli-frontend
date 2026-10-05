@@ -322,7 +322,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
             <input
               type="text"
-              value={searchQuery}
+              value={searchQuery} maxLength={100}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Ürün adı veya koduna göre ara (örn: MBL-334, İmaj Dolap)..."
               className="w-full pl-10 pr-4 py-2.5 bg-paper border border-line rounded-xs text-xs text-neutral-800 focus:outline-none focus:border-wood focus:bg-white transition-all"
@@ -615,7 +615,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={editName}
+                  value={editName} maxLength={150}
                   onChange={(e) => setEditName(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-paper border border-line rounded-xs text-xs font-semibold focus:outline-none focus:border-wood focus:bg-white"
                 />
@@ -721,7 +721,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 </label>
                 <textarea
                   rows={2}
-                  value={editDescription}
+                  value={editDescription} maxLength={5000}
                   onChange={(e) => setEditDescription(e.target.value)}
                   className="w-full px-3.5 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
                 />
@@ -734,7 +734,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={editDimensions}
+                    value={editDimensions} maxLength={120}
                     onChange={(e) => setEditDimensions(e.target.value)}
                     placeholder="G: 180cm | D: 90cm | Y: 75cm"
                     className="w-full px-3 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
@@ -746,7 +746,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={editMaterial}
+                    value={editMaterial} maxLength={200}
                     onChange={(e) => setEditMaterial(e.target.value)}
                     placeholder="Doğal Meşe, Fırınlanmış Gürgen vb."
                     className="w-full px-3 py-2 bg-paper border border-line rounded-xs text-xs focus:outline-none focus:border-wood focus:bg-white"
