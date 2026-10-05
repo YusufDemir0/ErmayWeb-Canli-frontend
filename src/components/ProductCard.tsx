@@ -169,7 +169,7 @@ export const ProductCard: React.FC<ProductCardProps> = memo(({
 
         {showWhatsapp && (
           <a
-            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında fiyat ve teslimat bilgisi almak istiyorum.`)}`}
+            hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba Ermay Mobilya, "${product.name}" hakkında fiyat ve teslimat bilgisi almak istiyorum.`)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-whatsapp hover:text-whatsapp-dark underline-offset-2 hover:underline self-start"

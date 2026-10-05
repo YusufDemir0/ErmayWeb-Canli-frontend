@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   LayoutGrid,
@@ -20,6 +20,7 @@ import {
   LogOut,
   ExternalLink,
   Menu,
+  Search,
   X,
   LayoutTemplate,
 } from "lucide-react";
@@ -203,6 +204,28 @@ export const ADMIN_ARMS: NavArm[] = [
   },
 ];
 
+/** Hızlı aramada eşleşecek ek kelimeler (ekranın adında geçmeyen ama kullanıcının arayacağı şeyler) */
+const KEYWORDS: Partial<Record<AdminTabId, string>> = {
+  overview: "özet panel bugün",
+  orders: "sipariş talep müşteri durum whatsapp",
+  messages: "mesaj iletişim formu gelen kutusu",
+  products: "ürün fiyat görsel stok yayın taslak renk ölçü",
+  categories: "kategori sıra görsel alt kategori",
+  erpSync: "erp eşleştirme senkron stok fiyat",
+  stores: "mağaza bayi showroom adres harita şube",
+  deliveryZones: "teslimat il şehir kargo montaj bölge",
+  pageContent: "sayfa metin içerik kurumsal kvkk hakkımızda iletişim sayfası slayt kapak ana sayfa",
+  ticker: "duyuru bant kayan yazı kampanya",
+  contact: "telefon whatsapp e-posta adres sosyal medya instagram telegram çalışma saatleri",
+  blog: "blog yazı makale seo",
+  pageDesign: "tasarım düzen sırala gizle etiket zemin bölüm ekle",
+  tickerStyle: "duyuru bandı renk hız",
+  landingPage: "açılış sayfası ana sayfa yönlendirme",
+};
+
+const armOf = (id: AdminTabId): string =>
+  ADMIN_ARMS.find((a) => a.groups.some((g) => g.items.some((i) => i.id === id)))?.title || ADMIN_ARMS[0].title;
+
 /** Tam genişlik kullanan ekranlar (canlı önizlemeli düzenleyiciler) */
 export const WIDE_TABS: AdminTabId[] = ["pageContent", "pageDesign"];
 
@@ -243,16 +266,60 @@ export const AdminShell: React.FC<AdminShellProps> = ({
   const wide = WIDE_TABS.includes(activeTab);
   const current = findNavItem(activeTab);
 
+  // Yan menü yalnız seçili kolu (Ürün ya da CMS) gösterir; etkin ekranın kolu otomatik seçilir
+  const [arm, setArm] = useState(() => armOf(activeTab));
+  useEffect(() => setArm(armOf(activeTab)), [activeTab]);
+  const visibleArm = arms.find((a) => a.title === arm) || arms[0];
+
+  // Hızlı arama (Ctrl+K)
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  const allItems = useMemo(
+    () => arms.flatMap((a) => a.groups.flatMap((g) => g.items.map((i) => ({ ...i, arm: a.title, group: g.title })))),
+    [arms]
+  );
+
   const nav = (
     <nav
       aria-label="Yönetim menüsü"
-      className="flex-1 overflow-y-auto px-3 py-4 space-y-6"
+      className="flex-1 overflow-y-auto px-3 py-4 space-y-5"
     >
-      {arms.map((arm) => (
+      <button
+        type="button"
+        onClick={() => setPaletteOpen(true)}
+        className="w-full flex items-center gap-2 h-9 px-3 rounded-xs bg-white/10 hover:bg-white/15 text-sm text-neutral-300 cursor-pointer"
+      >
+        <Search className="h-4 w-4" />
+        <span className="flex-1 text-left">Ekran ara</span>
+        <kbd className="text-[11px] font-mono text-neutral-400 border border-white/20 rounded px-1">Ctrl K</kbd>
+      </button>
+      {arms.length > 1 && (
+        <div className="grid grid-cols-2 gap-1 p-1 bg-white/5 rounded-xs" role="tablist" aria-label="Bölüm">
+          {arms.map((a) => (
+            <button
+              key={a.title}
+              type="button"
+              role="tab"
+              aria-selected={a.title === visibleArm?.title}
+              onClick={() => setArm(a.title)}
+              className={`h-8 text-sm rounded-xs cursor-pointer ${a.title === visibleArm?.title ? "bg-white text-ink font-semibold" : "text-neutral-300 hover:bg-white/10"}`}
+            >
+              {a.title}
+            </button>
+          ))}
+        </div>
+      )}
+      {[visibleArm].filter(Boolean).map((arm) => (
         <div key={arm.title} className="space-y-4">
-          <p className="px-3 text-sm font-semibold text-white border-b border-white/10 pb-1.5">
-            {arm.title}
-          </p>
           {arm.groups.map((group) => (
             <div key={group.title}>
               <p className="px-3 mb-1.5 text-xs font-medium text-neutral-500">
@@ -375,6 +442,18 @@ export const AdminShell: React.FC<AdminShellProps> = ({
         </div>
       )}
 
+      {paletteOpen && (
+        <CommandPalette
+          items={allItems}
+          onClose={() => setPaletteOpen(false)}
+          onPick={(id) => {
+            onSelectTab(id);
+            setPaletteOpen(false);
+            setMobileOpen(false);
+          }}
+        />
+      )}
+
       <main className="flex-1 min-w-0">
         <header className="hidden lg:block border-b border-line bg-white">
           <div className={`${wide ? "" : "max-w-6xl"} mx-auto px-8 py-5`}>
@@ -397,5 +476,88 @@ export const AdminShell: React.FC<AdminShellProps> = ({
     </div>
   );
 };
+
+interface PaletteItem extends NavItem {
+  arm: string;
+  group: string;
+}
+
+const trLower = (s: string) => s.toLocaleLowerCase("tr-TR");
+
+/** Ctrl+K: ekranı adıyla ya da içindeki işle bul ("kvkk", "mağaza", "duyuru rengi") */
+function CommandPalette({ items, onClose, onPick }: { items: PaletteItem[]; onClose: () => void; onPick: (id: AdminTabId) => void }) {
+  const [q, setQ] = useState("");
+  const [active, setActive] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => inputRef.current?.focus(), []);
+  useModalDismiss(true, onClose);
+
+  const results = useMemo(() => {
+    const words = trLower(q).split(/\s+/).filter(Boolean);
+    if (!words.length) return items;
+    return items.filter((i) => {
+      const hay = trLower(`${i.label} ${i.description} ${i.group} ${i.arm} ${KEYWORDS[i.id] || ""}`);
+      return words.every((w) => hay.includes(w));
+    });
+  }, [q, items]);
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-start justify-center p-4 pt-[12vh]" role="dialog" aria-modal="true" aria-label="Ekran ara">
+      <div className="absolute inset-0 bg-ink/50" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-white rounded-xs shadow-2xl border border-line overflow-hidden">
+        <div className="flex items-center gap-2 px-4 border-b border-line">
+          <Search className="h-4 w-4 text-neutral-500" />
+          <input
+            ref={inputRef}
+            value={q}
+            maxLength={60}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setActive(0);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActive((a) => Math.min(a + 1, results.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActive((a) => Math.max(a - 1, 0));
+              } else if (e.key === "Enter" && results[active]) {
+                onPick(results[active].id);
+              }
+            }}
+            placeholder="Ne yapmak istiyorsunuz? (ör. mağaza ekle, kvkk, duyuru rengi)"
+            className="flex-1 h-12 text-sm focus:outline-none"
+            aria-label="Ekran ara"
+          />
+        </div>
+        <ul className="max-h-[50vh] overflow-y-auto py-1" role="listbox">
+          {results.length === 0 && <li className="px-4 py-3 text-sm text-neutral-500">Eşleşen ekran yok.</li>}
+          {results.map((i, idx) => {
+            const Icon = i.icon;
+            return (
+              <li key={i.id} role="option" aria-selected={idx === active}>
+                <button
+                  type="button"
+                  onMouseEnter={() => setActive(idx)}
+                  onClick={() => onPick(i.id)}
+                  className={`w-full text-left px-4 py-2.5 flex items-start gap-3 cursor-pointer ${idx === active ? "bg-paper" : ""}`}
+                >
+                  <Icon className="h-4 w-4 mt-0.5 text-wood-dark shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-ink">
+                      {i.label} <span className="text-xs font-normal text-neutral-500">· {i.arm} / {i.group}</span>
+                    </span>
+                    <span className="block text-xs text-neutral-500 truncate">{i.description}</span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 export default AdminShell;

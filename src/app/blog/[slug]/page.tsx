@@ -51,7 +51,8 @@ export default async function BlogPostDetailPage({ params }: Props) {
   // WhatsApp numarası CMS'teki iletişim bilgisinden (Admin > İletişim bilgileri); uluslararası rakam biçimine çevrilir
   const contact = await cmsService.getContactConfig();
   const waDigits = String(contact.whatsapp || '').replace(/\D/g, '');
-  const waNumber = waDigits.startsWith('0') ? `90${waDigits.slice(1)}` : waDigits.length === 10 ? `90${waDigits}` : waDigits || '905324194151';
+  // Numara yoksa WhatsApp butonu gösterilmez (koda gömülü yedek numara yok)
+  const waNumber = waDigits.startsWith('0') ? `90${waDigits.slice(1)}` : waDigits.length === 10 ? `90${waDigits}` : waDigits;
 
   const { slug } = await params;
   let post: BlogPost | null = null;
@@ -186,7 +187,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
             <div className="flex items-center gap-2">
               <a
-                href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba, "${post.title}" başlıklı blog yazınızı okudum, bilgi almak istiyorum.`)}`}
+                hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Merhaba, "${post.title}" başlıklı blog yazınızı okudum, bilgi almak istiyorum.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-whatsapp hover:bg-whatsapp-dark text-white rounded-xs transition-colors font-bold text-xs"

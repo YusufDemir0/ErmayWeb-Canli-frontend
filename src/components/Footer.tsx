@@ -59,16 +59,20 @@ export const Footer: React.FC = () => {
             Atölyemizde ürettiğimiz ofis mobilyalarını aracısız, doğrudan size ulaştırıyoruz.
           </p>
           <dl className="space-y-1.5 text-xs text-neutral-300">
-            <div><dt className="inline text-neutral-400">Showroom: </dt><dd className="inline">{contactInfo?.address || 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul'}</dd></div>
-            <div>
+            {contactInfo?.address && (
+              <div><dt className="inline text-neutral-400">Showroom: </dt><dd className="inline">{contactInfo.address}</dd></div>
+            )}
+            {waNumber && <div>
               <dt className="inline text-neutral-400">WhatsApp: </dt>
               <dd className="inline">
-                <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-2 hover:underline font-mono">
+                <a hidden={!waNumber} href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-2 hover:underline font-mono">
                   {formatTrPhone(waNumber)}
                 </a>
               </dd>
-            </div>
-            <div><dt className="inline text-neutral-400">E-posta: </dt><dd className="inline">{contactInfo?.email || 'info@ermaymobilya.com'}</dd></div>
+            </div>}
+            {contactInfo?.email && (
+              <div><dt className="inline text-neutral-400">E-posta: </dt><dd className="inline"><a href={`mailto:${contactInfo.email}`} className="hover:text-white">{contactInfo.email}</a></dd></div>
+            )}
           </dl>
         </div>
 
@@ -111,7 +115,7 @@ export const Footer: React.FC = () => {
             Adetli alım teklifi, teslimat veya mevcut talebiniz için temsilcimize WhatsApp’tan yazabilirsiniz.
           </p>
           <a
-            href={`https://wa.me/${waNumber}?text=Merhaba%2C%20Ermay%20Mobilya%20%C3%BCr%C3%BCnleri%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
+            hidden={!waNumber} href={`https://wa.me/${waNumber}?text=Merhaba%2C%20Ermay%20Mobilya%20%C3%BCr%C3%BCnleri%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xs transition-colors"

@@ -1,3 +1,4 @@
+import { isValidTrPhone, toE164 } from '../phone';
 import { z } from 'zod';
 
 /**
@@ -42,19 +43,14 @@ export const emailSchema = z
   .email('Lütfen geçerli bir e-posta adresi giriniz.')
   .toLowerCase();
 
-// Telefon: Türkiye GSM Numarası veya Uluslararası format
+// Telefon: Türkiye numarası, E.164 (+90XXXXXXXXXX). Sabit hat (2xx-4xx), cep (5xx) ve 850 kabul edilir.
 export const phoneSchema = z
   .string()
   .trim()
-  .refine((val) => {
-    const digitsOnly = val.replace(/\D/g, '');
-    // Standard validation: at least 8 digits, up to 15 digits (E.164 standard)
-    if (digitsOnly.length < 8 || digitsOnly.length > 15) return false;
-    // If it is a 10-digit Turkish number, allow 5XX or standard format
-    return true;
-  }, {
-    message: 'Lütfen geçerli bir telefon numarası giriniz (en az 8, en fazla 15 hane).',
-  });
+  .refine((val) => isValidTrPhone(val), {
+    message: 'Telefon numarasını 10 hane olarak yazın (5XX XXX XX XX).',
+  })
+  .transform((val) => toE164(val));
 
 // Şifre: En az 6 karakter
 export const passwordSchema = z

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test tests/unit-core.test.js",
+    "test": "node --test tests/unit-core.test.js && node --test --experimental-strip-types tests/phone.test.ts",
     "cors:apply": "bash scripts/apply-cors.sh"
   },
   "dependencies": {

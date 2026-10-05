@@ -108,13 +108,17 @@ export default async function BlogIndexPage() {
                 className="bg-white border border-line hover:border-wood/70 rounded-xs overflow-hidden flex flex-col transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 group"
               >
                 {/* Cover Image */}
-                <Link href={`/blog/${post.slug}`} className="block relative aspect-16/10 overflow-hidden bg-neutral-100">
-                  <img
-                    src={post.coverImage || '/default-furniture.webp'}
-                    alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
+                <Link href={`/blog/${post.slug}`} className="block relative aspect-16/10 overflow-hidden bg-paper">
+                  {post.coverImage ? (
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="absolute inset-0 flex items-end p-5 font-display text-lg font-semibold text-ink/70 leading-snug">{post.title}</span>
+                  )}
                   {post.category && (
                     <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 text-sm font-semibold text-neutral-800 rounded-xs border border-line">
                       {post.category}

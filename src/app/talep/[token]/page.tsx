@@ -78,7 +78,8 @@ export default function PublicReceiptPage() {
   const token = params?.token as string;
 
   const [receipt, setReceipt] = useState<PublicReceiptDto | null>(null);
-  const [whatsappNumber, setWhatsappNumber] = useState('905324194151');
+  // Numara Admin > İletişim bilgileri'nden gelir; gelene kadar WhatsApp/telefon bağlantıları gizlidir
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -338,6 +339,7 @@ export default function PublicReceiptPage() {
                   </p>
                 </div>
                 <a
+                  hidden={!whatsappNumber}
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -395,7 +397,8 @@ export default function PublicReceiptPage() {
                         </a>
                       )}
                       <a
-                        href={whatsappUrl}
+                        hidden={!whatsappNumber}
+                  href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-sm text-whatsapp hover:text-whatsapp-dark font-medium py-2"
@@ -501,7 +504,7 @@ export default function PublicReceiptPage() {
 
         {/* Footer help text */}
         <div className="text-center mt-8 text-sm text-neutral-600 print:hidden">
-          <p>
+          <p hidden={!whatsappNumber}>
             Sorularınız için{' '}
             <a href={`tel:+${whatsappNumber}`} className="text-wood underline underline-offset-2 hover:text-ink">
               showroom danışma hattını

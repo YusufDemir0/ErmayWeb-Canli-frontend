@@ -10,6 +10,10 @@ import type { StoreItem } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 import { toast } from '../../../stores/useToastStore';
 import { TURKEY_CITIES, getDistrictsByCityName } from '../../../lib/turkeyData';
+import { PhoneInput } from '../../../components/form/PhoneInput';
+import { EmailInput, EMAIL_RE } from '../../../components/form/EmailInput';
+import { formatTrPhone, isValidTrPhone, toE164 } from '../../../lib/phone';
+import { isPlaceholderImage, realImage } from '../../../lib/productImages';
 
 interface StoresTabProps {
   onShowSuccess: (msg: string) => void;
@@ -66,7 +70,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       city: store.city,
       district: validDistrict,
       address: store.address,
-      phone: store.phone,
+      phone: toE164(store.phone) || store.phone,
       email: store.email || '',
       hours: store.hours || '',
       image: store.image || '',
@@ -103,18 +107,27 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       setSaveError('Mağaza adı, il, açık adres ve telefon zorunludur.');
       return;
     }
+    if (!isValidTrPhone(formData.phone)) {
+      setSaveError('Telefonu 10 hane olarak yazın (+90 XXX XXX XX XX).');
+      return;
+    }
+    if (formData.email.trim() && !EMAIL_RE.test(formData.email.trim())) {
+      setSaveError('E-posta adresini kontrol edin.');
+      return;
+    }
 
     const payload: StoreItem = {
       id: editingStoreId || `store-${Date.now()}`,
       name: formData.name.trim(),
       city: formData.city.trim(),
-      district: formData.district.trim() || undefined,
+      // Boş alan '' olarak gider; sunucu null'a çevirir. (undefined gönderilince eski değer silinemiyordu)
+      district: formData.district.trim(),
       address: formData.address.trim(),
-      phone: formData.phone.trim(),
-      email: formData.email.trim() || undefined,
-      hours: formData.hours.trim() || undefined,
-      image: formData.image.trim() || undefined,
-      mapUrl: formData.mapUrl.trim() || undefined,
+      phone: toE164(formData.phone),
+      email: formData.email.trim(),
+      hours: formData.hours.trim(),
+      image: formData.image.trim(),
+      mapUrl: formData.mapUrl.trim(),
       isActive: formData.isActive,
     };
 
@@ -209,16 +222,19 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
               <div>
                 {/* Store Image */}
                 <div className="aspect-[16/9] bg-neutral-100 relative overflow-hidden">
-                  {store.image ? (
+                  {realImage(store.image) ? (
                     <img
-                      src={store.image}
+                      src={realImage(store.image)}
                       alt={store.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-100 text-neutral-500">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-100 text-neutral-500 px-4 text-center">
                       <Building2 className="h-8 w-8 text-neutral-300 mb-1" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Görsel Yok</span>
+                      <span className="text-sm text-neutral-600">Görsel yok</span>
+                      {isPlaceholderImage(store.image) && (
+                        <span className="text-xs text-signal mt-1">Örnek görsel kayıtlı; sitede gösterilmez. Gerçek fotoğraf yükleyin.</span>
+                      )}
                     </div>
                   )}
                   <span className="absolute top-2.5 left-2.5 bg-paper text-neutral-900 font-semibold text-sm px-2.5 py-1 rounded-xs border border-line">
@@ -245,8 +261,8 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
                     <div className="flex items-center gap-2">
                       <Phone className="h-3.5 w-3.5 text-wood flex-shrink-0" />
-                      <a href={`tel:${store.phone}`} className="hover:text-neutral-900 font-mono font-medium">
-                        {store.phone}
+                      <a href={`tel:${toE164(store.phone) || store.phone}`} className="hover:text-neutral-900 font-mono font-medium">
+                        {formatTrPhone(store.phone)}
                       </a>
                     </div>
 
@@ -398,13 +414,11 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <label className="text-sm font-semibold text-neutral-700 block mb-1">
                     Telefon Numarası *
                   </label>
-                  <input
-                    type="text"
+                  <PhoneInput
                     required
-                    value={formData.phone} maxLength={25}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="0532 419 41 51"
-                    className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none font-mono"
+                    value={formData.phone}
+                    onChange={(v) => setFormData({ ...formData, phone: v })}
+                    className="h-10"
                   />
                 </div>
               </div>
@@ -428,12 +442,12 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <label className="text-sm font-semibold text-neutral-700 block mb-1">
                     E-Posta Adresi
                   </label>
-                  <input
-                    type="email"
-                    value={formData.email} maxLength={150}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="modoko@ermaymobilya.com"
-                    className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
+                  <EmailInput
+                    value={formData.email}
+                    onChange={(v) => setFormData({ ...formData, email: v })}
+                    extraDomains={['ermaymobilya.com']}
+                    placeholder="ad@ermaymobilya.com"
+                    className="w-full text-sm border border-line-strong h-10 px-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-none"
                   />
                 </div>
 

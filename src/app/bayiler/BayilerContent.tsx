@@ -18,6 +18,8 @@ import { TurkeyMap, REGION_NAMES } from '../../components/TurkeyMap';
 import { TURKEY_PROVINCES } from '../../data/turkeyProvinces';
 import { toast } from '../../stores/useToastStore';
 import { useWhatsappNumber } from '../../lib/whatsapp';
+import { formatTrPhone, toE164 } from '../../lib/phone';
+import { realImage } from '../../lib/productImages';
 
 interface BayilerContentProps {
   stores: StoreItem[];
@@ -246,7 +248,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           {activeStores.length === 0 && (
             <div className="bg-white border border-line rounded-xs p-8 text-center text-sm text-neutral-600">
               Mağaza bilgileri şu anda yüklenemedi. Showroom adreslerimiz için{' '}
-              <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-wood-dark font-semibold underline">
+              <a hidden={!waNumber} href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-wood-dark font-semibold underline">
                 WhatsApp hattımızdan
               </a>{' '}
               bize ulaşabilirsiniz.
@@ -301,20 +303,23 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           : 'border-line hover:border-line-strong'
                       }`}
                     >
-                      {/* Store Photo */}
-                      <div className="p-3">
-                        <div className="aspect-[16/10] rounded-xs overflow-hidden bg-neutral-100 relative">
-                          <img
-                            src={store.image || '/default-furniture.webp'}
-                            alt={store.name}
-                            className="w-full h-full object-cover transition-transform duration-500"
-                            loading="lazy"
-                          />
-                          <div className="absolute top-3 left-3 bg-white/90 text-neutral-900 text-xs font-medium px-3 py-1 rounded-full">
-                            {store.city} {store.district ? `· ${store.district}` : ''}
+                      {/* Mağaza fotoğrafı yalnız Admin'den yüklendiyse gösterilir (yer tutucu görsel yok) */}
+                      {realImage(store.image) ? (
+                        <div className="p-3">
+                          <div className="aspect-[16/10] rounded-xs overflow-hidden bg-neutral-100 relative">
+                            <img src={realImage(store.image)} alt={store.name} className="w-full h-full object-cover transition-transform duration-500" loading="lazy" />
+                            <div className="absolute top-3 left-3 bg-white/90 text-neutral-900 text-xs font-medium px-3 py-1 rounded-full">
+                              {store.city} {store.district ? `· ${store.district}` : ''}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="px-5 sm:px-6 pt-5">
+                          <span className="inline-block bg-paper text-neutral-800 text-xs font-medium px-3 py-1 rounded-full border border-line">
+                            {store.city} {store.district ? `· ${store.district}` : ''}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Store Details */}
                       <div className="p-5 sm:p-6 pt-2 flex-1 flex flex-col justify-between space-y-5">
@@ -373,8 +378,8 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           {store.phone && (
                             <div className="flex items-center gap-2 text-xs text-neutral-800 font-medium">
                               <Phone className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
-                              <a href={`tel:${store.phone}`} className="hover:underline">
-                                {store.phone}
+                              <a href={`tel:${toE164(store.phone) || store.phone}`} className="hover:underline">
+                                {formatTrPhone(store.phone)}
                               </a>
                             </div>
                           )}
@@ -395,7 +400,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
                           </a>
 
                           <a
-                            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
+                            hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                               `Merhaba, ${store.name} mağazanız hakkında bilgi almak istiyorum.`
                             )}`}
                             target="_blank"
@@ -432,7 +437,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
           </div>
 
           <a
-            href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
+            hidden={!waNumber} href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-3.5 bg-brand hover:bg-brand-dark text-ink font-semibold text-sm rounded-xs transition-colors shrink-0 flex items-center gap-2"

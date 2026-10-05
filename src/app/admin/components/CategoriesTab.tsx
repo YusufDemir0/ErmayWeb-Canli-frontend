@@ -457,11 +457,11 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
                       </span>
 
                       {/* Görsel */}
-                      <img
-                        src={rootCat.image || '/default-furniture.webp'}
-                        alt={rootCat.name}
-                        className="h-10 w-10 object-cover rounded-xs border border-line"
-                      />
+                      {rootCat.image ? (
+                        <img src={rootCat.image} alt={rootCat.name} className="h-10 w-10 object-cover rounded-xs border border-line" />
+                      ) : (
+                        <span className="h-10 w-10 rounded-xs border border-dashed border-line-strong bg-paper flex items-center justify-center text-[10px] text-neutral-500 text-center leading-tight shrink-0" title="Görsel yüklenmemiş">Görsel yok</span>
+                      )}
 
                       {/* İsim ve Bilgiler */}
                       <div className="min-w-0">
@@ -586,11 +586,11 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
 
                               <CornerDownRight className="h-4 w-4 text-wood flex-shrink-0" />
 
-                              <img
-                                src={childCat.image || '/default-furniture.webp'}
-                                alt={childCat.name}
-                                className="h-8 w-8 object-cover rounded-xs border border-line"
-                              />
+                              {childCat.image ? (
+                                <img src={childCat.image} alt={childCat.name} className="h-8 w-8 object-cover rounded-xs border border-line" />
+                              ) : (
+                                <span className="h-8 w-8 rounded-xs border border-dashed border-line-strong bg-paper flex items-center justify-center text-[10px] text-neutral-500 text-center leading-tight shrink-0" title="Görsel yüklenmemiş">Görsel yok</span>
+                              )}
 
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">

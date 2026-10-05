@@ -20,6 +20,7 @@ import {
   type PageSection,
   type RichBlock,
 } from '../../lib/pageLayout';
+import { formatTrPhone, toE164 } from '../../lib/phone';
 
 export interface ContactData {
   phones: string[];
@@ -297,11 +298,6 @@ const Cta: React.FC<{ s: PageSection; dark: boolean }> = ({ s, dark }) => {
 
 // ── Sisteme bağlı bölümler ────────────────────────────────────────────────────
 
-function toE164(phone: string): string {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.startsWith('90')) return `+${digits}`;
-  return `+90${digits.replace(/^0/, '')}`;
-}
 
 const InfoCard: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
   <div className="bg-white text-neutral-800 p-5 rounded-xs border border-line flex items-start gap-4">
@@ -334,7 +330,7 @@ const ContactDetails: React.FC<{ s: PageSection; dark: boolean; contact?: Contac
             <InfoCard icon={<Phone className="h-6 w-6" />} title="Telefon">
               {c.phones.map((phone) => (
                 <a key={phone} href={`tel:${toE164(phone)}`} className="block text-sm font-semibold text-neutral-900 mt-1 hover:text-wood">
-                  {phone}
+                  {formatTrPhone(phone)}
                 </a>
               ))}
             </InfoCard>

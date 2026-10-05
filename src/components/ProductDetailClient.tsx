@@ -754,7 +754,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
               <p className="text-xs text-neutral-600 pt-1">
                 3 adet ve üzeri ya da komple ofis kurulumu için{' '}
                 <a
-                  href={`https://wa.me/${waNumber}?text=Merhaba%2C%20${encodeURIComponent(product.name)}%20modelinden%20%C5%9Firketimiz%20i%C3%A7in%20adetli%2Ftoplu%20ofis%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20toptan%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
+                  hidden={!waNumber} href={`https://wa.me/${waNumber}?text=Merhaba%2C%20${encodeURIComponent(product.name)}%20modelinden%20%C5%9Firketimiz%20i%C3%A7in%20adetli%2Ftoplu%20ofis%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20toptan%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-wood underline underline-offset-2 hover:text-wood-dark"
@@ -827,7 +827,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     : '';
                   return (
                     <a
-                      href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
+                      hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                         `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}${setPiecesSummaryText}\n• Ölçüler: ${product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : 'Standart Seri')}\n• Malzeme: ${product.material || '1. Sınıf E1 Melamin & Metal İskelet'}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
                       )}`}
                       target="_blank"

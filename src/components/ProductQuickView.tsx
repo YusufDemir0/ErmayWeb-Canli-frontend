@@ -270,7 +270,7 @@ export const ProductQuickView: React.FC = () => {
 
             {/* WhatsApp Direct Order CTA */}
             <a
-              href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Selamlar Ermay Mobilya, "${product.name}" (${formatPrice(product.price)}) ürününüz için WhatsApp üzerinden doğrudan sipariş vermek ve teslimat durumunu öğrenmek istiyorum.`)}`}
+              hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Selamlar Ermay Mobilya, "${product.name}" (${formatPrice(product.price)}) ürününüz için WhatsApp üzerinden doğrudan sipariş vermek ve teslimat durumunu öğrenmek istiyorum.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2.5 bg-whatsapp hover:bg-whatsapp-dark text-white text-xs md:text-sm font-bold py-3 px-4 rounded-xs transition-all duration-200 mb-4 cursor-pointer"

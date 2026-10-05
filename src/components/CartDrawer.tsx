@@ -202,7 +202,7 @@ export const CartDrawer: React.FC = () => {
                   Ürünlere dön
                 </button>
                 <a
-                  href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
+                  hidden={!waNumber} href={`https://wa.me/${waNumber}?text=Merhaba%2C%20%C5%9Firketimiz%20i%C3%A7in%20adetli%20ve%20toplu%20ofis%20mobilyas%C4%B1%20al%C4%B1m%C4%B1%20yapmak%20istiyoruz.%20Fabrika%20iskontolu%20fiyat%20teklifi%20alabilir%20miyiz%3F`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-wood underline underline-offset-2 hover:text-wood-dark py-2"

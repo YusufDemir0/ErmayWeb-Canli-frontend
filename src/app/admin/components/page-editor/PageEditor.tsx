@@ -35,6 +35,8 @@ export type EditorMode = 'design' | 'content';
 
 interface PageEditorProps {
   mode: EditorMode;
+  /** İçerik <-> Tasarım geçişi (taslak korunur) */
+  onSwitchMode?: (mode: EditorMode) => void;
   onShowSuccess: (msg: string) => void;
   onShowError: (msg: string) => void;
 }
@@ -49,7 +51,7 @@ const sectionTitle = (s: PageSection): string => {
   return own ? own : meta?.name || s.type;
 };
 
-export default function PageEditor({ mode, onShowSuccess, onShowError }: PageEditorProps) {
+export default function PageEditor({ mode, onSwitchMode, onShowSuccess, onShowError }: PageEditorProps) {
   const [blocks, setBlocks] = useState<Record<string, unknown> | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pageKey, setPageKey] = useState<PageKey>('page_home');
@@ -320,6 +322,22 @@ export default function PageEditor({ mode, onShowSuccess, onShowError }: PageEdi
     <div className="space-y-3">
       {/* Üst çubuk */}
       <div className="bg-white border border-line rounded-xs px-3 py-2 flex flex-wrap items-center gap-2">
+        {onSwitchMode && (
+          <div className="flex p-0.5 bg-paper rounded-xs" role="tablist" aria-label="Düzenleme türü">
+            {(['content', 'design'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => onSwitchMode(m)}
+                className={`h-8 px-3 text-sm rounded-xs cursor-pointer ${mode === m ? 'bg-white text-ink font-semibold shadow-sm' : 'text-neutral-600 hover:text-ink'}`}
+              >
+                {m === 'content' ? 'İçerik' : 'Tasarım'}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="flex gap-1 overflow-x-auto no-scrollbar max-w-full" role="tablist" aria-label="Sayfa">
           {PAGE_KEYS.map((k) => (
             <button

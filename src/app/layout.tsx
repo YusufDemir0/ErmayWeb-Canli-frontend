@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import AppInitializer from '../providers/AppInitializer';
 import Navbar from '../components/Navbar';
 import BackButton from '../components/BackButton';
+import NavigationProgress from '../components/NavigationProgress';
 import { Footer } from '../components/Footer';
 import ClientModals from '../components/ClientModals';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
@@ -55,6 +56,9 @@ export default function RootLayout({
     <html lang="tr" className={`${plexSans.variable} ${plexMono.variable} ${archivo.variable}`}>
       <body className="font-sans flex flex-col min-h-screen bg-white text-ink antialiased">
         <AppInitializer>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           <Navbar />
           <BackButton />
           <main className="flex-1">{children}</main>

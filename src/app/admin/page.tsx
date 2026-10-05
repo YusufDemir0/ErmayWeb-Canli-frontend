@@ -329,8 +329,8 @@ export default function AdminPage() {
 
           {(activeTab === 'pageContent' || activeTab === 'pageDesign') && (
             <PageEditor
-              key={activeTab}
               mode={activeTab === 'pageDesign' ? 'design' : 'content'}
+              onSwitchMode={(m) => setActiveTab(m === 'design' ? 'pageDesign' : 'pageContent')}
               onShowSuccess={showSaveSuccess}
               onShowError={showError}
             />

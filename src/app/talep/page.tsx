@@ -21,12 +21,16 @@ import apiClient from '../../services/api';
 import { TURKEY_CITIES, getDistrictsByCityName } from '../../lib/turkeyData';
 import type { StoreItem } from '../../types';
 import { InlineSkeleton } from '../../components/Skeleton';
+import { PhoneInput } from '../../components/form/PhoneInput';
+import { EmailInput, EMAIL_RE } from '../../components/form/EmailInput';
+import { isValidTrPhone } from '../../lib/phone';
 
-type FieldKey = 'name' | 'phone' | 'city' | 'district' | 'store' | 'kvkk';
+type FieldKey = 'name' | 'phone' | 'email' | 'city' | 'district' | 'store' | 'kvkk';
 
 const FIELD_ORDER: { key: FieldKey; id: string }[] = [
   { key: 'name', id: 'talep-name' },
   { key: 'phone', id: 'talep-phone' },
+  { key: 'email', id: 'talep-email' },
   { key: 'city', id: 'talep-city' },
   { key: 'district', id: 'talep-district' },
   { key: 'store', id: 'talep-store' },
@@ -226,9 +230,11 @@ export default function OrderRequestPage() {
       errors.name = 'Ad ve soyadınızı eksiksiz yazın.';
     }
     // Phone validation
-    const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length < 10) {
-      errors.phone = 'Geçerli bir cep telefonu numarası yazın (05XX XXX XX XX).';
+    if (!isValidTrPhone(customerPhone, { mobile: true })) {
+      errors.phone = 'Cep telefonu numaranızı 10 hane olarak yazın (5XX XXX XX XX).';
+    }
+    if (customerEmail.trim() && !EMAIL_RE.test(customerEmail.trim())) {
+      errors.email = 'E-posta adresini kontrol edin (ör. ad@gmail.com).';
     }
     if (!city) errors.city = 'İl seçin.';
     if (city && !district) errors.district = 'İlçe seçin.';
@@ -406,22 +412,19 @@ export default function OrderRequestPage() {
                     <label htmlFor="talep-phone" className="block text-sm font-medium text-ink mb-1.5">
                       Telefon Numarası <span className="text-signal" aria-hidden="true">*</span>
                     </label>
-                    <input
+                    <PhoneInput
                       id="talep-phone"
                       name="tel"
-                      type="tel"
-                      inputMode="tel"
-                      autoComplete="tel"
                       required
-                      value={customerPhone} maxLength={25}
-                      onChange={(e) => {
-                        setCustomerPhone(e.target.value);
+                      mobile
+                      value={customerPhone}
+                      onChange={(v) => {
+                        setCustomerPhone(v);
                         clearFieldError('phone');
                       }}
-                      placeholder="05XX XXX XX XX"
-                      aria-invalid={!!fieldErrors.phone}
-                    aria-describedby={fieldErrors.phone ? 'talep-phone-error' : undefined}
-                    className={inputClass(!!fieldErrors.phone)}
+                      invalid={fieldErrors.phone ? true : undefined}
+                      aria-describedby={fieldErrors.phone ? 'talep-phone-error' : undefined}
+                      className="h-11"
                     />
                   <FieldError id="talep-phone-error" message={fieldErrors.phone} />
                     <p className="text-xs text-neutral-500 mt-1">WhatsApp veya telefon görüşmesi için kullanılır.</p>
@@ -431,16 +434,20 @@ export default function OrderRequestPage() {
                     <label htmlFor="talep-email" className="block text-sm font-medium text-ink mb-1.5">
                       E-posta Adresi <span className="text-neutral-500 font-normal">(isteğe bağlı)</span>
                     </label>
-                    <input
+                    <EmailInput
                       id="talep-email"
                       name="email"
-                      type="email"
-                      autoComplete="email"
-                      value={customerEmail} maxLength={150}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="ahmet@ornek.com"
-                      className={inputClass()}
+                      value={customerEmail}
+                      onChange={(v) => {
+                        setCustomerEmail(v);
+                        clearFieldError('email');
+                      }}
+                      placeholder="ad@ornek.com"
+                      invalid={fieldErrors.email ? true : undefined}
+                      aria-describedby={fieldErrors.email ? 'talep-email-error' : undefined}
+                      className={inputClass(!!fieldErrors.email)}
                     />
+                    <FieldError id="talep-email-error" message={fieldErrors.email} />
                   </div>
                 </div>
               </div>

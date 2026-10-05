@@ -43,11 +43,14 @@ export interface CampaignPopupConfig {
 
 export interface ContactInfoConfig {
   phone: string;
+  /** İkinci hat (iletişim sayfasında gösterilir) */
+  phoneSecondary?: string;
   fax: string;
   email: string;
   address: string;
   whatsapp: string;
   showroom: string;
+  workingHours?: string;
 }
 
 export interface HeroSlide {
@@ -149,98 +152,47 @@ interface CMSState {
   updateSocialLinks: (config: Partial<SocialLinksConfig>) => void;
 }
 
-export const DEFAULT_SOCIAL_LINKS: SocialLinksConfig = {
-  instagram: 'https://instagram.com/ermaymobilya',
-  youtube: 'https://youtube.com/@ermaymobilya',
-  telegram: 'https://t.me/ErmayMobilya',
-  whatsapp: '905324194151',
-  facebook: 'https://facebook.com/ermaymobilya',
-  tiktok: 'https://tiktok.com/@ermaymobilya',
+/*
+ * Başlangıç değerleri boştur: sitede yalnız Admin'den girilen veri görünür. CMS yanıtı gelene kadar ilgili bölümler
+ * gizlenir ya da iskelet gösterir; koda gömülü telefon, adres, duyuru veya kampanya yoktur.
+ */
+export const EMPTY_SOCIAL_LINKS: SocialLinksConfig = {
+  instagram: '',
+  youtube: '',
+  telegram: '',
+  whatsapp: '',
+  facebook: '',
+  tiktok: '',
 };
 
-const DEFAULT_TICKER = [
-  '• DOĞRUDAN FABRİKADAN ARACISIZ SATIŞ',
-  '• İSTANBUL İÇİ KENDİ ARACIMIZLA TESLİMAT & MONTAJ',
-  '• ÇOKLU ALIMLARDA FABRİKA İSKONTOSU',
-  '• 1. SINIF E1 MELAMİN & DAYANIKLI METAL İSKELET',
-  '• 2 YIL RESMİ ÜRETİCİ GARANTİSİ'
-];
-
-const DEFAULT_POPUP: CampaignPopupConfig = {
-  enabled: true,
-  popupType: 'coupon',
-  title: 'FABRİKA SATIŞ & TOPTAN İSKONTO',
-  subtitle: 'Standart seri ofis mobilyalarımızda doğrudan üretici fiyatı ve toptan avantajı!',
-  discountCode: 'FABRIKA10',
-  badgeText: 'ÜRETİCİDEN',
-  image: '/default-furniture.webp',
-  buttonText: 'Koleksiyonu İncele',
-  buttonLink: '/katalog'
+const EMPTY_POPUP: CampaignPopupConfig = {
+  enabled: false,
+  popupType: 'announcement',
+  title: '',
+  subtitle: '',
+  discountCode: '',
+  badgeText: '',
+  image: '',
+  buttonText: '',
+  buttonLink: '',
 };
 
-const DEFAULT_CONTACT: ContactInfoConfig = {
-  phone: '0532 419 41 51',
-  fax: '+90 (216) 555 42 42',
-  email: 'info@ermaymobilya.com',
-  address: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul',
-  whatsapp: '905324194151',
-  showroom: 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul'
+const EMPTY_CONTACT: ContactInfoConfig = {
+  phone: '',
+  fax: '',
+  email: '',
+  address: '',
+  whatsapp: '',
+  showroom: '',
 };
 
-export const DEFAULT_STORES: StoreItem[] = [
-  {
-    id: 'store-1',
-    name: 'Ermay Modoko Merkez Mağaza',
-    city: 'İstanbul',
-    district: 'Ümraniye / Modoko',
-    address: 'Modoko Mobilyacılar Sitesi, No: 42, 34775 Ümraniye / İstanbul',
-    phone: '0532 419 41 51',
-    email: 'istanbul@ermaymobilya.com',
-    hours: 'Hafta içi: 09:00 - 20:00 | Hafta sonu: 10:00 - 19:00',
-    image: '/default-furniture.webp'
-  },
-  {
-    id: 'store-2',
-    name: 'Ermay Kocaeli Fabrika Satış Mağazası',
-    city: 'Kocaeli',
-    district: 'İzmit',
-    address: 'Kadıköy Bağdat Cd. No: 141, 41050 İzmit / Kocaeli',
-    phone: '0532 419 41 51',
-    email: 'kocaeli@ermaymobilya.com',
-    hours: 'Hafta içi: 09:00 - 19:00 | Cumartesi: 09:00 - 18:00',
-    image: '/default-furniture.webp'
-  },
-  {
-    id: 'store-3',
-    name: 'Ermay Sakarya Mağaza',
-    city: 'Sakarya',
-    district: 'Serdivan',
-    address: 'İstiklal Cd. No: 88, Serdivan / Sakarya',
-    phone: '0532 419 41 51',
-    email: 'sakarya@ermaymobilya.com',
-    hours: 'Hafta içi: 09:00 - 19:00 | Cumartesi: 09:00 - 18:00',
-    image: '/default-furniture.webp'
-  }
-];
-
-const DEFAULT_HOME_CONFIG: HomeConfig = {
-  heroSlides: [
-    {
-      id: 'slide-1',
-      title: 'Doğrudan Fabrikadan Aracısız Ofis Mobilyaları',
-      subtitle: 'Kendi üretim tesislerimizde standart seri imalat; aracı komisyonu olmadan net fabrika fiyatıyla.',
-      badge: 'FABRİKA SATIŞ GÜVENCESİ',
-      image: '/default-furniture.webp',
-      buttonText: 'Koleksiyonu Keşfet',
-      buttonLink: '/katalog'
-    }
-  ],
-  featuredTitle: 'Öne Çıkan Ofis Takımları',
-  featuredSubtitle: 'En çok tercih edilen standart seri fabrika ofis mobilyalarımız',
-  categoriesTitle: 'Kategoriler',
-  categoriesSubtitle: 'Çalışma alanlarınız ve ofisiniz için standart seri fabrika imalatı çözümler'
+const EMPTY_HOME_CONFIG: HomeConfig = {
+  heroSlides: [],
+  featuredTitle: '',
+  featuredSubtitle: '',
+  categoriesTitle: '',
+  categoriesSubtitle: '',
 };
-
 
 export const DEFAULT_CATEGORIES: Category[] = [];
 
@@ -250,18 +202,18 @@ let adminCatalogMode = false;
 let adminStoresMode = false;
 
 export const useCMSStore = create<CMSState>()((set, get) => ({
-      tickerItems: DEFAULT_TICKER,
+      tickerItems: [],
       tickerStyle: DEFAULT_TICKER_STYLE,
-      campaignPopup: DEFAULT_POPUP,
-      contactInfo: DEFAULT_CONTACT,
+      campaignPopup: EMPTY_POPUP,
+      contactInfo: EMPTY_CONTACT,
       // Sunucu tarafı varsayılanıyla aynı (services/landingService.ts): tercih kaydedilmemişse FAZ 15 kararı
       landingPageConfig: { type: 'category', targetSlug: 'aksesuar-ve-diger' } as LandingPageConfig,
       products: [],
       categories: [],
-      stores: [], // Gerçek liste API'den gelir; DEFAULT_STORES uydurma adresler içerdiği için başlangıçta gösterilmez
-      homeConfig: DEFAULT_HOME_CONFIG,
+      stores: [], // Yalnız API'den gelen mağazalar
+      homeConfig: EMPTY_HOME_CONFIG,
       corporateConfig: DEFAULT_CORPORATE_CONFIG,
-      socialLinks: DEFAULT_SOCIAL_LINKS,
+      socialLinks: EMPTY_SOCIAL_LINKS,
       isLoading: false,
       cmsLoaded: false,
       catalogLoaded: false,
@@ -273,26 +225,22 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
           if (res.data?.success && res.data.cms) {
             const cms = res.data.cms;
             set({
-              tickerItems: cms.ticker_items || get().tickerItems,
+              // Kayıt yoksa boş: duyuru bandı, kampanya ve iletişim alanları gizlenir
+              tickerItems: Array.isArray(cms.ticker_items) ? cms.ticker_items : [],
               tickerStyle: cms.ticker_style
                 ? { ...DEFAULT_TICKER_STYLE, ...(cms.ticker_style as Partial<TickerStyleConfig>) }
                 : get().tickerStyle,
-              campaignPopup: cms.campaign_popup || get().campaignPopup,
-              contactInfo: cms.contact_info || get().contactInfo,
+              campaignPopup: cms.campaign_popup ? { ...EMPTY_POPUP, ...cms.campaign_popup } : EMPTY_POPUP,
+              contactInfo: { ...EMPTY_CONTACT, ...(cms.contact_info || cms.contact || {}) },
               landingPageConfig: (cms.landing_page_config as LandingPageConfig) || get().landingPageConfig,
               socialLinks: cms.social_links
-                ? { ...DEFAULT_SOCIAL_LINKS, ...(cms.social_links as SocialLinksConfig) }
-                : get().socialLinks,
+                ? { ...EMPTY_SOCIAL_LINKS, ...(cms.social_links as SocialLinksConfig) }
+                : EMPTY_SOCIAL_LINKS,
               homeConfig: cms.home_config
-                ? { ...get().homeConfig, ...cms.home_config }
+                ? { ...EMPTY_HOME_CONFIG, ...cms.home_config }
                 : cms.home_hero
-                ? {
-                    ...get().homeConfig,
-                    heroSlides: Array.isArray(cms.home_hero)
-                      ? cms.home_hero
-                      : [cms.home_hero],
-                  }
-                : get().homeConfig,
+                ? { ...EMPTY_HOME_CONFIG, heroSlides: Array.isArray(cms.home_hero) ? cms.home_hero : [cms.home_hero] }
+                : EMPTY_HOME_CONFIG,
               // Kayıtlı blok eksik alan içerebilir; varsayılanların üzerine birleştirilir
               corporateConfig: resolveCorporateConfig(cms.corporate_config as Partial<CorporateConfig> | undefined),
             });

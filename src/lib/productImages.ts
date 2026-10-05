@@ -84,3 +84,9 @@ export function getProductImages(
 
 export default getProductImage;
 
+
+/** Seed verisindeki yer tutucu görsel: gerçek fotoğraf değildir, mağaza ve kategorilerde "görsel yok" sayılır. */
+export const PLACEHOLDER_IMAGE = '/default-furniture.webp';
+export const isPlaceholderImage = (src?: string | null): boolean => !!src && src.includes('default-furniture');
+/** Gerçek görsel varsa adresi, yoksa '' */
+export const realImage = (src?: string | null): string => (src && !isPlaceholderImage(src) ? src : '');

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
@@ -94,6 +94,23 @@ export const Navbar: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
+  // Arama kutusu dışarı tıklanınca ya da Esc ile kapanır; açık kalıp menünün üstünü örtmesin
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showSearchInput) return;
+    const onDown = (e: MouseEvent) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) setShowSearchInput(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setShowSearchInput(false);
+    document.addEventListener('mousedown', onDown);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [showSearchInput]);
+  useEffect(() => setShowSearchInput(false), [pathname]);
+
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
@@ -143,7 +160,8 @@ export const Navbar: React.FC = () => {
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link href="/" className="flex items-center shrink-0" title="Ermay Mobilya - Ana sayfa">
+            {/* Logo, "Anasayfa" bağlantısıyla aynı yere gider (açılış tercihi kategori ise kök URL ürün listesidir) */}
+            <Link href={homeHref} className="flex items-center shrink-0" title="Ermay Mobilya - Ana sayfa">
               <BrandLogo variant="onLight" priority className="h-9 md:h-11 w-auto" />
             </Link>
           </div>
@@ -176,9 +194,10 @@ export const Navbar: React.FC = () => {
           {/* Right Section: Actions & Cart */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Expandable Search Trigger */}
-            <div className="relative">
+            <div className="relative" ref={searchWrapRef}>
               <button
                 onClick={() => setShowSearchInput(!showSearchInput)}
+                aria-expanded={showSearchInput}
                 className="p-2 text-neutral-700 hover:text-wood hover:bg-neutral-100/80 rounded-full transition-colors cursor-pointer"
                 aria-label="Arama Yap"
               >
@@ -365,7 +384,7 @@ export const Navbar: React.FC = () => {
             {/* Footer Contact & Account */}
             <div className="p-5 border-t border-line bg-paper space-y-3">
               <a
-                href={`https://wa.me/${waNumber}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobil sitenizden ulaşıyorum. Bilgi almak istiyorum.')}`}
+                hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent('Merhaba Ermay Mobilya, mobil sitenizden ulaşıyorum. Bilgi almak istiyorum.')}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full bg-whatsapp hover:bg-whatsapp-dark text-white text-xs font-semibold py-3 px-4 rounded-xs flex items-center justify-center gap-2 transition-colors"

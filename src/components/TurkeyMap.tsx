@@ -17,6 +17,7 @@ import type { StoreItem } from '../types';
 import { TURKEY_PROVINCES, ProvinceData } from '../data/turkeyProvinces';
 import { useWhatsappNumber } from '../lib/whatsapp';
 import { useCMSStore } from '../stores/useCMSStore';
+import { formatTrPhone, toE164 } from '../lib/phone';
 
 // İl merkezleri: data/turkeyProvinces.ts path'lerinden alan ağırlıklı merkez (en büyük parça) olarak hesaplandı (viewBox 1000×422)
 export const PROVINCE_CENTERS: Record<string, { x: number; y: number }> = {
@@ -711,8 +712,8 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                     {store.phone && (
                       <div className="flex items-center gap-1.5 text-xs text-neutral-800 font-medium">
                         <Phone className="w-3 h-3 text-neutral-500 shrink-0" />
-                        <a href={`tel:${store.phone}`} className="hover:underline">
-                          {store.phone}
+                        <a href={`tel:${toE164(store.phone) || store.phone}`} className="hover:underline">
+                          {formatTrPhone(store.phone)}
                         </a>
                       </div>
                     )}
@@ -732,7 +733,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                       </a>
 
                       <a
-                        href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
+                        hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                           `Merhaba, ${activeBubbleCity} ${store.name} mağazanız hakkında bilgi almak istiyorum.`
                         )}`}
                         target="_blank"
@@ -775,7 +776,7 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
 
                   <div className="space-y-2">
                     <a
-                      href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
+                      hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                         `Merhaba, ${activeBubbleCity} teslimatı, fabrika satış fiyatları ve nakliye koşulları hakkında bilgi almak istiyorum.`
                       )}`}
                       target="_blank"
@@ -787,11 +788,12 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                     </a>
 
                     <a
-                      href={`tel:${(contactInfo?.phone || '').replace(/[^0-9+]/g, '') || waNumber}`}
+                      hidden={!contactInfo?.phone}
+                      href={`tel:${toE164(contactInfo?.phone)}`}
                       className="w-full py-2 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium rounded-xs transition-colors flex items-center justify-center gap-2 text-xs"
                     >
                       <Phone className="w-3.5 h-3.5 text-neutral-500" />
-                      <span>Destek hattı: {contactInfo?.phone || waNumber}</span>
+                      <span>Destek hattı: {formatTrPhone(contactInfo?.phone)}</span>
                     </a>
                   </div>
                 </div>

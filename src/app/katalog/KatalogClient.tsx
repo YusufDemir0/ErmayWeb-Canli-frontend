@@ -9,6 +9,7 @@ import { useCMSStore } from '../../stores/useCMSStore';
 import { Skeleton, TextSkeleton } from '../../components/Skeleton';
 import { getProductImages } from '../../lib/productImages';
 import type { Product } from '../../types';
+import { formatTrPhone, toE164 } from '../../lib/phone';
 
 interface KatalogClientProps {
   initialProducts: Product[];
@@ -302,11 +303,19 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                 {/* PRINT RUNNING FOOTER */}
                 <footer className="hidden print:flex border-t border-wood/40 pt-1.5 text-xs text-neutral-500 items-center justify-between uppercase tracking-wider">
                   <div>
-                    <span className="font-semibold text-neutral-700">Merkez showroom ve atölye:</span> {contactInfo.address || contactInfo.showroom || 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul'}
+                    {(contactInfo.address || contactInfo.showroom) && (
+                      <>
+                        <span className="font-semibold text-neutral-700">Merkez showroom ve atölye:</span> {contactInfo.address || contactInfo.showroom}
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span>TEL: {contactInfo.phone || '0216 365 00 00'}</span>
-                    <span>|</span>
+                    {contactInfo.phone && (
+                      <>
+                        <span>TEL: {formatTrPhone(contactInfo.phone)}</span>
+                        <span>|</span>
+                      </>
+                    )}
                     <span className="font-bold text-neutral-800">WWW.ERMAYMOBILYA.COM</span>
                   </div>
                 </footer>

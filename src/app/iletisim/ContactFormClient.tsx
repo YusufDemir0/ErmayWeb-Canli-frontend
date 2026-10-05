@@ -5,6 +5,8 @@ import { Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { contactFormSchema } from '../../lib/validations';
 import apiClient from '../../services/api';
+import { PhoneInput } from '../../components/form/PhoneInput';
+import { EmailInput } from '../../components/form/EmailInput';
 
 export default function ContactFormClient() {
   const [formData, setFormData] = useState({
@@ -78,10 +80,12 @@ export default function ContactFormClient() {
             </div>
           )}
           <div>
-            <label className="text-sm font-medium text-neutral-700 block mb-1">
+            <label htmlFor="cf-name" className="text-sm font-medium text-neutral-700 block mb-1">
               Adınız / Soyadınız
             </label>
             <input
+              id="cf-name"
+              autoComplete="name"
               type="text"
               required
               value={formData.name} maxLength={100}
@@ -93,30 +97,29 @@ export default function ContactFormClient() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-neutral-700 block mb-1">
+              <label htmlFor="cf-email" className="text-sm font-medium text-neutral-700 block mb-1">
                 E-Posta Adresiniz
               </label>
-              <input
-                type="email"
+              <EmailInput
+                id="cf-email"
                 required
-                value={formData.email} maxLength={150}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="ornek@domain.com"
+                value={formData.email}
+                onChange={(v) => setFormData({ ...formData, email: v })}
+                placeholder="ad@ornek.com"
                 className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-neutral-700 block mb-1">
+              <label htmlFor="cf-phone" className="text-sm font-medium text-neutral-700 block mb-1">
                 Telefon Numaranız
               </label>
-              <input
-                type="tel"
+              <PhoneInput
+                id="cf-phone"
                 required
-                value={formData.phone} maxLength={25}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="0532 000 00 00"
-                className="w-full bg-white border border-line-strong text-ink text-base sm:text-sm p-3 rounded-xs focus:ring-2 focus:ring-wood/30 focus:border-wood focus:outline-none"
+                value={formData.phone}
+                onChange={(v) => setFormData({ ...formData, phone: v })}
+                className="h-[46px]"
               />
             </div>
           </div>

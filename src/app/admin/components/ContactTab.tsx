@@ -1,374 +1,237 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { BellRing, FileSpreadsheet, Loader2, Phone, Send, Share2 } from 'lucide-react';
 import type { ContactInfoConfig } from '../../../stores/useCMSStore';
-import { useCMSStore } from '../../../stores/useCMSStore';
-import { 
-  Phone, Mail, MapPin, Send, MessageSquare, 
-  CheckCircle2, AlertCircle, Loader2, Sparkles, Share2, BellRing, FileSpreadsheet
-} from 'lucide-react';
+import { useCMSStore, describeApiError } from '../../../stores/useCMSStore';
 import apiClient from '../../../services/api';
-
-const InstagramIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-  </svg>
-);
-
-const YoutubeIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
-    <polygon points="10 15 15 12 10 9 10 15" fill="currentColor"/>
-  </svg>
-);
+import { PhoneInput } from '../../../components/form/PhoneInput';
+import { EmailInput, EMAIL_RE } from '../../../components/form/EmailInput';
+import { isValidTrPhone, toE164, toWhatsappDigits } from '../../../lib/phone';
+import { AdminCard, AdminField, SaveBar, adminInput } from './ui';
 
 interface ContactTabProps {
   contactInfo: ContactInfoConfig;
-  onUpdateContactInfo: (contact: Partial<ContactInfoConfig>) => void;
+  onUpdateContactInfo?: (contact: Partial<ContactInfoConfig>) => void;
   onShowSuccess: (msg: string) => void;
 }
 
-export const ContactTab: React.FC<ContactTabProps> = ({
-  contactInfo,
-  onUpdateContactInfo,
-  onShowSuccess,
-}) => {
-  const socialLinks = useCMSStore((state) => state.socialLinks);
-  const updateSocialLinks = useCMSStore((state) => state.updateSocialLinks);
+interface FormState {
+  phone: string;
+  phoneSecondary: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  showroom: string;
+  workingHours: string;
+  instagram: string;
+  youtube: string;
+  telegram: string;
+}
 
-  const [localContact, setLocalContact] = useState(contactInfo);
-  const [localSocials, setLocalSocials] = useState(socialLinks);
+const HTTPS = /^https:\/\/[^\s]+$/;
 
-  // Telegram Test State
-  const [isTestingTelegram, setIsTestingTelegram] = useState(false);
-  const [telegramStatusMsg, setTelegramStatusMsg] = useState<string | null>(null);
+/**
+ * İletişim bilgileri: sitede görünen her telefon, e-posta, adres ve sosyal bağlantının tek kaynağı.
+ * Telefonlar +90 biçiminde kaydedilir; WhatsApp numarası tek yerde tutulur.
+ */
+export const ContactTab: React.FC<ContactTabProps> = ({ contactInfo, onShowSuccess }) => {
+  const socialLinks = useCMSStore((s) => s.socialLinks);
 
-  // Daily Report Trigger State
-  const [isSendingReport, setIsSendingReport] = useState(false);
-  const [reportStatusMsg, setReportStatusMsg] = useState<string | null>(null);
+  const initial = useMemo<FormState>(
+    () => ({
+      phone: toE164(contactInfo.phone) || contactInfo.phone || '',
+      phoneSecondary: toE164(contactInfo.phoneSecondary) || contactInfo.phoneSecondary || '',
+      whatsapp: toE164(contactInfo.whatsapp || socialLinks.whatsapp) || '',
+      email: contactInfo.email || '',
+      address: contactInfo.address || '',
+      showroom: contactInfo.showroom || '',
+      workingHours: contactInfo.workingHours || '',
+      instagram: socialLinks.instagram || '',
+      youtube: socialLinks.youtube || '',
+      telegram: socialLinks.telegram || '',
+    }),
+    [contactInfo, socialLinks]
+  );
 
-  const handleSaveAll = () => {
-    onUpdateContactInfo(localContact);
-    updateSocialLinks(localSocials);
-    onShowSuccess('İletişim ve sosyal medya bağlantıları başarıyla güncellendi.');
+  const [form, setForm] = useState<FormState>(initial);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  useEffect(() => setForm(initial), [initial]);
+
+  const dirty = JSON.stringify(form) !== JSON.stringify(initial);
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setSaveError(null);
   };
 
-  const handleTestTelegram = async () => {
-    setIsTestingTelegram(true);
-    setTelegramStatusMsg(null);
-    try {
-      const res = await apiClient.post('/cms/telegram/test');
-      if (res.data?.success) {
-        setTelegramStatusMsg('Telegram test mesajı botunuza başarıyla iletildi! 🎉');
-        onShowSuccess('Telegram bildirimi gönderildi!');
-      } else {
-        setTelegramStatusMsg(res.data?.message || 'Telegram bildirimi gönderilemedi.');
-      }
-    } catch (err: unknown) {
-      const errObj = err as { response?: { data?: { message?: string } } };
-      const msg = errObj.response?.data?.message || 'Telegram servisiyle bağlantı kurulamadı. Lütfen .env dosyasındaki TELEGRAM_BOT_TOKEN ve TELEGRAM_CHAT_ID ayarlarını kontrol ediniz.';
-      setTelegramStatusMsg(msg);
-    } finally {
-      setIsTestingTelegram(false);
-    }
-  };
+  const errors: Partial<Record<keyof FormState, string>> = {};
+  if (form.phone && !isValidTrPhone(form.phone)) errors.phone = 'Numarayı 10 hane olarak yazın.';
+  if (form.phoneSecondary && !isValidTrPhone(form.phoneSecondary)) errors.phoneSecondary = 'Numarayı 10 hane olarak yazın.';
+  if (form.whatsapp && !isValidTrPhone(form.whatsapp, { mobile: true })) errors.whatsapp = 'WhatsApp için 5 ile başlayan cep numarası yazın.';
+  if (form.email && !EMAIL_RE.test(form.email)) errors.email = 'E-posta adresini kontrol edin.';
+  for (const k of ['instagram', 'youtube', 'telegram'] as const) {
+    if (form[k] && !HTTPS.test(form[k])) errors[k] = 'Bağlantı https:// ile başlamalı.';
+  }
+  const hasErrors = Object.keys(errors).length > 0;
 
-  const handleSendDailyReport = async () => {
-    setIsSendingReport(true);
-    setReportStatusMsg(null);
+  // Sunucu onaylamadan "kaydedildi" denmez
+  const save = async () => {
+    if (hasErrors) return;
+    setSaving(true);
+    setSaveError(null);
+    const contact = {
+      ...contactInfo,
+      phone: toE164(form.phone),
+      phoneSecondary: toE164(form.phoneSecondary),
+      whatsapp: toWhatsappDigits(form.whatsapp),
+      email: form.email.trim(),
+      address: form.address.trim(),
+      showroom: form.showroom.trim(),
+      workingHours: form.workingHours.trim(),
+    };
+    const social = {
+      ...socialLinks,
+      instagram: form.instagram.trim(),
+      youtube: form.youtube.trim(),
+      telegram: form.telegram.trim(),
+      // Tek WhatsApp numarası: sosyal ayar da aynı numarayı taşır
+      whatsapp: toWhatsappDigits(form.whatsapp),
+    };
     try {
-      const res = await apiClient.post('/orders/daily-report');
-      if (res.data?.success) {
-        setReportStatusMsg(`Dünün satış raporu admin e-postasına gönderildi! (${res.data.data?.orderCount || 0} sipariş, ${res.data.data?.totalRevenue || 0} TL)`);
-        onShowSuccess('Günlük satış bülteni e-postanıza iletildi!');
-      } else {
-        setReportStatusMsg(res.data?.message || 'Satış raporu gönderilemedi.');
-      }
-    } catch (err: unknown) {
-      const errObj = err as { response?: { data?: { message?: string } } };
-      const msg = errObj.response?.data?.message || 'Rapor servisi çağrılamadı. Lütfen SMTP ve e-posta ayarlarını kontrol ediniz.';
-      setReportStatusMsg(msg);
+      await apiClient.put('/cms/contact', { content: contact });
+      await apiClient.put('/cms/social_links', { content: social });
+      useCMSStore.setState({ contactInfo: contact, socialLinks: social });
+      onShowSuccess('İletişim bilgileri kaydedildi.');
+    } catch (err) {
+      setSaveError(describeApiError(err, 'İletişim bilgileri kaydedilemedi.'));
     } finally {
-      setIsSendingReport(false);
+      setSaving(false);
     }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-5xl">
-      
-      {/* 1. Contact & Workshop Physical Details */}
-      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-6">
-        <div className="border-b border-line pb-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
-            İletişim & Konum Yönetimi
-          </span>
-          <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
-            <Phone className="h-4 w-4 text-wood-dark" />
-            <span>Firma İletişim Bilgileri</span>
-          </h3>
+    <div className="space-y-6 animate-fade-in max-w-4xl">
+      <AdminCard title="İletişim bilgileri" icon={Phone} description="Footer, İletişim sayfası, katalog çıktısı ve tüm WhatsApp butonları bu bilgileri kullanır. Boş bırakılan bilgi sitede gösterilmez.">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <AdminField id="ct-phone" label="Telefon" error={errors.phone} hint="İletişim sayfası ve harita baloncuğunda görünür.">
+            <PhoneInput id="ct-phone" value={form.phone} onChange={(v) => set('phone', v)} className="h-10" />
+          </AdminField>
+          <AdminField id="ct-phone2" label="İkinci telefon" error={errors.phoneSecondary} hint="İsteğe bağlı.">
+            <PhoneInput id="ct-phone2" value={form.phoneSecondary} onChange={(v) => set('phoneSecondary', v)} className="h-10" />
+          </AdminField>
+          <AdminField id="ct-wa" label="WhatsApp hattı" error={errors.whatsapp} hint="Sitedeki tüm WhatsApp butonları bu numaraya gider. Boşsa butonlar gizlenir.">
+            <PhoneInput id="ct-wa" mobile value={form.whatsapp} onChange={(v) => set('whatsapp', v)} className="h-10" />
+          </AdminField>
+          <AdminField id="ct-email" label="E-posta" error={errors.email}>
+            <EmailInput id="ct-email" value={form.email} onChange={(v) => set('email', v)} extraDomains={['ermaymobilya.com']} className={adminInput(!!errors.email)} />
+          </AdminField>
+          <AdminField id="ct-address" label="Adres" count={[form.address.length, 300]} hint="Footer ve İletişim sayfasında görünür.">
+            <input id="ct-address" type="text" value={form.address} maxLength={300} onChange={(e) => set('address', e.target.value)} className={adminInput()} />
+          </AdminField>
+          <AdminField id="ct-showroom" label="Showroom adresi" count={[form.showroom.length, 300]} hint="Adresten farklıysa doldurun; katalog çıktısında kullanılır.">
+            <input id="ct-showroom" type="text" value={form.showroom} maxLength={300} onChange={(e) => set('showroom', e.target.value)} className={adminInput()} />
+          </AdminField>
+          <AdminField id="ct-hours" label="Çalışma saatleri" count={[form.workingHours.length, 120]} hint="Ör. Pazartesi–Cumartesi 09:00–19:30, Pazar 11:00–18:30">
+            <input id="ct-hours" type="text" value={form.workingHours} maxLength={120} onChange={(e) => set('workingHours', e.target.value)} className={adminInput()} />
+          </AdminField>
         </div>
+      </AdminCard>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1">
-              Müşteri Hizmetleri / Sabit Telefon
-            </label>
-            <input
-              type="text"
-              value={localContact.phone} maxLength={25}
-              onChange={(e) => setLocalContact({ ...localContact, phone: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="0216 420 00 00"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1">
-              Resmi E-Posta Adresi
-            </label>
-            <input
-              type="email"
-              value={localContact.email} maxLength={150}
-              onChange={(e) => setLocalContact({ ...localContact, email: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="info@ermaymobilya.com"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-sm font-semibold text-neutral-700 block mb-1">
-              Fabrika & Üretim Merkezi Açık Adresi
-            </label>
-            <input
-              type="text"
-              value={localContact.address} maxLength={300}
-              onChange={(e) => setLocalContact({ ...localContact, address: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1">
-              Showroom / Mağaza Konumu (Footer & Nav)
-            </label>
-            <input
-              type="text"
-              value={localContact.showroom || ''} maxLength={300}
-              onChange={(e) => setLocalContact({ ...localContact, showroom: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1">
-              Resmi WhatsApp Sipariş / İletişim Numarası
-            </label>
-            <input
-              type="text"
-              value={localContact.whatsapp || ''} maxLength={16}
-              onChange={(e) => setLocalContact({ ...localContact, whatsapp: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
-              placeholder="+90 532 419 41 51"
-            />
-          </div>
+      <AdminCard title="Sosyal medya" icon={Share2} description="Mobil menünün altında simge olarak görünür. Boş bırakılan hesap gösterilmez.">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {(
+            [
+              ['instagram', 'Instagram', 'https://instagram.com/…'],
+              ['youtube', 'YouTube', 'https://youtube.com/@…'],
+              ['telegram', 'Telegram', 'https://t.me/…'],
+            ] as const
+          ).map(([k, label, ph]) => (
+            <AdminField key={k} id={`ct-${k}`} label={label} error={errors[k]}>
+              <input id={`ct-${k}`} type="url" inputMode="url" value={form[k]} maxLength={500} placeholder={ph} onChange={(e) => set(k, e.target.value.trim())} className={adminInput(!!errors[k])} />
+            </AdminField>
+          ))}
         </div>
-      </div>
+      </AdminCard>
 
-      {/* 2. Social Media Channels CMS */}
-      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-6">
-        <div className="border-b border-line pb-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
-            Topluluk & Kanal Entegrasyonu
-          </span>
-          <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
-            <Share2 className="h-4 w-4 text-wood-dark" />
-            <span>Sosyal Medya & Sipariş Hatları</span>
-          </h3>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Web sitesinin üst menüsünde, altbilgisinde (footer) ve ürün detaylarında gösterilecek resmi hesap bağlantıları.
-          </p>
-        </div>
+      <SaveBar dirty={dirty} saving={saving} onSave={save} onReset={() => setForm(initial)} disabled={hasErrors} error={saveError || (hasErrors ? 'İşaretli alanları düzeltin.' : null)} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <InstagramIcon className="h-3.5 w-3.5 text-pink-600" />
-              <span>Instagram Kanalı (URL / Kullanıcı Adı)</span>
-            </label>
-            <input
-              type="text"
-              value={localSocials.instagram} maxLength={500}
-              onChange={(e) => setLocalSocials({ ...localSocials, instagram: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="https://instagram.com/ermaymobilya"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <YoutubeIcon className="h-3.5 w-3.5 text-signal" />
-              <span>YouTube Kanalı (Atölye & Üretim Videoları)</span>
-            </label>
-            <input
-              type="text"
-              value={localSocials.youtube} maxLength={500}
-              onChange={(e) => setLocalSocials({ ...localSocials, youtube: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="https://youtube.com/@ermaymobilya"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <Send className="h-3.5 w-3.5 text-wood-dark" />
-              <span>Telegram Kanalı / İletişim Grubu</span>
-            </label>
-            <input
-              type="text"
-              value={localSocials.telegram} maxLength={500}
-              onChange={(e) => setLocalSocials({ ...localSocials, telegram: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none"
-              placeholder="https://t.me/ermaymobilya"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold text-neutral-700 block mb-1 flex items-center gap-1.5">
-              <MessageSquare className="h-3.5 w-3.5 text-ok" />
-              <span>WhatsApp Esnaf Sipariş Hattı (Numara)</span>
-            </label>
-            <input
-              type="text"
-              value={localSocials.whatsapp} maxLength={500}
-              onChange={(e) => setLocalSocials({ ...localSocials, whatsapp: e.target.value })}
-              className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-amber-600 focus:outline-none font-mono"
-              placeholder="+90 532 000 00 00"
-            />
-          </div>
-        </div>
-
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
-          >
-            Tüm İletişim ve Sosyal Bağlantıları Kaydet
-          </button>
-        </div>
-      </div>
-
-      {/* 3. Telegram Instant Order Notification Setup & Testing */}
-      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-5">
-        <div className="border-b border-line pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
-              Anlık Yönetici Bildirimleri
-            </span>
-            <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
-              <BellRing className="h-4 w-4 text-wood-dark" />
-              <span>Telegram Sipariş Bildirim Altyapısı</span>
-            </h3>
-          </div>
-          <span className="text-xs bg-paper text-wood-dark border border-line px-3 py-1 rounded-full font-semibold">
-            Canlı Entegrasyon Hazır
-          </span>
-        </div>
-
-        <div className="bg-paper p-4 rounded border border-line text-xs space-y-2 text-neutral-700">
-          <p className="font-semibold text-sky-950">
-            🔔 Web sitesinden yeni bir sipariş verildiğinde Telegram botunuz üzerinden anında:
-          </p>
-          <ul className="list-disc pl-5 space-y-1 text-neutral-600 text-xs">
-            <li>Sipariş numarası, tutarı ve müşteri adı</li>
-            <li>Teslim edilecek şehir ve bölgesel lojistik kodu (Örn: <code>34-MAR</code>)</li>
-            <li>Satın alımın yapıldığı cihaz türü (Mobil / Laptop / Masaüstü)</li>
-            <li>Sepetteki ürünlerin listesi doğrudan cep telefonunuza gelir.</li>
-          </ul>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <button
-            type="button"
-            onClick={handleTestTelegram}
-            disabled={isTestingTelegram}
-            className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-400 text-white text-sm font-semibold py-2.5 px-5 rounded transition-colors cursor-pointer"
-          >
-            {isTestingTelegram ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Test Gönderiliyor...</span>
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4" />
-                <span>Telegram Test Bildirimi Gönder</span>
-              </>
-            )}
-          </button>
-
-          {telegramStatusMsg && (
-            <span className={`text-xs font-semibold ${telegramStatusMsg.includes('başarıyla') ? 'text-ok' : 'text-signal'}`}>
-              {telegramStatusMsg}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* 4. Daily Sales Report Bulletin */}
-      <div className="bg-white p-6 md:p-8 rounded-xs border border-line space-y-5">
-        <div className="border-b border-line pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-wood-dark block mb-1">
-              Satış Muhasebe Özeti
-            </span>
-            <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-wood-dark" />
-              <span>Günlük Satış Durum Raporu (E-Posta Bülteni)</span>
-            </h3>
-          </div>
-          <span className="text-xs bg-paper text-wood-dark border border-line px-3 py-1 rounded-full font-semibold">
-            Her Sabah 09:00 Otomatik
-          </span>
-        </div>
-
-        <p className="text-xs text-neutral-600 leading-relaxed">
-          Her sabah bir önceki günün toplam satış adedi, toplam cirosu, ödeme dağılımı (Kredi Kartı / Havale) ve sipariş listesi admin e-posta adresinize (<code>{contactInfo.email || 'admin@ermaymobilya.com'}</code>) otomatik HTML bülten olarak iletilir. İsterseniz aşağıdaki butonla dünün raporunu anında talep edebilirsiniz.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSendDailyReport}
-            disabled={isSendingReport}
-            className="inline-flex items-center gap-2 bg-amber-700 hover:bg-amber-800 disabled:bg-wood text-white text-sm font-semibold py-2.5 px-5 rounded transition-colors cursor-pointer"
-          >
-            {isSendingReport ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Rapor Gönderiliyor...</span>
-              </>
-            ) : (
-              <>
-                <Mail className="h-4 w-4" />
-                <span>Günlük Satış Raporunu E-Postama Gönder</span>
-              </>
-            )}
-          </button>
-
-          {reportStatusMsg && (
-            <span className={`text-xs font-semibold ${reportStatusMsg.includes('gönderildi') ? 'text-ok' : 'text-signal'}`}>
-              {reportStatusMsg}
-            </span>
-          )}
-        </div>
-      </div>
-
+      <NotificationsCard />
     </div>
   );
 };
 
+/** Telegram bildirimi ve günlük talep özeti: ne gönderildiği olduğu gibi anlatılır */
+function NotificationsCard() {
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [sending, setSending] = useState(false);
+  const [reportMsg, setReportMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const test = async () => {
+    setTesting(true);
+    setTestMsg(null);
+    try {
+      const res = await apiClient.post('/cms/telegram/test');
+      setTestMsg({ ok: !!res.data?.success, text: res.data?.message || (res.data?.success ? 'Test mesajı gönderildi.' : 'Gönderilemedi.') });
+    } catch (err) {
+      setTestMsg({ ok: false, text: describeApiError(err, 'Telegram bağlantısı kurulamadı. Sunucudaki TELEGRAM_BOT_TOKEN ve TELEGRAM_CHAT_ID ayarlarını kontrol edin.') });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const report = async () => {
+    setSending(true);
+    setReportMsg(null);
+    try {
+      const res = await apiClient.post('/orders/daily-report');
+      const d = res.data?.data as { totalRequests?: number; totalVolume?: number } | undefined;
+      setReportMsg({
+        ok: !!res.data?.success,
+        text: res.data?.success
+          ? `Dünün özeti gönderildi: ${d?.totalRequests ?? 0} talep, ${(d?.totalVolume ?? 0).toLocaleString('tr-TR')} TL tahmini tutar.`
+          : res.data?.message || 'Özet gönderilemedi.',
+      });
+    } catch (err) {
+      setReportMsg({ ok: false, text: describeApiError(err, 'Özet gönderilemedi.') });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <AdminCard
+      title="Telegram bildirimleri"
+      icon={BellRing}
+      description="Yeni sipariş talebi ve iletişim mesajı geldiğinde Telegram’a kısa bir bildirim gider. Bot ayarları sunucudadır."
+    >
+      <div className="text-sm text-neutral-700 space-y-1">
+        <p>Talep bildiriminde: talep numarası, il/ilçe, ürün kalem sayısı, tahmini tutar ve müşteri tercihi (WhatsApp ya da mağaza).</p>
+        <p className="text-neutral-500">Ad, telefon ve adres gibi kişisel veriler gönderilmez (KVKK).</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" onClick={test} disabled={testing} className="inline-flex items-center gap-2 h-10 px-4 text-sm font-semibold border border-line-strong rounded-xs hover:bg-paper disabled:opacity-50 cursor-pointer">
+          {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          Test bildirimi gönder
+        </button>
+        {testMsg && <span className={`text-sm ${testMsg.ok ? 'text-ok' : 'text-signal'}`}>{testMsg.text}</span>}
+      </div>
+      <div className="border-t border-line pt-4 space-y-3">
+        <p className="text-sm text-neutral-700 flex items-start gap-2">
+          <FileSpreadsheet className="h-4 w-4 text-wood-dark shrink-0 mt-0.5" />
+          Dünün talep özeti (talep sayısı, durum ve tercih dağılımı, toplam tahmini tutar) isteğe bağlı olarak Telegram’a gönderilir. Otomatik zamanlama yoktur.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" onClick={report} disabled={sending} className="inline-flex items-center gap-2 h-10 px-4 text-sm font-semibold border border-line-strong rounded-xs hover:bg-paper disabled:opacity-50 cursor-pointer">
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            Dünün özetini gönder
+          </button>
+          {reportMsg && <span className={`text-sm ${reportMsg.ok ? 'text-ok' : 'text-signal'}`}>{reportMsg.text}</span>}
+        </div>
+      </div>
+    </AdminCard>
+  );
+}
+
+export default ContactTab;

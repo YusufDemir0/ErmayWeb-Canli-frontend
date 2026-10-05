@@ -221,11 +221,11 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   <tr key={post.id} className="hover:bg-paper/70 transition-colors">
                     <td className="py-3 px-4">
                       <div className="w-12 h-12 bg-neutral-100 rounded-xs overflow-hidden border border-line">
-                        <img
-                          src={post.coverImage || '/default-furniture.webp'}
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                        />
+                        {post.coverImage ? (
+                          <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="w-full h-full flex items-center justify-center text-[10px] text-neutral-500 text-center leading-tight" title="Kapak görseli yüklenmemiş">Görsel yok</span>
+                        )}
                       </div>
                     </td>
                     <td className="py-3 px-4 font-semibold text-neutral-900 max-w-xs truncate">
