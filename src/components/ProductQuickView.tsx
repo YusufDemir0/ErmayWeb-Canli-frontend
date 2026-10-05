@@ -8,6 +8,7 @@ import { useCartStore } from '../stores/useCartStore';
 import type { ProductImages } from '../types';
 import { useWhatsappNumber } from '../lib/whatsapp';
 import { useModalDismiss } from '../lib/useModalDismiss';
+import EdgeNav from './EdgeNav';
 
 export const ProductQuickView: React.FC = () => {
   const waNumber = useWhatsappNumber(); // Tüm WhatsApp butonları tek kaynaktan (Admin > İletişim Bilgileri)
@@ -82,8 +83,13 @@ export const ProductQuickView: React.FC = () => {
               alt={product.name}
               className="w-full h-full object-cover transition-all duration-500"
             />
+            <EdgeNav
+              enabled={productImagesList.length > 1}
+              onPrev={() => setActiveImageIndex((i) => (i - 1 + productImagesList.length) % productImagesList.length)}
+              onNext={() => setActiveImageIndex((i) => (i + 1) % productImagesList.length)}
+            />
             {product.badge && (
-              <span className="absolute top-4 left-4 bg-ink text-white text-sm font-semibold py-1 px-3 rounded-xs">
+              <span className="absolute top-4 left-4 z-30 pointer-events-none bg-ink text-white text-sm font-semibold py-1 px-3 rounded-xs">
                 {product.badge}
               </span>
             )}

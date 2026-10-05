@@ -164,7 +164,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         <button
           onClick={handleManualSyncNow}
           disabled={isSyncingErp}
-          className="inline-flex items-center justify-center gap-2 px-4 h-11 bg-brand hover:bg-ink text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer disabled:opacity-60 shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 h-11 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer disabled:opacity-60 shrink-0"
         >
           <RefreshCw className={`h-4 w-4 ${isSyncingErp ? 'animate-spin' : ''}`} />
           <span>{isSyncingErp ? 'Güncelleniyor…' : 'Şimdi güncelle'}</span>

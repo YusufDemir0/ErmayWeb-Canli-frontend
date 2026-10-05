@@ -186,7 +186,7 @@ export const CartDrawer: React.FC = () => {
                 id="checkout-btn"
                 href="/talep"
                 onClick={onClose}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer"
               >
                 <span>Sipariş talebine geç</span>
                 <ArrowRight className="h-4 w-4" />

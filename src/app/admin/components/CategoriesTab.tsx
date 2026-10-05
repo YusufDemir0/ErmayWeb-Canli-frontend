@@ -346,7 +346,7 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({
             <button
               type="submit"
               disabled={uploadingImage}
-              className="bg-brand hover:bg-ink text-ink text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
+              className="bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
             >
               {uploadingImage
                 ? 'Görsel Yükleniyor...'

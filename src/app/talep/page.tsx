@@ -767,7 +767,7 @@ export default function OrderRequestPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || isQuoting || isCityDisabled}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer disabled:bg-neutral-300 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                className="w-full h-12 flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold transition-colors rounded-xs cursor-pointer disabled:bg-neutral-300 disabled:text-neutral-600 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>

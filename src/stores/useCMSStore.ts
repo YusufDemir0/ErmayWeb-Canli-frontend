@@ -3,10 +3,19 @@ import type { Product, Category, StoreItem, SocialLinksConfig } from '../types';
 import apiClient from '../services/api';
 import { isAxiosError } from 'axios';
 import { toast } from './useToastStore';
+import { DEFAULT_CORPORATE_CONFIG, resolveCorporateConfig, type CorporateConfig } from '../lib/corporateContent';
 
 /**
  * CMS kayıtları iyimser (optimistic) yapılır; sunucu reddederse admin "kaydedildi" sanmasın diye görünür hata gösterilir.
  */
+/** Sunucu hata yanıtını kullanıcıya gösterilecek tek cümleye çevirir (zod alan hataları dahil) */
+export const describeApiError = (err: unknown, fallback: string): string => {
+  if (!isAxiosError(err)) return fallback;
+  const data = err.response?.data as { message?: string; errors?: { field: string; message: string }[] } | undefined;
+  if (data?.errors?.length) return data.errors.map((e) => e.message).join(' ');
+  return data?.message || fallback;
+};
+
 const reportCmsSaveError = (label: string) => (err: unknown) => {
   console.warn(`${label} kaydetme hatası:`, err);
   const serverMsg = isAxiosError(err) ? (err.response?.data as { message?: string } | undefined)?.message : undefined;
@@ -52,26 +61,7 @@ export interface HomeConfig {
   categoriesSubtitle: string;
 }
 
-export interface CorporateConfig {
-  heroBadge: string;
-  heroTitle: string;
-  heroHighlight: string;
-  heroSubtitle: string;
-  heroImage: string;
-  storyTitle: string;
-  storyContent?: string; // Unified adaptive multi-paragraph rich text
-  storyParagraph1?: string;
-  storyParagraph2?: string;
-  experienceYears: string;
-  experienceSubtitle: string;
-  storyImage: string;
-  visionTitle: string;
-  visionText: string;
-  missionTitle: string;
-  missionText: string;
-  qualityTitle: string;
-  qualityText: string;
-}
+export type { CorporateConfig } from '../lib/corporateContent';
 
 /** Duyuru bandı görünümü (CMS anahtarı: ticker_style) */
 export interface TickerStyleConfig {
@@ -244,26 +234,6 @@ const DEFAULT_HOME_CONFIG: HomeConfig = {
   categoriesSubtitle: 'Çalışma alanlarınız ve ofisiniz için standart seri fabrika imalatı çözümler'
 };
 
-const DEFAULT_CORPORATE_CONFIG: CorporateConfig = {
-  heroBadge: 'DOĞRUDAN ÜRETİCİDEN',
-  heroTitle: 'Fabrikadan Aracısız,',
-  heroHighlight: 'Standart Seri Güvencesi.',
-  heroSubtitle: 'Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı ofis mobilyaları.',
-  heroImage: '/default-furniture.webp',
-  storyTitle: 'İmalat Felsefemiz ve Üretim Standartlarımız',
-  storyContent: `Ermay Mobilya, modern üretim tesislerinde standart seri ofis mobilyası imalatı yaparak doğrudan kurumsal firmalara ve son kullanıcıya aracısız ulaştırmaktadır.\n\nÜrünlerimizde 1. sınıf E1 melamin paneller, darbe emici 2mm PVC kenar bantları ve elektrostatik fırın boyalı DKP çelik profil ayaklar kullanılarak sağlamlık ve uzun ömür güvence altına alınır. Aracı ve mağaza komisyonlarını ortadan kaldırarak en rekabetçi fabrika fiyatlarını sunuyoruz.`,
-  storyParagraph1: 'Ermay Mobilya, modern tesislerinde standart seri ofis mobilyaları üreterek aracısız doğrudan satış gerçekleştirmektedir.',
-  storyParagraph2: '1. Sınıf E1 melamin paneller, 2mm PVC kenar koruması ve dayanıklı çelik profil ayaklar ile uzun ömürlü kullanım sunar.',
-  experienceYears: '40+',
-  experienceSubtitle: 'Yıllık İmalat Güvencesi',
-  storyImage: '/default-furniture.webp',
-  visionTitle: 'Vizyonumuz',
-  visionText: 'Ofis ve çalışma alanlarında uzun ömürlü, dayanıklı ve ergonomik standart seri mobilyaları en uygun fabrika fiyatıyla müşterilerimize ulaştırmak.',
-  missionTitle: 'Misyonumuz',
-  missionText: '1. Sınıf E1 melamin, darbe emici PVC ve elektrostatik boyalı çelik konstrüksiyon ile yüksek kalite standartlarında seri üretim.',
-  qualityTitle: 'Kalite Politikamız',
-  qualityText: 'Tüm ürünlerimizde E1 normunda insan sağlığına uygun antibakteriyel melamin ve yüksek mukavemetli metal profiller kullanıyoruz.'
-};
 
 export const DEFAULT_CATEGORIES: Category[] = [];
 
@@ -317,9 +287,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
                   }
                 : get().homeConfig,
               // Kayıtlı blok eksik alan içerebilir; varsayılanların üzerine birleştirilir
-              corporateConfig: cms.corporate_config
-                ? { ...DEFAULT_CORPORATE_CONFIG, ...(cms.corporate_config as Partial<CorporateConfig>) }
-                : get().corporateConfig,
+              corporateConfig: resolveCorporateConfig(cms.corporate_config as Partial<CorporateConfig> | undefined),
             });
           }
         } catch (err) {
@@ -516,26 +484,22 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         }
       },
 
+      // Mağaza kaydı sunucu onayından sonra listeye yansır; hata sessizce yutulmaz, sunucu mesajıyla fırlatılır
       addStore: async (store) => {
-        set((state) => ({ stores: [store, ...state.stores] }));
         try {
-          const res = await apiClient.post('/stores', store);
-          if (res.data?.success && res.data.store) {
-            get().fetchStores({ includeInactive: true });
-          }
+          await apiClient.post('/stores', store);
+          await get().fetchStores({ includeInactive: true });
         } catch (e) {
-          console.warn('Mağaza API ekleme hatası:', e);
+          throw new Error(describeApiError(e, 'Mağaza eklenemedi.'));
         }
       },
 
       updateStore: async (id, updatedFields) => {
-        set((state) => ({
-          stores: state.stores.map((s) => (s.id === id ? { ...s, ...updatedFields } : s))
-        }));
         try {
           await apiClient.put(`/stores/${id}`, updatedFields);
+          await get().fetchStores({ includeInactive: true });
         } catch (e) {
-          console.warn('Mağaza API güncelleme hatası:', e);
+          throw new Error(describeApiError(e, 'Mağaza güncellenemedi.'));
         }
       },
 

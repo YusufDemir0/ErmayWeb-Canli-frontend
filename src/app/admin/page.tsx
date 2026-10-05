@@ -254,7 +254,7 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              className="w-full bg-brand hover:bg-ink text-ink text-sm font-semibold h-11 rounded-xs transition-colors cursor-pointer"
+              className="w-full bg-brand hover:bg-brand-dark text-ink text-sm font-semibold h-11 rounded-xs transition-colors cursor-pointer"
             >
               Giriş yap
             </button>

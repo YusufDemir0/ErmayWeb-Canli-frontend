@@ -257,7 +257,7 @@ export const TickerTab: React.FC<TickerTabProps> = ({ tickerItems, onAddTickerIt
                 await updateTickerStyle(style);
                 onShowSuccess('Duyuru bandı görünümü kaydedildi.');
               }}
-              className="flex-1 h-11 bg-brand hover:bg-ink text-ink text-sm font-semibold rounded-xs disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+              className="flex-1 h-11 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold rounded-xs disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             >
               Görünümü kaydet
             </button>

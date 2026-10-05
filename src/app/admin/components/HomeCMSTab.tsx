@@ -98,7 +98,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <button
             type="button"
             onClick={handleAddSlide}
-            className="flex items-center gap-1.5 bg-brand hover:bg-ink text-ink text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-2.5 px-4 rounded-xs transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Yeni Slayt Ekle</span>
@@ -363,7 +363,7 @@ export const HomeCMSTab: React.FC<HomeCMSTabProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold py-3.5 px-8 rounded-xs transition-colors cursor-pointer"
+              className="bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3.5 px-8 rounded-xs transition-colors cursor-pointer"
             >
               Ana Sayfa Değişikliklerini Kaydet
             </button>

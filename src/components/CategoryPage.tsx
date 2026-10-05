@@ -10,6 +10,8 @@ import type { Product } from '../types';
 import { useCMSStore } from '../stores/useCMSStore';
 import { useUIStore } from '../stores/useUIStore';
 import ProductCard from './ProductCard';
+import SearchableCheckList from './SearchableCheckList';
+import { useModalDismiss } from '../lib/useModalDismiss';
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -62,6 +64,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   const [minPriceInput, setMinPriceInput] = useState<number | ''>(appliedMinPrice);
   const [maxPriceInput, setMaxPriceInput] = useState<number | ''>(appliedMaxPrice);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
+  const closeMobileFilter = React.useCallback(() => setIsMobileFilterOpen(false), []);
+  useModalDismiss(isMobileFilterOpen, closeMobileFilter);
 
   // Synchronize local input fields whenever URL parameters change
   useEffect(() => {
@@ -333,6 +337,100 @@ const MATERIAL_GROUPS = [
     inStockOnly ||
     Boolean(effectiveSearch);
 
+  // Filtre blokları: masaüstü kenar çubuğunda ve mobil filtre çekmecesinde aynı bileşenler kullanılır
+  const colorFilter = (
+    <SearchableCheckList
+      title="Renk"
+      options={COLORS_LIST}
+      selected={selectedColors}
+      onToggle={toggleColor}
+      onClear={() => updateFilters({ color: null })}
+      searchPlaceholder="Renk ara (örn. ceviz)"
+    />
+  );
+  const materialFilter = (
+    <SearchableCheckList
+      title="Malzeme"
+      options={MATERIALS_LIST}
+      selected={selectedMaterials}
+      onToggle={toggleMaterial}
+      onClear={() => updateFilters({ material: null })}
+      searchPlaceholder="Malzeme ara"
+    />
+  );
+  const priceFilter = (
+          <div className="border-b border-line-strong pb-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-neutral-900">
+                Fiyat aralığı (TL)
+              </h3>
+              {(appliedMinPrice !== '' || appliedMaxPrice !== '') && (
+                <button 
+                  onClick={() => {
+                    setMinPriceInput('');
+                    setMaxPriceInput('');
+                    updateFilters({ minPrice: null, maxPrice: null });
+                  }} 
+                  className="text-xs text-wood-dark hover:underline cursor-pointer"
+                >
+                  Temizle
+                </button>
+              )}
+            </div>
+            
+            {/* Quick Price Range Pills */}
+            <div className="flex flex-wrap gap-1.5 text-xs">
+              <button
+                type="button"
+                onClick={() => handleQuickPrice('', 15000)}
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
+              >
+                0 - 15.000 TL
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickPrice(15000, 35000)}
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
+              >
+                15.000 - 35.000 TL
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickPrice(35000, '')}
+                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
+              >
+                35.000 TL +
+              </button>
+            </div>
+
+            <form onSubmit={handlePriceFilterSubmit} className="space-y-2 pt-1">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  placeholder="En az"
+                  value={minPriceInput}
+                  onChange={(e) => setMinPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
+                />
+                <span className="text-neutral-500">-</span>
+                <input
+                  type="number"
+                  placeholder="En çok"
+                  value={maxPriceInput}
+                  onChange={(e) => setMaxPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-ink hover:bg-neutral-800 text-white text-sm font-semibold h-9 rounded-xs transition-colors cursor-pointer"
+              >
+                Fiyatı uygula
+              </button>
+            </form>
+          </div>
+  );
+
   return (
     <div className="w-full bg-paper min-h-screen text-neutral-800">
       
@@ -467,40 +565,8 @@ const MATERIAL_GROUPS = [
             </div>
           </div>
 
-          {/* 2. Color Filter (URL Based) */}
-          <div className="border-b border-line-strong pb-5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-neutral-900">
-                Renk Seçenekleri
-              </h3>
-              {selectedColors.length > 0 && (
-                <button 
-                  onClick={() => updateFilters({ color: null })} 
-                  className="text-xs text-wood-dark hover:underline cursor-pointer"
-                >
-                  Temizle
-                </button>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {COLORS_LIST.map((col) => {
-                const isChecked = selectedColors.some((sc) => sc.toLowerCase() === col.toLowerCase());
-                return (
-                  <label key={col} className={`flex items-center gap-2 p-1.5 rounded border cursor-pointer transition-all ${
-                    isChecked ? 'border-line bg-paper font-bold text-neutral-900' : 'border-line hover:border-line-strong text-neutral-700'
-                  }`}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleColor(col)}
-                      className="h-3.5 w-3.5 accent-wood rounded-xs cursor-pointer"
-                    />
-                    <span className="text-xs truncate">{col}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
+          {/* 2. Renk: aranabilir, kaydırılabilir liste */}
+          {colorFilter}
 
           {/* 3. Width Filter (URL Based) */}
           <div className="border-b border-line-strong pb-5 space-y-2.5">
@@ -538,110 +604,11 @@ const MATERIAL_GROUPS = [
             </div>
           </div>
 
-          {/* 4. Price Range Filter (URL Based) */}
-          <div className="border-b border-line-strong pb-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-neutral-900">
-                Fabrika Fiyat Aralığı (TL)
-              </h3>
-              {(appliedMinPrice !== '' || appliedMaxPrice !== '') && (
-                <button 
-                  onClick={() => {
-                    setMinPriceInput('');
-                    setMaxPriceInput('');
-                    updateFilters({ minPrice: null, maxPrice: null });
-                  }} 
-                  className="text-xs text-wood-dark hover:underline cursor-pointer"
-                >
-                  Temizle
-                </button>
-              )}
-            </div>
-            
-            {/* Quick Price Range Pills */}
-            <div className="flex flex-wrap gap-1.5 text-xs">
-              <button
-                type="button"
-                onClick={() => handleQuickPrice('', 15000)}
-                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
-              >
-                0 - 15.000 TL
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickPrice(15000, 35000)}
-                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
-              >
-                15.000 - 35.000 TL
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickPrice(35000, '')}
-                className="px-2.5 py-1 rounded-xs bg-paper border border-line-strong text-neutral-700 hover:border-wood cursor-pointer"
-              >
-                35.000 TL +
-              </button>
-            </div>
+          {/* 4. Fiyat aralığı */}
+          {priceFilter}
 
-            <form onSubmit={handlePriceFilterSubmit} className="space-y-2 pt-1">
-              <div className="flex gap-2 items-center">
-                <input
-                  type="number"
-                  placeholder="En az"
-                  value={minPriceInput}
-                  onChange={(e) => setMinPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
-                />
-                <span className="text-neutral-500">-</span>
-                <input
-                  type="number"
-                  placeholder="En çok"
-                  value={maxPriceInput}
-                  onChange={(e) => setMaxPriceInput(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs border border-line-strong p-2 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none bg-paper"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-brand hover:bg-ink text-ink text-xs uppercase font-bold tracking-wider py-2 rounded-xs transition-colors cursor-pointer"
-              >
-                Fiyat Uygula
-              </button>
-            </form>
-          </div>
-
-          {/* 5. Material Checkboxes (URL Based) */}
-          <div className="border-b border-line-strong pb-5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-neutral-900">
-                Malzeme
-              </h3>
-              {selectedMaterials.length > 0 && (
-                <button 
-                  onClick={() => updateFilters({ material: null })} 
-                  className="text-xs text-wood-dark hover:underline cursor-pointer"
-                >
-                  Temizle
-                </button>
-              )}
-            </div>
-            <div className="space-y-2 text-xs">
-              {MATERIALS_LIST.map((mat) => {
-                const isChecked = selectedMaterials.some((sm) => sm.toLowerCase() === mat.toLowerCase());
-                return (
-                  <label key={mat} className="flex items-center gap-2.5 cursor-pointer text-neutral-700 hover:text-neutral-900">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleMaterial(mat)}
-                      className="h-4 w-4 accent-wood rounded-xs cursor-pointer"
-                    />
-                    <span>{mat}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
+          {/* 5. Malzeme: aranabilir liste */}
+          {materialFilter}
 
           {/* 6. Stock Toggle (URL Based) */}
           <div>
@@ -698,9 +665,10 @@ const MATERIAL_GROUPS = [
               <div className="relative w-5/6 max-w-sm bg-white h-full shadow-2xl z-10 flex flex-col justify-between p-5 overflow-y-auto animate-slide-in">
                 <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
                   <span className="font-bold text-sm text-neutral-900 uppercase tracking-wider">Fabrika Filtreleri</span>
-                  <button 
+                  <button
                     onClick={() => setIsMobileFilterOpen(false)}
-                    className="p-1 text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                    aria-label="Filtreleri kapat"
+                    className="h-10 w-10 -mr-2 flex items-center justify-center text-neutral-500 hover:text-ink cursor-pointer"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -771,6 +739,11 @@ const MATERIAL_GROUPS = [
                     </div>
                   </div>
 
+                  {/* Fiyat, renk ve malzeme (masaüstüyle aynı) */}
+                  {priceFilter}
+                  {colorFilter}
+                  {materialFilter}
+
                   {/* Dimension (Width) Filter */}
                   <div className="border-b border-line-strong pb-4 space-y-2">
                     <h3 className="font-bold text-neutral-900">Genişlik Ölçüsü</h3>
@@ -816,9 +789,9 @@ const MATERIAL_GROUPS = [
                 <div className="pt-4 border-t border-line mt-4">
                   <button
                     onClick={() => setIsMobileFilterOpen(false)}
-                    className="w-full py-3 bg-neutral-900 hover:bg-brand text-ink font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
+                    className="w-full h-12 bg-brand hover:bg-brand-dark text-ink font-semibold text-sm rounded-xs transition-colors cursor-pointer"
                   >
-                    Sonuçları Göster ({totalItems} Ürün)
+                    {totalItems} ürünü göster
                   </button>
                 </div>
               </div>

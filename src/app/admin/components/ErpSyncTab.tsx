@@ -333,7 +333,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
           <button
             onClick={() => fetchCatalog()}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold rounded-xs transition-colors cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span>ERP'den Güncelle</span>
@@ -800,7 +800,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
                 type="button"
                 onClick={handleSaveModal}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold rounded-xs transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-ink hover:bg-neutral-800 text-white text-sm font-semibold rounded-xs transition-colors cursor-pointer"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

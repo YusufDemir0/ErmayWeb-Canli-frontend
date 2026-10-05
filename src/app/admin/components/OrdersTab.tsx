@@ -374,7 +374,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                           setTargetStatus(nextAllowed);
                           setStaffNote(req.staffNote || '');
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand hover:bg-brand-dark text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer"
                       >
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                         <span>Durum Değiştir</span>
@@ -623,7 +623,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
                 <button
                   type="submit"
                   disabled={isUpdatingStatus}
-                  className="px-5 py-2 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-brand hover:bg-brand-dark text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   {isUpdatingStatus && <RefreshCw className="h-3 w-3 animate-spin" />}
                   <span>Kaydet</span>

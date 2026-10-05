@@ -28,7 +28,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
     coverImage: '',
     category: 'Dekorasyon & Tasarım',
     tags: 'masif ahşap, lüks mobilya, modoko, dekorasyon',
-    author: 'Ermay Mobilya Mimari Ekibi',
+    author: 'Ermay Mobilya',
     isPublished: true,
   });
 
@@ -59,7 +59,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       coverImage: '',
       category: 'Dekorasyon & Tasarım',
       tags: 'masif ahşap, lüks mobilya, modoko, dekorasyon',
-      author: 'Ermay Mobilya Mimari Ekibi',
+      author: 'Ermay Mobilya',
       isPublished: true,
     });
     setIsModalOpen(true);
@@ -74,7 +74,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       coverImage: post.coverImage || '',
       category: post.category || 'Dekorasyon & Tasarım',
       tags: (post.tags || []).join(', '),
-      author: post.author || 'Ermay Mobilya Mimari Ekibi',
+      author: post.author || 'Ermay Mobilya',
       isPublished: post.isPublished !== false,
     });
     setIsModalOpen(true);
@@ -109,7 +109,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       coverImage: formData.coverImage.trim() || undefined,
       category: formData.category.trim() || 'Dekorasyon & Tasarım',
       tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
-      author: formData.author.trim() || 'Ermay Mobilya Mimari Ekibi',
+      author: formData.author.trim() || 'Ermay Mobilya',
       isPublished: formData.isPublished,
     };
 
@@ -175,7 +175,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
 
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-brand-dark text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Yeni Blog Yazısı Ekle</span>
@@ -322,13 +322,20 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                   <label className="block text-sm font-semibold text-neutral-700 mb-1">
                     Kategori
                   </label>
+                  {/* Var olan kategoriler önerilir; aynı kategorinin farklı yazılışları birikmesin */}
                   <input
                     type="text"
+                    list="blog-category-options"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="Dekorasyon & Tasarım"
-                    className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
+                    placeholder="Listeden seçin veya yeni yazın"
+                    className="w-full px-3 h-10 text-sm border border-line-strong rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-hidden"
                   />
+                  <datalist id="blog-category-options">
+                    {Array.from(new Set(posts.map((p) => p.category).filter(Boolean))).map((c) => (
+                      <option key={c} value={c as string} />
+                    ))}
+                  </datalist>
                 </div>
 
                 <div>
@@ -339,7 +346,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                     type="text"
                     value={formData.author}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    placeholder="Ermay Mobilya Mimari Ekibi"
+                    placeholder="Ermay Mobilya"
                     className="w-full px-3 py-2 border border-line-strong rounded-xs focus:ring-1 focus:ring-wood focus:outline-hidden"
                   />
                 </div>
@@ -436,7 +443,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-ink text-ink font-bold rounded-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-brand hover:bg-brand-dark text-ink font-bold rounded-xs transition-colors cursor-pointer"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span>{editingPostId ? 'Güncellemeleri Kaydet' : 'Blog Yazısını Yayınla'}</span>

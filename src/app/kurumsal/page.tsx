@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Award, ShieldCheck, Building2, CheckCircle, Hammer, Truck } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import { resolveCorporateConfig, type CorporateConfig } from '../../lib/corporateContent';
 
 import { cmsService } from '../../services/cmsService';
 
@@ -32,172 +32,121 @@ export const metadata: Metadata = {
   },
 };
 
-const DEFAULT_CORP_DATA = {
-  heroBadge: 'DOĞRUDAN ÜRETİCİDEN',
-  heroTitle: 'Fabrikadan Aracısız,',
-  heroHighlight: 'Standart Seri Güvencesi.',
-  heroSubtitle: 'Kendi üretim tesislerimizde standart seri olarak imal edilen dayanıklı ofis mobilyaları ve kurumsal çalışma alanları.',
-  experienceYears: '40+ Yıl',
-  experienceSubtitle: 'Kesintisiz İmalat Güvencesi',
-  storyImage: '/default-furniture.webp',
-  storyTitle: 'İmalat Felsefemiz ve Üretim Standartlarımız',
-  storyContent: `Ermay Mobilya, modern üretim tesislerinde standart seri ofis mobilyası imalatı yaparak doğrudan kurumsal firmalara ve son kullanıcıya aracısız ulaştırmaktadır.\n\nÜrünlerimizde 1. sınıf E1 melamin paneller, darbe emici 2mm PVC kenar bantları ve elektrostatik fırın boyalı DKP çelik profil ayaklar kullanılarak sağlamlık ve uzun ömür güvence altına alınır. Aracı ve mağaza komisyonlarını ortadan kaldırarak en rekabetçi fabrika fiyatlarını sunuyoruz.`,
-  visionTitle: 'İmalat Vizyonumuz',
-  visionText: 'Ofis ve çalışma alanlarında uzun ömürlü, dayanıklı ve ergonomik standart seri mobilyaları en uygun fabrika fiyatıyla müşterilerimize ulaştırmak.',
-  missionTitle: 'Üretim Standartlarımız',
-  missionText: '1. Sınıf E1 melamin paneller, 2mm darbe koruyucu PVC ve elektrostatik boyalı çelik konstrüksiyon ile yüksek kalite standartlarında seri üretim.',
-};
-
 export default async function KurumsalPage() {
   const remoteConfig = await cmsService.getCorporateConfig();
-  const corporateConfig = remoteConfig ? { ...DEFAULT_CORP_DATA, ...remoteConfig } : DEFAULT_CORP_DATA;
+  const c = resolveCorporateConfig(remoteConfig as Partial<CorporateConfig> | null);
 
-  const paragraphs = (corporateConfig.storyContent || DEFAULT_CORP_DATA.storyContent)
-    .split('\n')
+  const paragraphs = (c.storyContent || '')
+    .split(/\n+/)
     .map((p: string) => p.trim())
     .filter(Boolean);
+  const highlights = (c.highlights || []).filter(Boolean);
+  const cards = (c.cards || []).filter((card) => card.title || card.text);
+  const kvkkSections = (c.kvkkSections || []).filter((sec) => sec.heading || sec.text);
 
   return (
-    <div className="w-full bg-paper min-h-screen py-12">
+    <div className="w-full bg-canvas min-h-screen pb-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb Navigation */}
-        <nav className="text-xs text-neutral-500 flex items-center gap-2 mb-8">
-          <Link href="/" className="hover:text-wood transition-colors">Ana Sayfa</Link>
-          <span>/</span>
-          <span className="text-neutral-600 font-normal">Kurumsal</span>
-          <span>/</span>
-          <span className="text-wood font-semibold">Hakkımızda</span>
-        </nav>
-
-        {/* Hero Header Section */}
-        <div className="relative bg-white text-neutral-900 rounded-xs overflow-hidden p-8 md:p-14 mb-12 border border-line">
-          <div className="max-w-3xl">
-            <span className="inline-block bg-paper text-wood-dark font-semibold text-sm px-3 py-1 rounded-xs mb-4 border border-line">
-              {corporateConfig.heroBadge}
-            </span>
-            <h1 className="text-3xl md:text-5xl font-display font-bold tracking-tight leading-tight mb-6 text-neutral-900">
-              {corporateConfig.heroTitle} <span className="text-wood">{corporateConfig.heroHighlight}</span>
-            </h1>
-            <p className="text-neutral-600 text-xs md:text-sm leading-relaxed">
-              {corporateConfig.heroSubtitle}
-            </p>
-          </div>
-        </div>
-
-        {/* Main Content Grid: Story & Images */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
-          {/* Image Showcase */}
-          <div className="lg:col-span-5 relative">
-            <div className="aspect-[4/3] rounded-xs overflow-hidden border border-line">
-              <img
-                src={corporateConfig.storyImage}
-                alt="Ermay Mobilya Atölyesi"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col bg-brand text-ink p-6 rounded-xs shadow-xl font-bold max-w-xs">
-              <span className="text-3xl font-extrabold">{corporateConfig.experienceYears}</span>
-              <span className="text-xs uppercase tracking-wider font-semibold mt-1">
-                {corporateConfig.experienceSubtitle}
+        {/* Üst bölüm */}
+        <section className="bg-white rounded-xs border border-line overflow-hidden mb-12 grid grid-cols-1 lg:grid-cols-12">
+          <div className={`p-8 md:p-14 ${c.heroImage ? 'lg:col-span-7' : 'lg:col-span-12 max-w-3xl'}`}>
+            {c.heroBadge && (
+              <span className="inline-block bg-paper text-wood-dark text-sm px-3 py-1 rounded-xs mb-4 border border-line">
+                {c.heroBadge}
               </span>
-            </div>
+            )}
+            <h1 className="text-3xl md:text-5xl font-display font-bold tracking-tight leading-tight mb-6 text-ink">
+              {c.heroTitle} {c.heroHighlight && <span className="text-wood">{c.heroHighlight}</span>}
+            </h1>
+            {c.heroSubtitle && <p className="text-neutral-600 text-base leading-relaxed">{c.heroSubtitle}</p>}
           </div>
+          {c.heroImage && (
+            <div className="lg:col-span-5 min-h-56 bg-paper">
+              <img src={c.heroImage} alt="" className="w-full h-full object-cover" />
+            </div>
+          )}
+        </section>
 
-          {/* Story Text Content */}
-          <div className="lg:col-span-7 space-y-5 text-neutral-700 leading-relaxed text-xs md:text-sm">
-            <h2 className="text-xl md:text-2xl font-display font-bold tracking-tight text-neutral-900 border-l-4 border-wood pl-4">
-              {corporateConfig.storyTitle}
-            </h2>
+        {/* Hikâye */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
+          {c.storyImage && (
+            <div className="lg:col-span-5 relative">
+              <div className="aspect-[4/3] rounded-xs overflow-hidden border border-line bg-paper">
+                <img src={c.storyImage} alt="Ermay Mobilya atölyesi" className="w-full h-full object-cover" />
+              </div>
+              {c.experienceYears && (
+                <div className="absolute -bottom-6 -right-6 hidden sm:flex flex-col bg-brand text-ink p-6 rounded-xs shadow-xl max-w-xs">
+                  <span className="text-3xl font-display font-extrabold">{c.experienceYears}</span>
+                  {c.experienceSubtitle && <span className="text-sm font-medium mt-1">{c.experienceSubtitle}</span>}
+                </div>
+              )}
+            </div>
+          )}
 
+          <div className={`${c.storyImage ? 'lg:col-span-7' : 'lg:col-span-12'} space-y-5 text-neutral-700 leading-relaxed text-base`}>
+            {c.storyTitle && (
+              <h2 className="text-2xl font-display font-bold tracking-tight text-ink border-l-4 border-brand pl-4">{c.storyTitle}</h2>
+            )}
             {paragraphs.map((para, pIdx) => (
-              <p key={pIdx} className="leading-relaxed">
-                {para}
-              </p>
+              <p key={pIdx}>{para}</p>
             ))}
 
-            {/* Quality Checklist Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-line">
-              <div className="flex items-center gap-2.5">
-                <Hammer className="h-4 w-4 text-wood flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">E1 melamin ve çelik profil imalatı</span>
+            {highlights.length > 0 && (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-line">
+                {highlights.map((h, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-ink">
+                    <CheckCircle className="h-4 w-4 text-wood flex-shrink-0 mt-0.5" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+
+        {/* Değer kartları */}
+        {cards.length > 0 && (
+          <section className={`grid grid-cols-1 gap-6 mb-16 ${cards.length >= 3 ? 'md:grid-cols-3' : cards.length === 2 ? 'md:grid-cols-2' : ''}`}>
+            {cards.map((card, i) => (
+              <div key={i} className="bg-white p-8 rounded-xs border border-line border-t-4 border-t-brand">
+                <span className="font-mono text-sm text-wood">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="text-lg font-display font-semibold text-ink mt-2 mb-2">{card.title}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed">{card.text}</p>
               </div>
-              <div className="flex items-center gap-2.5">
-                <ShieldCheck className="h-4 w-4 text-wood flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">2 Yıl Resmi Fabrika Garantisi</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Truck className="h-4 w-4 text-wood flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">İstanbul içinde kendi aracımızla teslimat ve montaj</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <CheckCircle className="h-4 w-4 text-wood flex-shrink-0" />
-                <span className="text-xs font-semibold text-neutral-800">Doğrudan Fabrikadan Aracısız Satış</span>
+            ))}
+          </section>
+        )}
+
+        {/* KVKK aydınlatma metni (#kvkk) */}
+        {kvkkSections.length > 0 && (
+          <section id="kvkk" className="scroll-mt-28 bg-white rounded-xs border border-line p-8 md:p-12">
+            <div className="max-w-4xl">
+              {c.kvkkBadge && (
+                <span className="inline-block bg-paper text-wood-dark text-sm px-3 py-1 rounded-xs mb-3 border border-line">
+                  {c.kvkkBadge}
+                </span>
+              )}
+              {c.kvkkTitle && <h2 className="text-2xl font-display font-bold text-ink tracking-tight mb-4">{c.kvkkTitle}</h2>}
+              <div className="space-y-4 text-neutral-700 text-sm leading-relaxed">
+                {kvkkSections.map((sec, i) => (
+                  <p key={i}>
+                    {sec.heading && <strong className="text-ink">{sec.heading}: </strong>}
+                    {sec.text}
+                  </p>
+                ))}
+                {c.kvkkEmail && (
+                  <p>
+                    Başvurularınızı{' '}
+                    <a href={`mailto:${c.kvkkEmail}`} className="text-wood underline underline-offset-2">
+                      {c.kvkkEmail}
+                    </a>{' '}
+                    adresine iletebilirsiniz.
+                  </p>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Corporate Value Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white p-8 rounded-xs border border-line text-center">
-            <Building2 className="h-10 w-10 text-wood mx-auto mb-4 stroke-[1.5]" />
-            <h3 className="text-sm font-bold text-neutral-900 mb-2">
-              {corporateConfig.visionTitle}
-            </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
-              {corporateConfig.visionText}
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-xs border border-line text-center">
-            <Award className="h-10 w-10 text-wood mx-auto mb-4 stroke-[1.5]" />
-            <h3 className="text-sm font-bold text-neutral-900 mb-2">
-              {corporateConfig.missionTitle}
-            </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
-              {corporateConfig.missionText}
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-xs border border-line text-center">
-            <ShieldCheck className="h-10 w-10 text-wood mx-auto mb-4 stroke-[1.5]" />
-            <h3 className="text-sm font-bold text-neutral-900 mb-2">
-              Müşteri Memnuniyeti
-            </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
-              Uzaktan satışlarda 14 gün yasal cayma hakkı, 2 yıl resmi üretici garantisi ve hızlı teslimat ağıyla güven veren satış sonrası hizmet.
-            </p>
-          </div>
-        </div>
-
-        {/* KVKK Aydınlatma Metni & Veri Güvenliği Bölümü (#kvkk) */}
-        <div id="kvkk" className="scroll-mt-24 bg-white rounded-xs border border-line p-8 md:p-12">
-          <div className="max-w-4xl">
-            <span className="inline-block bg-paper text-wood-dark font-semibold text-sm px-3 py-1 rounded-xs mb-3 border border-line">
-              6698 Sayılı Kanun Kapsamında
-            </span>
-            <h2 className="text-2xl font-display font-bold text-neutral-900 tracking-tight mb-4">
-              Kişisel Verilerin Korunması (KVKK) Aydınlatma Metni
-            </h2>
-            <div className="space-y-4 text-neutral-600 text-xs md:text-sm leading-relaxed">
-              <p>
-                <strong>Veri Sorumlusu:</strong> Ermay Mobilya San. ve Tic. Ltd. Şti. olarak 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca, müşterilerimizin ve web sitemizi ziyaret eden kullanıcılarımızın kişisel verilerinin gizliliğine ve güvenliğine en üst düzeyde önem vermekteyiz.
-              </p>
-              <p>
-                <strong>İşlenen Kişisel Veriler ve Veri Minimizasyonu İlkesi:</strong> Sitemiz üzerinden sipariş talebi oluşturduğunuzda yalnızca talebinizin teyit edilmesi, lojistik süreçlerin planlanması ve mağaza randevunuzun koordine edilmesi amacıyla asgari düzeyde kişisel veri (Ad-Soyad, Telefon Numarası, İl/İlçe ve varsa teslimat notunuz) işlenmektedir. Platformumuzda müşteri üyeliği, kredi kartı, banka kartı veya sanal POS ödeme bilgileri kesinlikle toplanmaz ve saklanmaz.
-              </p>
-              <p>
-                <strong>Kişisel Verilerin İşlenme Amacı ve Hukuki Sebebi:</strong> Kişisel verileriniz, KVKK’nın 5. maddesinde yer alan “bir sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması” ve “ilgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla veri sorumlusunun meşru menfaatleri için veri işlenmesinin zorunlu olması” hukuki sebeplerine dayalı olarak; talep ettiğiniz standart seri ürünlerin imalatı, sevk edilmesi ve müşteri hizmetleri desteğinin verilmesi amacıyla işlenmektedir.
-              </p>
-              <p>
-                <strong>Kişisel Verilerin Aktarımı:</strong> Toplanan kişisel veriler, üçüncü şahıslara veya reklam/pazarlama ajanslarına asla satılmaz veya aktarılmaz. Yalnızca siparişinizin sevkiyatı ve montajı için zorunlu olan yetkili nakliye birimlerimiz ile kanunen yetkili kamu kurum ve kuruluşları dışında hiçbir kurumla paylaşılmamaktadır.
-              </p>
-              <p>
-                <strong>İlgili Kişi Olarak Haklarınız:</strong> KVKK’nın 11. maddesi uyarınca; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, amaca uygun kullanılıp kullanılmadığını sorgulama, düzeltilmesini veya silinmesini isteme haklarına sahipsiniz. Başvurularınızı <em>bilgi@ermaymobilya.com</em> e-posta adresimize iletebilirsiniz.
-              </p>
-            </div>
-          </div>
-        </div>
+          </section>
+        )}
       </div>
     </div>
   );

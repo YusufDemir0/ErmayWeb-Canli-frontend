@@ -19,7 +19,7 @@ import { getProductImages } from '../lib/productImages';
 import type { Product, ProductColorVariant, ProductSetPiece } from '../types';
 import ProductCard from './ProductCard';
 import LeadTimeBadge from './LeadTimeBadge';
-import DimensionLine from './DimensionLine';
+import EdgeNav from './EdgeNav';
 import { toast } from '../stores/useToastStore';
 import { useWhatsappNumber } from '../lib/whatsapp';
 
@@ -228,6 +228,13 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current || !zoomImageRef.current) return;
+    // Kenar geçiş alanındayken büyüteç kapalı; ortaya dönünce yeniden açılır
+    const onEdge = (e.target as HTMLElement).closest('[data-edge-nav]');
+    if (onEdge) {
+      if (isZoomed) setIsZoomed(false);
+      return;
+    }
+    if (!isZoomed) setIsZoomed(true);
     const rect = imageContainerRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -324,7 +331,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
           </p>
           <Link
             href="/katalog"
-            className="inline-block bg-neutral-900 hover:bg-brand text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
+            className="inline-block bg-ink hover:bg-neutral-800 text-white text-sm font-semibold py-3 px-6 rounded-xs transition-colors"
           >
             2026 Kataloğuna Dön
           </Link>
@@ -568,6 +575,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 <span>Yakınlaştırmak için üzerine gelin</span>
               </div>
 
+              {/* Kenar okları: görseller arasında geçiş */}
+              <EdgeNav
+                enabled={imagesList.length > 1}
+                onPrev={() => setSelectedImageIndex((i) => (i - 1 + imagesList.length) % imagesList.length)}
+                onNext={() => setSelectedImageIndex((i) => (i + 1) % imagesList.length)}
+                onEdgeEnter={() => setIsZoomed(false)}
+              />
+
               {/* Tag / Collection Badge */}
               {product.badge && (
                 <div className="absolute top-3 left-3 bg-white text-ink font-medium text-xs px-2 py-1 rounded-xs border border-line">
@@ -597,7 +612,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
 
             {/* Ölçü künyesi: yalnız gerçek veri varsa */}
             {(product.dimensions || product.widthCm) && (
-              <div className="border border-line rounded-xs p-3.5 space-y-2.5">
+              <div className="border border-line rounded-xs p-3.5">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   <Ruler className="h-4 w-4 text-wood" aria-hidden="true" />
                   <span className="text-neutral-600">Ölçüler</span>
@@ -605,7 +620,6 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                     {product.dimensions || [product.widthCm && `G ${product.widthCm}`, product.depthCm && `D ${product.depthCm}`, product.heightCm && `Y ${product.heightCm}`].filter(Boolean).join(' × ') + ' cm'}
                   </span>
                 </div>
-                <DimensionLine value={product.widthCm} />
               </div>
             )}
 
@@ -786,7 +800,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   {/* Buy Now Button (UNTOUCHABLE: Hemen Al) */}
                   <button
                     onClick={handleBuyNowClick}
-                    className="flex-1 min-w-[120px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-brand hover:bg-ink text-ink transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 min-w-[120px] h-11 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xs text-sm font-semibold bg-brand hover:bg-brand-dark text-ink transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <span>Hemen Al</span>
                   </button>
@@ -1292,7 +1306,7 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                 <button
                   type="button"
                   onClick={handleAddBundleToCart}
-                  className="w-full bg-neutral-900 hover:bg-brand text-ink py-3 px-4 rounded-xs text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-ink hover:bg-neutral-800 text-white py-3 px-4 rounded-xs text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>

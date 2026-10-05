@@ -9,6 +9,7 @@ import { useCMSStore } from '../../../stores/useCMSStore';
 import type { StoreItem } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 import { toast } from '../../../stores/useToastStore';
+import { TURKEY_CITIES, getDistrictsByCityName } from '../../../lib/turkeyData';
 
 interface StoresTabProps {
   onShowSuccess: (msg: string) => void;
@@ -29,7 +30,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
     address: '',
     phone: '',
     email: '',
-    hours: 'Hafta İçi & Cmt: 09:00 - 20:00 | Pazar: 11:00 - 19:00',
+    hours: '',
     image: '',
     mapUrl: '',
     isActive: true,
@@ -44,11 +45,12 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       address: '',
       phone: '0532 419 41 51',
       email: 'info@ermaymobilya.com',
-      hours: 'Hafta İçi & Cmt: 09:00 - 20:00 | Pazar: 11:00 - 19:00',
+      hours: '',
       image: '',
       mapUrl: '',
       isActive: true,
     });
+    setSaveError(null);
     setIsModalOpen(true);
   };
 
@@ -61,11 +63,12 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       address: store.address,
       phone: store.phone,
       email: store.email || '',
-      hours: store.hours || 'Hafta İçi & Cmt: 09:00 - 20:00 | Pazar: 11:00 - 19:00',
+      hours: store.hours || '',
       image: store.image || '',
       mapUrl: store.mapUrl || '',
       isActive: store.isActive !== false,
     });
+    setSaveError(null);
     setIsModalOpen(true);
   };
 
@@ -85,10 +88,14 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError(null);
     if (!formData.name.trim() || !formData.city.trim() || !formData.address.trim() || !formData.phone.trim()) {
-      alert('Lütfen Mağaza Adı, İl, Açık Adres ve Telefon alanlarını doldurun.');
+      setSaveError('Mağaza adı, il, açık adres ve telefon zorunludur.');
       return;
     }
 
@@ -106,17 +113,34 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
       isActive: formData.isActive,
     };
 
-    if (editingStoreId) {
-      updateStore(editingStoreId, payload);
-      onShowSuccess(`"${payload.name}" mağazası güncellendi.`);
-    } else {
-      addStore(payload);
-      onShowSuccess(`"${payload.name}" mağazası sisteme eklendi.`);
+    // Sunucu onaylamadan "kaydedildi" denmez; hata formda gösterilir, form açık kalır
+    setIsSaving(true);
+    try {
+      if (editingStoreId) {
+        await updateStore(editingStoreId, payload);
+        onShowSuccess(`"${payload.name}" mağazası güncellendi.`);
+      } else {
+        await addStore(payload);
+        onShowSuccess(`"${payload.name}" mağazası eklendi.`);
+      }
+      setIsModalOpen(false);
+      setEditingStoreId(null);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Mağaza kaydedilemedi.');
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsModalOpen(false);
-    setEditingStoreId(null);
   };
+
+  const sortedCities = React.useMemo(
+    () => [...TURKEY_CITIES].sort((a, b) => a.name.localeCompare(b.name, 'tr')),
+    []
+  );
+  const districtOptions = React.useMemo(() => {
+    const list = formData.city ? getDistrictsByCityName(formData.city) : [];
+    // Eski kayıtlarda listede olmayan ilçe metni varsa kaybolmasın diye seçeneklere eklenir
+    return formData.district && !list.includes(formData.district) ? [formData.district, ...list] : list;
+  }, [formData.city, formData.district]);
 
   const filteredStores = stores.filter((s) => {
     if (!searchFilter) return true;
@@ -145,7 +169,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
+          className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           <span>Yeni Mağaza / Bayi Ekle</span>
@@ -325,14 +349,19 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <label className="text-sm font-semibold text-neutral-700 block mb-1">
                     İl *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     required
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    placeholder="Örn: İstanbul"
-                    className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
-                  />
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value, district: '' })}
+                    className="w-full text-sm border border-line-strong h-10 px-2.5 rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-none bg-white"
+                  >
+                    <option value="" disabled>İl seçin</option>
+                    {sortedCities.map((c) => (
+                      <option key={c.id} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -341,13 +370,19 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                   <label className="text-sm font-semibold text-neutral-700 block mb-1">
                     İlçe
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.district}
+                    disabled={!formData.city}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                    placeholder="Örn: Ümraniye"
-                    className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
-                  />
+                    className="w-full text-sm border border-line-strong h-10 px-2.5 rounded-xs focus:ring-2 focus:ring-wood/30 focus:outline-none bg-white disabled:bg-paper"
+                  >
+                    <option value="">{formData.city ? 'İlçe seçin (isteğe bağlı)' : 'Önce il seçin'}</option>
+                    {districtOptions.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -401,7 +436,7 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
                     type="text"
                     value={formData.hours}
                     onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
-                    placeholder="09:00 - 20:00"
+                    placeholder="Örn: Pzt–Cmt 09:00–19:30, Pazar 11:00–18:30"
                     className="w-full text-xs border border-line-strong p-2.5 rounded-xs focus:ring-1 focus:ring-wood focus:outline-none"
                   />
                 </div>
@@ -458,6 +493,9 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
               </div>
 
               {/* Modal Footer Actions */}
+              {saveError && (
+                <p role="alert" className="text-sm text-signal border-l-4 border-signal bg-signal/5 px-3 py-2">{saveError}</p>
+              )}
               <div className="pt-4 border-t border-line flex items-center justify-between">
                 <button
                   type="button"
@@ -469,9 +507,10 @@ export const StoresTab: React.FC<StoresTabProps> = ({ onShowSuccess }) => {
 
                 <button
                   type="submit"
-                  className="bg-brand hover:bg-ink text-ink text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  className="bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-3 px-8 rounded-xs transition-colors cursor-pointer disabled:opacity-60"
                 >
-                  {editingStoreId ? 'Değişiklikleri Güncelle' : 'Mağazayı Kaydet'}
+                  {isSaving ? 'Kaydediliyor…' : editingStoreId ? 'Değişiklikleri kaydet' : 'Mağazayı kaydet'}
                 </button>
               </div>
 

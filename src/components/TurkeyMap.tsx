@@ -143,20 +143,41 @@ export const REGION_TRANSFORMS: Record<string, { scale: number; x: number; y: nu
   Object.keys(REGION_BOUNDS).map((id) => [id, regionTransform(id)])
 );
 
-/** Bölge sınır kutusunun ekranda görünen kısmının ortası (ekran = viewBox koordinatı); görünür alan çok küçükse null */
-const visibleRegionLabelPos = (
-  regionId: string,
+/**
+ * Diğer bölgelerin etiket konumları (ekran = viewBox koordinatı).
+ * Konum, bölgenin ekranda görünen illerinin merkezlerinin ortalamasıdır (sınır kutusu ortası geniş bölgelerde komşu
+ * bölgeye düşüyordu). Etiketler kenarlardan içeri alınır ve birbirine çok yakınsa dikeyde ayrılır.
+ */
+const LABEL_W = 150;
+const LABEL_H = 34;
+const computeRegionLabels = (
+  activeRegionId: string,
   t: { scale: number; x: number; y: number }
-): { x: number; y: number } | null => {
-  const b = REGION_BOUNDS[regionId];
-  if (!b) return null;
-  const margin = 24;
-  const x0 = Math.max(b[0] * t.scale + t.x, margin);
-  const y0 = Math.max(b[1] * t.scale + t.y, margin);
-  const x1 = Math.min(b[2] * t.scale + t.x, VIEW_W - margin);
-  const y1 = Math.min(b[3] * t.scale + t.y, VIEW_H - margin);
-  if (x1 - x0 < 60 || y1 - y0 < 28) return null;
-  return { x: (x0 + x1) / 2, y: (y0 + y1) / 2 };
+): Record<string, { x: number; y: number }> => {
+  const margin = 20;
+  const placed: { id: string; x: number; y: number }[] = [];
+  for (const regionId of Object.keys(REGION_BOUNDS)) {
+    if (regionId === activeRegionId) continue;
+    const pts = TURKEY_PROVINCES.filter((p) => p.region === regionId)
+      .map((p) => PROVINCE_CENTERS[p.name])
+      .filter(Boolean)
+      .map((c) => ({ x: c.x * t.scale + t.x, y: c.y * t.scale + t.y }))
+      .filter((c) => c.x > margin && c.x < VIEW_W - margin && c.y > margin && c.y < VIEW_H - margin);
+    if (pts.length === 0) continue;
+    let x = pts.reduce((a, c) => a + c.x, 0) / pts.length;
+    let y = pts.reduce((a, c) => a + c.y, 0) / pts.length;
+    x = Math.min(Math.max(x, LABEL_W / 2 + 8), VIEW_W - LABEL_W / 2 - 8);
+    y = Math.min(Math.max(y, LABEL_H), VIEW_H - 12);
+    // Çakışma: önceki bir etiketle üst üste geliyorsa aşağı/yukarı kaydır
+    for (let guard = 0; guard < 6; guard++) {
+      const clash = placed.find((o) => Math.abs(o.x - x) < LABEL_W && Math.abs(o.y - y) < LABEL_H);
+      if (!clash) break;
+      y = clash.y + (y >= clash.y ? LABEL_H : -LABEL_H);
+      y = Math.min(Math.max(y, LABEL_H), VIEW_H - 12);
+    }
+    placed.push({ id: regionId, x, y });
+  }
+  return Object.fromEntries(placed.map((p) => [p.id, { x: p.x, y: p.y }]));
 };
 
 // Bölge görünümünde seçili olmayan bölgeler tek renk alan olarak çizilir (il sınırları gizlenir)
@@ -269,6 +290,12 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
     }
     return { scale: 1, x: 0, y: 0 };
   }, [activeRegionId]);
+
+  const regionLabels = useMemo(
+    () => (activeRegionId ? computeRegionLabels(activeRegionId, currentTransform) : {}),
+    [activeRegionId, currentTransform]
+  );
+
 
   // Click on province or pin: open city bubble
   // Önce bölge (gerekirse) değişir, sonra il seçilir; ters sırada bölge değişimi baloncuğu kapatıyordu
@@ -528,9 +555,9 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
               yerleşir ve bölge değişiminde aynı eğriyle kayar. Tıklanınca o bölgeye geçilir. */}
           {activeRegionId &&
             Object.keys(REGION_NAMES)
-              .filter((regionId) => regionId !== activeRegionId)
+              .filter((regionId) => regionId !== activeRegionId && regionLabels[regionId])
               .map((regionId) => {
-                const pos = visibleRegionLabelPos(regionId, currentTransform);
+                const pos = regionLabels[regionId];
                 if (!pos) return null;
                 const count = regionStoreCounts[regionId] || 0;
                 return (
@@ -548,10 +575,10 @@ export const TurkeyMap: React.FC<TurkeyMapProps> = ({
                       if (onSelectRegion) onSelectRegion(regionId);
                     }}
                   >
-                    <text textAnchor="middle" fill="#523C22" fontSize="15" fontWeight="700" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
+                    <text textAnchor="middle" fill="#523C22" fontSize="13" fontWeight="700" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
                       {REGION_NAMES[regionId]}
                     </text>
-                    <text y="17" textAnchor="middle" fill="#6E5231" fontSize="12" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
+                    <text y="15" textAnchor="middle" fill="#6E5231" fontSize="11" className="font-sans select-none" paintOrder="stroke" stroke="#EFE7D6" strokeWidth="4">
                       {count > 0 ? `${count} mağaza · görüntüle` : 'görüntüle'}
                     </text>
                   </g>

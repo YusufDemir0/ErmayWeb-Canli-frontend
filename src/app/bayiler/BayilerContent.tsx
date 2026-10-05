@@ -435,7 +435,7 @@ export const BayilerContent: React.FC<BayilerContentProps> = ({ stores }) => {
             href={`https://wa.me/${waNumber}?text=Merhaba,%20%C5%9Fehrime%20teslimat%20ko%C5%9Fullar%C4%B1%20ve%20fabrika%20sat%C4%B1%C5%9F%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 bg-brand hover:bg-ink text-ink font-semibold text-sm rounded-xs transition-colors shrink-0 flex items-center gap-2"
+            className="px-6 py-3.5 bg-brand hover:bg-brand-dark text-ink font-semibold text-sm rounded-xs transition-colors shrink-0 flex items-center gap-2"
           >
             <MessageCircle className="w-4 h-4 text-neutral-900" />
             <span>Teslimat danışmanı</span>

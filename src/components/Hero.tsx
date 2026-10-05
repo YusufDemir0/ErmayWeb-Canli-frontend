@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import OptimizedImage from './OptimizedImage';
+import EdgeNav from './EdgeNav';
 import { Skeleton, TextSkeleton } from './Skeleton';
 
 export const Hero: React.FC = () => {
@@ -98,8 +99,8 @@ export const Hero: React.FC = () => {
       })}
 
       {/* Content Overlay: düz, opak panel (cam efekti yok) */}
-      <div className="absolute inset-0 z-20 flex items-end md:items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-0">
-        <div key={currentSlide} className="max-w-xl bg-white p-6 md:p-10 border-l-4 border-brand animate-fade-in">
+      <div className="absolute inset-0 z-30 pointer-events-none flex items-end md:items-center justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-0">
+        <div key={currentSlide} className="pointer-events-auto max-w-xl bg-white p-6 md:p-10 border-l-4 border-brand animate-fade-in">
           {activeSlide.badge && (
             <span className="text-xs font-semibold text-wood uppercase tracking-wider block mb-3">
               {activeSlide.badge}
@@ -115,7 +116,7 @@ export const Hero: React.FC = () => {
           )}
           <Link
             href={resolveButtonLink(activeSlide.buttonLink)}
-            className="group inline-flex items-center gap-2.5 bg-brand hover:bg-ink text-ink text-sm font-semibold py-3.5 px-6 transition-colors duration-200 rounded-xs"
+            className="group inline-flex items-center gap-2.5 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-3.5 px-6 transition-colors duration-200 rounded-xs"
           >
             <span>{activeSlide.buttonText || 'Ürünleri incele'}</span>
             <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
@@ -123,26 +124,13 @@ export const Hero: React.FC = () => {
         </div>
       </div>
 
-      {/* Slayt kontrolleri: köşeli düğmeler ve mono sayaç */}
+      {/* Kenar okları: slaytlar arasında geçiş (fare kenara yaklaşınca belirginleşir) */}
+      <EdgeNav enabled={slides.length > 1} onPrev={handlePrev} onNext={handleNext} label="slayt" tone="dark" zoneClassName="w-16 md:w-24" />
+
+      {/* Slayt sayacı */}
       {slides.length > 1 && (
-        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-30 flex items-center gap-1 bg-white">
-          <button
-            onClick={handlePrev}
-            className="h-11 w-11 flex items-center justify-center text-ink hover:bg-paper transition-colors cursor-pointer"
-            aria-label="Önceki slayt"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <span className="font-mono text-xs text-neutral-600 tabular-nums-all px-1" aria-live="polite">
-            {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-          </span>
-          <button
-            onClick={handleNext}
-            className="h-11 w-11 flex items-center justify-center text-ink hover:bg-paper transition-colors cursor-pointer"
-            aria-label="Sonraki slayt"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-30 bg-white px-2.5 py-1 font-mono text-xs text-neutral-700 tabular-nums-all" aria-live="polite">
+          {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
         </div>
       )}
     </section>

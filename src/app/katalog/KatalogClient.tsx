@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Printer, Ruler, Layers, 
   Package, Check, ShieldCheck, Filter
 } from 'lucide-react';
 import { useCMSStore } from '../../stores/useCMSStore';
+import { Skeleton, TextSkeleton } from '../../components/Skeleton';
 import { getProductImages } from '../../lib/productImages';
 import type { Product } from '../../types';
 
@@ -32,9 +33,24 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
            p.categoryId === selectedCategory;
   });
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // Ekranda yalnız ilk sayfa net, ikincisi bulanık önizleme; kataloğun tamamı indirme (PDF/baskı) ile alınır.
+  // İndirmede tüm sayfalar basılır, baskı bitince ekran önizleme moduna döner.
+  const [printAll, setPrintAll] = useState(false);
+  const catalogLoaded = useCMSStore((state) => state.catalogLoaded);
+  const handlePrint = () => setPrintAll(true);
+  useEffect(() => {
+    if (!printAll) return;
+    const done = () => setPrintAll(false);
+    window.addEventListener('afterprint', done, { once: true });
+    const t = setTimeout(() => window.print(), 50);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('afterprint', done);
+    };
+  }, [printAll]);
+  const PREVIEW_COUNT = 2;
+  const visibleProducts = printAll ? products : products.slice(0, PREVIEW_COUNT);
+  const totalCount = products.length;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -94,10 +110,10 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
             {/* Print CTA */}
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 bg-neutral-900 hover:bg-brand text-ink hover:text-neutral-950 px-4 py-2 rounded-xs text-sm font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-2 bg-ink hover:bg-neutral-800 text-white px-4 py-2 rounded-xs text-sm font-semibold transition-colors cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
-              <span>PDF İndir / Yazdır (A4 Yatay)</span>
+              <span>Kataloğu indir (PDF)</span>
             </button>
           </div>
         </div>
@@ -105,8 +121,25 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
 
       {/* 2. CATALOG CONTENT (A4 LANDSCAPE - 1 PRODUCT PER PAGE) */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8 md:space-y-12 print:p-0 print:m-0 print:space-y-0 print:max-w-none">
+        {products.length === 0 && !catalogLoaded && rawProducts.length === 0 ? (
+          <div className="space-y-8" aria-busy="true" aria-label="Katalog yükleniyor">
+            {[0, 1].map((i) => (
+              <div key={i} className="bg-white rounded-xs border border-line p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-8">
+                <Skeleton className="md:col-span-7 aspect-[4/3]" />
+                <div className="md:col-span-5 space-y-4">
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-8 w-4/5" />
+                  <TextSkeleton lines={4} />
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-8 w-40" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="space-y-8 md:space-y-12 print:space-y-0">
-          {products.map((product, pIdx) => {
+          {visibleProducts.map((product, pIdx) => {
+            const isTeaser = !printAll && pIdx === PREVIEW_COUNT - 1 && products.length > 1;
             const pageNumber = String(pIdx + 1).padStart(2, '0');
             const isEven = pIdx % 2 === 0;
             const imgs = getProductImages(product);
@@ -115,9 +148,12 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
             const categoryTitle = formatCategoryName(product.category);
 
             return (
-              <div 
-                key={product.id}
-                className="katalog-sheet-landscape bg-white rounded-xs border border-line p-6 md:p-8 print:p-0 print:border-none print:shadow-none"
+              <div key={product.id} className="relative">
+              <div
+                className={`katalog-sheet-landscape bg-white rounded-xs border border-line p-6 md:p-8 print:p-0 print:border-none print:shadow-none ${
+                  isTeaser ? 'blur-[6px] select-none pointer-events-none max-h-[520px] overflow-hidden print:blur-none' : ''
+                }`}
+                aria-hidden={isTeaser || undefined}
               >
                 {/* PRINT RUNNING HEADER */}
                 <header className="hidden print:flex border-b border-wood/40 pb-1.5 mb-3 items-center justify-between print-header">
@@ -266,18 +302,43 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                 {/* PRINT RUNNING FOOTER */}
                 <footer className="hidden print:flex border-t border-wood/40 pt-1.5 text-xs text-neutral-500 items-center justify-between uppercase tracking-wider">
                   <div>
-                    <span className="font-semibold text-neutral-700">Merkez showroom ve atölye:</span> {contactInfo.showroom || 'Modoko Mobilyacılar Sitesi No: 42, Ümraniye / İstanbul'}
+                    <span className="font-semibold text-neutral-700">Merkez showroom ve atölye:</span> {contactInfo.address || contactInfo.showroom || 'Modoko Mobilyacılar Sitesi 1. Cadde No: 42, Ümraniye / İstanbul'}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span>TEL: {contactInfo.phone || '+90 (216) 456 78 90'}</span>
+                    <span>TEL: {contactInfo.phone || '0216 365 00 00'}</span>
                     <span>|</span>
                     <span className="font-bold text-neutral-800">WWW.ERMAYMOBILYA.COM</span>
                   </div>
                 </footer>
               </div>
+
+              {/* İkinci sayfanın üstünde: kataloğun tamamını indirme çağrısı */}
+              {isTeaser && (
+                <div className="absolute inset-0 flex items-center justify-center p-4 print:hidden">
+                  <div className="bg-white border border-line border-t-4 border-t-brand rounded-xs p-6 md:p-8 max-w-md text-center space-y-4 shadow-xl">
+                    <h2 className="font-display text-xl md:text-2xl font-bold text-ink">
+                      {totalCount} ürünün tamamı katalogda
+                    </h2>
+                    <p className="text-sm text-neutral-600">
+                      Ölçüler, malzemeler ve güncel fiyatlarla tüm ürünleri içeren kataloğu indirin; A4 yatay, baskıya hazır.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold h-12 px-6 rounded-xs cursor-pointer"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Kataloğu indir (PDF)
+                    </button>
+                    <p className="text-xs text-neutral-500">Açılan pencerede hedef olarak &quot;PDF olarak kaydet&quot;i seçin.</p>
+                  </div>
+                </div>
+              )}
+              </div>
             );
           })}
         </div>
+        )}
       </main>
     </div>
   );

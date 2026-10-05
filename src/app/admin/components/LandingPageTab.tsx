@@ -161,7 +161,7 @@ export const LandingPageTab: React.FC<LandingPageTabProps> = ({ onShowSuccess, o
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand hover:bg-ink text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand hover:bg-brand-dark text-ink text-xs font-bold rounded-xs transition-colors cursor-pointer disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
           <span>{isSaving ? 'Kaydediliyor...' : 'Açılış Sayfası Tercihini Kaydet'}</span>

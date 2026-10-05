@@ -176,7 +176,7 @@ export const DeliveryZonesTab: React.FC<DeliveryZonesTabProps> = ({
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-neutral-900 hover:bg-brand text-ink px-6 py-3 rounded-xs text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-ink hover:bg-neutral-800 text-white px-6 py-3 rounded-xs text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             <span>{isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>

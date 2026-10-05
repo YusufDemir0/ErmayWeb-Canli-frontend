@@ -261,7 +261,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
 
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-2 bg-brand hover:bg-ink text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
+            className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-ink text-sm font-semibold py-3 px-6 rounded-xs transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Yeni Ürün Ekle</span>
@@ -653,7 +653,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                   className={`px-6 py-2.5 text-sm font-semibold rounded-xs transition-colors ${
                     isBulkSubmitting || wizardSelectedIds.length === 0 || !wizardTargetCategoryId
                       ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
-                      : 'bg-brand hover:bg-ink text-ink cursor-pointer'
+                      : 'bg-brand hover:bg-brand-dark text-ink cursor-pointer'
                   }`}
                 >
                   {isBulkSubmitting ? 'Bağlanıyor...' : `Seçilen ${wizardSelectedIds.length} Ürünü Eşle & Yayına Al`}
