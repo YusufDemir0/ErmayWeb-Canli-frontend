@@ -320,7 +320,7 @@ export default function PageEditor({ mode, onShowSuccess, onShowError }: PageEdi
     <div className="space-y-3">
       {/* Üst çubuk */}
       <div className="bg-white border border-line rounded-xs px-3 py-2 flex flex-wrap items-center gap-2">
-        <div className="flex gap-1" role="tablist" aria-label="Sayfa">
+        <div className="flex gap-1 overflow-x-auto no-scrollbar max-w-full" role="tablist" aria-label="Sayfa">
           {PAGE_KEYS.map((k) => (
             <button
               key={k}
@@ -334,7 +334,7 @@ export default function PageEditor({ mode, onShowSuccess, onShowError }: PageEdi
             </button>
           ))}
         </div>
-        <div className="flex gap-1 ml-auto items-center">
+        <div className="flex flex-wrap gap-1 ml-auto items-center justify-end">
           <button type="button" onClick={undo} disabled={past.current.length === 0} className="h-9 w-9 flex items-center justify-center rounded-xs hover:bg-paper disabled:opacity-30 cursor-pointer" aria-label="Geri al" title="Geri al (Ctrl+Z)">
             <Undo2 className="h-4 w-4" />
           </button>
