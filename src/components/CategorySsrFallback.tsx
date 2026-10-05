@@ -1,27 +1,26 @@
 import React from 'react';
 import type { Product } from '../types';
+import ListingSkeleton from './ListingSkeleton';
+import ProductCard from './ProductCard';
+import { ProductGridSkeleton } from './Skeleton';
 
 /**
- * Kategori sayfası istemcide (useSearchParams) render edildiği için sunucu HTML'i yalnızca bu fallback'i içerir.
- * Arama motorları ve JS'siz istemciler boş "Yükleniyor..." yerine başlığı ve ürün bağlantılarını görsün diye
- * aynı içeriğin erişilebilir bir özeti burada sunucuda render edilir.
+ * Kategori sayfası istemcide (useSearchParams) render edildiği için sunucu HTML'i bu fallback'i içerir.
+ * Ürünler sunucuda zaten çekildiğinden iskelet yerine gerçek kartlar basılır: yavaş bağlantıda ziyaretçi ürünleri
+ * hemen görür, filtre paneli bir an sonra devreye girer. Arama motorları da ürün bağlantılarını görür.
  */
 export default function CategorySsrFallback({ title, products }: { title: string; products: Product[] }) {
   return (
-    <div className="min-h-screen bg-paper flex items-center justify-center text-xs text-neutral-500">
-      <h1 className="sr-only">{title} | Ermay Mobilya</h1>
-      <span aria-hidden="true">Yükleniyor...</span>
-      {products.length > 0 && (
-        <nav className="sr-only" aria-label={`${title} ürünleri`}>
-          <ul>
-            {products.map((p) => (
-              <li key={p.id}>
-                <a href={`/urun/${p.slug || p.id}`}>{p.name}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <ListingSkeleton title={title}>
+      {products.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.slice(0, 12).map((p, idx) => (
+            <ProductCard key={p.id} product={p} priority={idx < 3} />
+          ))}
+        </div>
+      ) : (
+        <ProductGridSkeleton count={6} />
       )}
-    </div>
+    </ListingSkeleton>
   );
 }

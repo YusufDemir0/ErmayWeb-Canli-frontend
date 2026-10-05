@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import { getProductImage } from '../lib/productImages';
 import OptimizedImage from './OptimizedImage';
+import { Skeleton, TextSkeleton } from './Skeleton';
 import type { Product } from '../types';
 
 const currencyFormatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 });
@@ -17,6 +18,7 @@ const formatPrice = (amount: number) => currencyFormatter.format(amount).replace
  */
 export const CuratedSets: React.FC = () => {
   const products = useCMSStore((state) => state.products);
+  const catalogLoaded = useCMSStore((state) => state.catalogLoaded);
 
   const sets = React.useMemo(
     () =>
@@ -26,6 +28,35 @@ export const CuratedSets: React.FC = () => {
         .slice(0, 3),
     [products]
   );
+
+  if (!catalogLoaded) {
+    return (
+      <section className="py-12 md:py-16 bg-paper border-y border-line" aria-busy="true" aria-label="Takımlar yükleniyor">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-72" />
+            <Skeleton className="h-4 w-96 max-w-full" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-line border border-line">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="bg-white">
+                <Skeleton className="aspect-[16/10] rounded-none" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-5 w-3/4" />
+                  <TextSkeleton lines={4} />
+                  <div className="flex justify-between pt-2">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-10 w-32" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (sets.length === 0) return null;
 

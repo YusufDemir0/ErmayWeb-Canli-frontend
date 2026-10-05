@@ -17,11 +17,11 @@ import {
   ShieldCheck, 
   ArrowLeft,
   AlertCircle,
-  Loader2,
   Calendar
 } from 'lucide-react';
 import { requestService, PublicReceiptDto } from '../../../services/requestService';
 import { cmsService } from '../../../services/cmsService';
+import { Skeleton, TextSkeleton } from '../../../components/Skeleton';
 
 // Durum çizgisi, backend'deki geçiş haritasının (orderStateMachine.service.ts) mutlu yolunu gösterir; yeni durum üretmez.
 const STEP_LABELS: Record<string, string> = {
@@ -161,10 +161,33 @@ export default function PublicReceiptPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-canvas min-h-screen py-24 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-wood mx-auto" />
-          <p className="text-xs text-neutral-500">Dijital talep fişiniz yükleniyor...</p>
+      <div className="w-full bg-canvas min-h-screen py-10 md:py-14" aria-busy="true">
+        <span className="sr-only">Talep fişiniz yükleniyor…</span>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
+          <div className="flex justify-between">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-11 w-32" />
+          </div>
+          <div className="bg-white border border-line rounded-xs">
+            <div className="p-6 sm:p-8 border-b border-line bg-paper space-y-3">
+              <Skeleton className="h-3.5 w-40" />
+              <Skeleton className="h-9 w-56" />
+              <div className="grid grid-cols-5 gap-3 pt-4">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-5" />
+                ))}
+              </div>
+            </div>
+            <div className="p-6 sm:p-8 grid grid-cols-2 gap-6 border-b border-line">
+              <TextSkeleton lines={2} />
+              <TextSkeleton lines={2} />
+            </div>
+            <div className="p-6 sm:p-8 space-y-3">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-10" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

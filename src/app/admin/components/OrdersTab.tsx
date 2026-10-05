@@ -30,6 +30,7 @@ import {
 import { isAxiosError } from 'axios';
 import { toast } from '../../../stores/useToastStore';
 import { Pagination } from '../../../components/Pagination';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 interface OrdersTabProps {
   onShowSuccess?: (msg: string) => void;
@@ -278,9 +279,8 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({ onShowSuccess }) => {
         {/* Requests List */}
         <div className="space-y-4">
           {isLoading && requests.length === 0 ? (
-            <div className="text-center py-16 text-neutral-500 space-y-3">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-wood" />
-              <p className="text-xs">Talepler getiriliyor...</p>
+            <div className="bg-white border border-line rounded-xs">
+              <RowsSkeleton rows={5} label="Talepler yükleniyor" />
             </div>
           ) : requests.length === 0 ? (
             <div className="text-center py-16 text-neutral-500 space-y-2 border border-dashed border-line rounded-xs">

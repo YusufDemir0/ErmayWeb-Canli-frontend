@@ -5,6 +5,7 @@ import { Plus, Edit3, Trash2, BookOpen, Sparkles, Image as ImageIcon, Save, X, S
 import blogService from '../../../services/blogService';
 import type { BlogPost } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 interface BlogTabProps {
   onShowSuccess: (msg: string) => void;
@@ -196,7 +197,7 @@ export const BlogTab: React.FC<BlogTabProps> = ({ onShowSuccess, onShowError }) 
       {/* Posts Table */}
       <div className="bg-white rounded-xs border border-line overflow-hidden">
         {isLoading ? (
-          <div className="text-center py-16 text-xs text-neutral-500">Blog yazıları yükleniyor...</div>
+          <RowsSkeleton rows={4} label="Blog yazıları yükleniyor" />
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-16 text-xs text-neutral-500 space-y-2">
             <BookOpen className="h-8 w-8 text-neutral-300 mx-auto" />

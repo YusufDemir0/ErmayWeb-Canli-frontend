@@ -10,6 +10,18 @@ import { useCMSStore } from '../stores/useCMSStore';
 export const UpperNavbar: React.FC = () => {
   const tickerItems = useCMSStore((state) => state.tickerItems);
   const tickerStyle = useCMSStore((state) => state.tickerStyle);
+  const cmsLoaded = useCMSStore((state) => state.cmsLoaded);
+
+  // CMS yanıtlanana kadar varsayılan duyurular gösterilmez; şeridin yeri ayrılır
+  if (!cmsLoaded) {
+    return (
+      <div className="h-8 sm:h-9 flex items-center gap-8 px-4 overflow-hidden" style={{ backgroundColor: tickerStyle.backgroundColor }} aria-hidden="true">
+        {[0, 1, 2, 3].map((i) => (
+          <span key={i} className="h-2.5 w-40 shrink-0 rounded-xs bg-black/10 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   // CMS metinleri bazen kendi madde işaretiyle ("• ...") girilmiş; ayırıcıyı bileşen çiziyor
   const cleanItems = (tickerItems || [])

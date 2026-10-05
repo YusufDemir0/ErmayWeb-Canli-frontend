@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCMSStore } from '../stores/useCMSStore';
 import { getProductImage } from '../lib/productImages';
 import OptimizedImage from './OptimizedImage';
+import { Skeleton } from './Skeleton';
 import type { Category, Product } from '../types';
 
 interface CategoryListProps {
@@ -31,6 +32,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title: propTitle, su
   const storeCategories = useCMSStore((state) => state.categories);
   const products = useCMSStore((state) => state.products);
   const homeConfig = useCMSStore((state) => state.homeConfig);
+  const catalogLoaded = useCMSStore((state) => state.catalogLoaded);
 
   const title = propTitle || homeConfig.categoriesTitle || 'Kategoriler';
   const subtitle = propSubtitle || homeConfig.categoriesSubtitle || '';
@@ -51,6 +53,24 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title: propTitle, su
       return { cat, image: product ? getProductImage(product) : '' };
     });
   }, [storeCategories, products]);
+
+  if (!catalogLoaded) {
+    return (
+      <section className="py-10 md:py-14" aria-busy="true" aria-label="Kategoriler yükleniyor">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-2">
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <div className="flex gap-0 overflow-hidden py-8 px-2">
+          {Array.from({ length: 10 }, (_, i) => (
+            <div key={i} className="flex flex-col items-center w-32 md:w-40 shrink-0 px-2 gap-3">
+              <Skeleton className="h-24 w-24 md:h-28 md:w-28 rounded-full" />
+              <Skeleton className="h-3.5 w-20" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (items.length === 0) return null;
 

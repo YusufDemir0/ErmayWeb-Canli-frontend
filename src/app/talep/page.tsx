@@ -20,6 +20,7 @@ import { requestService, QuoteResponseItem } from '../../services/requestService
 import apiClient from '../../services/api';
 import { TURKEY_CITIES, getDistrictsByCityName } from '../../lib/turkeyData';
 import type { StoreItem } from '../../types';
+import { InlineSkeleton } from '../../components/Skeleton';
 
 type FieldKey = 'name' | 'phone' | 'city' | 'district' | 'store' | 'kvkk';
 
@@ -365,7 +366,7 @@ export default function OrderRequestPage() {
             {/* Mobil: kısa özet; tam özet ve gönder düğmesi formun sonunda */}
             <a href="#talep-ozet" className="lg:hidden flex items-center justify-between gap-3 bg-paper border border-line rounded-xs px-4 py-3 text-sm">
               <span className="text-neutral-700">{cartItems.length} kalem · tahmini</span>
-              <span className="font-mono font-semibold text-ink tabular-nums-all">{formatPrice(verifiedSubtotal)}</span>
+              <span className="font-mono font-semibold text-ink tabular-nums-all">{isQuoting ? <InlineSkeleton className="h-4 w-20" /> : formatPrice(verifiedSubtotal)}</span>
             </a>
             
             {/* 1. İletişim Bilgileri */}
@@ -711,7 +712,7 @@ export default function OrderRequestPage() {
                 </div>
                 <div className="flex justify-between pt-3 border-t border-line text-base font-semibold text-ink">
                   <dt>Tahmini tutar</dt>
-                  <dd className="font-mono tabular-nums-all">{isQuoting ? '…' : formatPrice(verifiedSubtotal)}</dd>
+                  <dd className="font-mono tabular-nums-all">{isQuoting ? <InlineSkeleton className="h-5 w-24" /> : formatPrice(verifiedSubtotal)}</dd>
                 </div>
               </dl>
 

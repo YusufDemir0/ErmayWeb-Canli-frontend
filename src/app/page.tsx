@@ -64,8 +64,12 @@ export default async function HomePage() {
     console.warn('HomePage SSR açılış kategorisi ürün çekme uyarısı:', e);
   }
 
+  // Görünür başlık: açılış kategorisinin adı (ürünlerin kategori bilgisinden)
+  const firstCategory = initialProducts[0]?.category;
+  const landingTitle = typeof firstCategory === 'object' && firstCategory?.name ? firstCategory.name : 'Ürünler';
+
   return (
-    <Suspense fallback={<CategorySsrFallback title="Ermay Mobilya | Doğrudan Üreticiden Standart Seri Ofis Mobilyaları" products={initialProducts} />}>
+    <Suspense fallback={<CategorySsrFallback title={landingTitle} products={initialProducts} />}>
       <CategoryPage categorySlug={slug} initialProducts={initialProducts} />
     </Suspense>
   );

@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMSStore } from '../stores/useCMSStore';
 import OptimizedImage from './OptimizedImage';
+import { Skeleton, TextSkeleton } from './Skeleton';
 
 export const Hero: React.FC = () => {
   const homeConfig = useCMSStore((state) => state.homeConfig);
   const slides = homeConfig?.heroSlides || [];
   const categories = useCMSStore((state) => state.categories);
+  const cmsLoaded = useCMSStore((state) => state.cmsLoaded);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -29,6 +31,24 @@ export const Hero: React.FC = () => {
   const handleNext = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
+
+  // CMS gelene kadar varsayılan slayt gösterilmez (önce eski metin görünüp sonra değişmesin); aynı ölçüde iskelet
+  if (!cmsLoaded) {
+    return (
+      <section className="relative w-full h-[65vh] md:h-[82vh] bg-paper-deep/60 overflow-hidden" aria-busy="true" aria-label="Yükleniyor">
+        <div className="absolute inset-0 animate-pulse bg-paper-deep/50" />
+        <div className="absolute inset-0 flex items-end md:items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-0">
+          <div className="w-full max-w-xl bg-white p-6 md:p-10 border-l-4 border-brand space-y-4">
+            <Skeleton className="h-3 w-40" />
+            <Skeleton className="h-9 w-4/5" />
+            <Skeleton className="h-9 w-3/5" />
+            <TextSkeleton lines={2} />
+            <Skeleton className="h-12 w-44" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!slides || slides.length === 0) return null;
 

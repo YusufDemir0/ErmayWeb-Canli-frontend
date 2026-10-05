@@ -8,6 +8,7 @@ import { formatPrice } from '../../../lib/formatPrice';
 import { requestService, AdminOrderRequest } from '../../../services/requestService';
 import apiClient from '../../../services/api';
 import { toast } from '../../../stores/useToastStore';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 interface OverviewTabProps {
   orders?: unknown[];
@@ -106,7 +107,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </button>
         </div>
         {isLoading ? (
-          <p className="px-5 py-6 text-sm text-neutral-600">Yükleniyor…</p>
+          <RowsSkeleton rows={3} label="Talepler yükleniyor" />
         ) : newRequests.length === 0 ? (
           <p className="px-5 py-6 text-sm text-neutral-600 flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-ok" /> Dönüş bekleyen yeni talep yok.

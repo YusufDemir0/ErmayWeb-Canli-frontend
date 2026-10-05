@@ -5,6 +5,7 @@ import { Mail, Phone, RefreshCw, CheckCircle2, RotateCcw, Inbox } from 'lucide-r
 import apiClient from '../../../services/api';
 import { toast } from '../../../stores/useToastStore';
 import { Pagination } from '../../../components/Pagination';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 interface ContactMessage {
   id: string;
@@ -107,7 +108,9 @@ export const ContactMessagesTab: React.FC<ContactMessagesTabProps> = ({ onOpenCo
         </div>
       </div>
 
-      {messages.length === 0 && !isLoading ? (
+      {messages.length === 0 && isLoading ? (
+        <RowsSkeleton rows={4} label="Mesajlar yükleniyor" />
+      ) : messages.length === 0 ? (
         <div className="p-10 text-center text-xs text-neutral-500">Bu filtrede mesaj bulunmuyor.</div>
       ) : (
         <ul className="divide-y divide-line">

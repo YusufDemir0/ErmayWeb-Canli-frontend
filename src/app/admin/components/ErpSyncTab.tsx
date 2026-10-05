@@ -12,6 +12,7 @@ import { resolveImageUrl } from '../../../lib/productImages';
 import { Pagination } from '../../../components/Pagination';
 import { toast } from '../../../stores/useToastStore';
 import type { Category } from '../../../types';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 export interface CatalogItem {
   erpId: string;
@@ -401,10 +402,7 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
       {/* 3. CATALOG TABLE */}
       <div className="bg-white border border-line rounded-xs overflow-hidden">
         {isLoading ? (
-          <div className="py-16 text-center space-y-3">
-            <Loader2 className="h-8 w-8 text-wood animate-spin mx-auto" />
-            <p className="text-xs text-neutral-500 font-medium">CRM/ERP MariaDB Kataloğu Taranıyor...</p>
-          </div>
+          <RowsSkeleton rows={6} label="ERP kataloğu yükleniyor" />
         ) : filteredCatalog.length === 0 ? (
           <div className="py-16 text-center space-y-2">
             <AlertCircle className="h-8 w-8 text-neutral-300 mx-auto" />

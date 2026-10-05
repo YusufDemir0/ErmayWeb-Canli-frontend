@@ -15,6 +15,7 @@ import { Pagination } from '../../../components/Pagination';
 import { toast } from '../../../stores/useToastStore';
 import { useCMSStore } from '../../../stores/useCMSStore';
 import { ProductFormModal } from './ProductFormModal';
+import { RowsSkeleton } from '../../../components/Skeleton';
 
 export interface ErpCatalogItem {
   erpId: string;
@@ -48,6 +49,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   // Yayın durumu filtresi: ERP'den gelen ürünlerin çoğu taslaktır; yayındakileri ayırmak için
+  const catalogLoaded = useCMSStore((state) => state.catalogLoaded);
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const fetchProductsAndCategories = useCMSStore((state) => state.fetchProductsAndCategories);
 
@@ -332,7 +334,13 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-line text-neutral-800">
-              {filteredProducts.length === 0 ? (
+              {!catalogLoaded && products.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-0">
+                    <RowsSkeleton rows={6} label="Ürünler yükleniyor" />
+                  </td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="text-center py-10 text-neutral-500 italic">
                     Arama kriterine uygun ürün bulunamadı.

@@ -105,6 +105,10 @@ interface CMSState {
   homeConfig: HomeConfig;
   corporateConfig: CorporateConfig;
   isLoading: boolean;
+  /** CMS blokları ilk kez yanıtlandı (başarılı ya da hatalı). İskeletler buna göre kalkar. */
+  cmsLoaded: boolean;
+  /** Ürün ve kategori listesi ilk kez yanıtlandı (başarılı ya da hatalı). */
+  catalogLoaded: boolean;
 
   // Actions
   fetchCmsBlocks: () => Promise<void>;
@@ -282,6 +286,8 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
       corporateConfig: DEFAULT_CORPORATE_CONFIG,
       socialLinks: DEFAULT_SOCIAL_LINKS,
       isLoading: false,
+      cmsLoaded: false,
+      catalogLoaded: false,
 
       fetchCmsBlocks: async () => {
         set({ isLoading: true });
@@ -319,7 +325,7 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
         } catch (err) {
           console.warn('REST API CMS blokları çekme uyarısı:', err);
         } finally {
-          set({ isLoading: false });
+          set({ isLoading: false, cmsLoaded: true });
         }
       },
 
@@ -359,6 +365,8 @@ export const useCMSStore = create<CMSState>()((set, get) => ({
           }
         } catch (err) {
           console.warn('REST API ürün/kategori çekme uyarısı:', err);
+        } finally {
+          set({ catalogLoaded: true });
         }
       },
 
