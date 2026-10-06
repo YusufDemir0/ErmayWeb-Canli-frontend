@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertCircle, ArrowDown, ArrowUp, Check, ExternalLink, ImagePlus, Loader2, Plus, Search, Trash2, X } from 'lucide-react';
-import type { Product, Category } from '../../../types';
+import { ERP_PLACEHOLDERS, type Product, type Category, type ErpPlaceholder } from '../../../types';
 import { uploadProductImage } from '../../../lib/uploadHelper';
 import { useModalDismiss } from '../../../lib/useModalDismiss';
 import { LUXURY_SWATCHES } from '../../../components/ProductDetailClient';
@@ -29,6 +29,8 @@ export interface ProductPayload {
   vatRate: number;
   erpItemId?: string;
   erpItemCode?: string;
+  erpPlaceholder?: ErpPlaceholder | null;
+  erpPlaceholderAck?: boolean;
   colors: string[];
   dimensions: string;
   widthCm: number | null;
@@ -77,13 +79,28 @@ const VAT_OPTIONS = [
   { label: '%0', value: '0' },
 ];
 
-const DRAFT_KEY = 'ermay_admin_product_form_draft_v2';
+const DRAFT_KEY = 'ermay_admin_product_form_draft_v3';
+
+/** Web kürasyonu (ERP'de karşılığı olmayan) ürün kimlik önekleri — backend utils/erp.ts ile aynı */
+const CURATED_ERP_PREFIXES = ['ERM-', 'WEB-', 'ATELIER-'];
+const isCuratedErpId = (id: string) => CURATED_ERP_PREFIXES.some((p) => id.startsWith(p));
+
+const PLACEHOLDER_LABEL: Record<ErpPlaceholder, string> = {
+  MOBILYA: 'DENEME MOBİLYA',
+  TAKIM: 'DENEME TAKIM',
+  KOLTUK: 'DENEME KOLTUK',
+  MASA: 'DENEME MASA',
+};
 
 interface FormState {
   name: string;
   category: string;
   erpItemId: string;
   erpItemCode: string;
+  /** ERP'de karşılığı yok: talepler deneme ürünle aktarılır */
+  erpMissing: boolean;
+  erpPlaceholder: ErpPlaceholder | '';
+  erpPlaceholderAck: boolean;
   images: string[];
   price: string;
   originalPrice: string;
@@ -113,6 +130,9 @@ function fromProduct(p: Product | null | undefined, categories: Category[]): For
       category: categories[0]?.slug || categories[0]?.id || '',
       erpItemId: '',
       erpItemCode: '',
+      erpMissing: false,
+      erpPlaceholder: '',
+      erpPlaceholderAck: false,
       images: [],
       price: '',
       originalPrice: '',
@@ -135,8 +155,12 @@ function fromProduct(p: Product | null | undefined, categories: Category[]): For
   return {
     name: p.name || '',
     category: categoryKey(p.category),
-    erpItemId: p.erpItemId ? String(p.erpItemId) : '',
-    erpItemCode: p.erpItemCode || '',
+    // Kürasyon kimliği (ERM-/WEB-) ERP eşleşmesi değildir; formda "ERP'de yok" olarak gösterilir
+    erpItemId: p.erpItemId && !isCuratedErpId(String(p.erpItemId)) ? String(p.erpItemId) : '',
+    erpItemCode: p.erpItemId && !isCuratedErpId(String(p.erpItemId)) ? p.erpItemCode || '' : '',
+    erpMissing: Boolean(p.erpItemId && isCuratedErpId(String(p.erpItemId))),
+    erpPlaceholder: p.erpPlaceholder || '',
+    erpPlaceholderAck: Boolean(p.erpPlaceholder && p.erpPlaceholderAckAt),
     images,
     price: numStr(p.price),
     originalPrice: numStr(p.originalPrice),
@@ -173,7 +197,11 @@ function validate(f: FormState): Errors {
   const e: Errors = {};
   if (f.name.trim().length < 2) e.name = 'Ürün adı en az 2 karakter olmalıdır.';
   if (!f.category) e.category = 'Kategori seçin.';
-  if (!f.erpItemId) e.erpItemId = 'ERP’deki karşılığını seçin. Eşleşmeyen ürün kaydedilemez.';
+  if (!f.erpItemId) {
+    if (!f.erpMissing) e.erpItemId = 'ERP’deki karşılığını seçin ya da “ERP’de yok” deyip deneme ürünle kaydedin.';
+    else if (!f.erpPlaceholder) e.erpPlaceholder = 'Talepler ERP’ye hangi deneme ürünle aktarılsın? Birini seçin.';
+    else if (!f.erpPlaceholderAck) e.erpPlaceholderAck = 'Kaydetmek için bilgilendirme metnini kabul edin.';
+  }
   if (!PRICE_RE.test(f.price.trim()) || toNumber(f.price) <= 0) e.price = 'Geçerli bir fiyat yazın (ör. 24500 veya 24500,90).';
   if (f.originalPrice.trim()) {
     if (!PRICE_RE.test(f.originalPrice.trim())) e.originalPrice = 'Geçerli bir fiyat yazın.';
@@ -208,6 +236,7 @@ function toPayload(f: FormState): ProductPayload {
     vatRate: Number(f.vatRate),
     erpItemId: f.erpItemId || undefined,
     erpItemCode: f.erpItemCode || undefined,
+    ...(f.erpMissing && !f.erpItemId && { erpPlaceholder: f.erpPlaceholder || null, erpPlaceholderAck: f.erpPlaceholderAck }),
     colors: f.colors.map((c) => c.trim()).filter(Boolean),
     dimensions: dims.join(' × '),
     widthCm: int(f.width),
@@ -235,6 +264,7 @@ const SERVER_FIELD: Record<string, keyof FormState> = {
   description: 'description',
   badge: 'badge',
   erpItemId: 'erpItemId',
+  erpPlaceholder: 'erpPlaceholder',
   category: 'category',
 };
 
@@ -554,7 +584,54 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ isOpen, onCl
                     Değiştir
                   </button>
                 </div>
+              ) : form.erpMissing ? (
+                <div className="border border-wood/40 bg-paper rounded-xs p-3 space-y-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-wood shrink-0 mt-0.5" aria-hidden="true" />
+                    <div className="space-y-1 text-neutral-700">
+                      <p className="font-semibold text-ink">Bu ürün ERP’de yok.</p>
+                      <p>
+                        Bu üründen gelen sipariş talepleri ERP’ye seçtiğiniz <strong>deneme ürünle</strong> aktarılır. ERP fişinde ürün adı
+                        {' '}<strong>{form.erpPlaceholder ? PLACEHOLDER_LABEL[form.erpPlaceholder] : 'DENEME …'}</strong> olarak görünür; gerçek ürün adı satır
+                        açıklamasına yazılır. Satış tutarı web fiyatından alınır, ancak ERP’deki kâr/zarar bu satır için doğru hesaplanmaz.
+                        Satışı ERP’de onaylamadan önce satırı gerçek ürünle değiştirin.
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="pf-erp" className="block text-xs font-medium text-ink mb-1">ERP’ye aktarılacak deneme ürün</label>
+                    <select
+                      id="pf-erp"
+                      value={form.erpPlaceholder}
+                      onChange={(e) => setForm((f) => ({ ...f, erpPlaceholder: e.target.value as ErpPlaceholder | '', erpPlaceholderAck: false }))}
+                      className={inputCls(!!shown('erpPlaceholder'))}
+                    >
+                      <option value="">Seçin</option>
+                      {ERP_PLACEHOLDERS.map((p) => (
+                        <option key={p} value={p}>{PLACEHOLDER_LABEL[p]}</option>
+                      ))}
+                    </select>
+                    {shown('erpPlaceholder') && <p className="mt-1 text-xs text-signal">{shown('erpPlaceholder')}</p>}
+                  </div>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.erpPlaceholderAck}
+                      disabled={!form.erpPlaceholder}
+                      onChange={(e) => set('erpPlaceholderAck', e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-wood"
+                    />
+                    <span className="text-neutral-700">Okudum; bu ürünün talepleri ERP’ye deneme ürünle aktarılsın.</span>
+                  </label>
+                  {shown('erpPlaceholderAck') && <p className="text-xs text-signal">{shown('erpPlaceholderAck')}</p>}
+                  {!editingProduct && (
+                    <button type="button" onClick={() => setForm((f) => ({ ...f, erpMissing: false, erpPlaceholder: '', erpPlaceholderAck: false }))} className="text-xs text-neutral-600 hover:text-ink underline cursor-pointer">
+                      ERP’deki karşılığını seç
+                    </button>
+                  )}
+                </div>
               ) : (
+                <>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-500" aria-hidden="true" />
                   <input
@@ -602,6 +679,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ isOpen, onCl
                     </ul>
                   )}
                 </div>
+                {/* ERP eşleşmesi kayıttan sonra değiştirilemez; "ERP'de yok" yalnız yeni üründe seçilir */}
+                {!editingProduct && (
+                  <button type="button" onClick={() => { setShowErpList(false); setForm((f) => ({ ...f, erpMissing: true })); }} className="mt-1.5 text-xs text-neutral-600 hover:text-ink underline cursor-pointer">
+                    Ürün ERP’de yok — deneme ürünle kaydet
+                  </button>
+                )}
+                </>
               )}
             </Field>
 

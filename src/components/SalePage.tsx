@@ -560,8 +560,8 @@ export const SalePage: React.FC<SalePageProps> = ({
 
                         {/* Material Specs */}
                         <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-neutral-500 mb-4">
-                          <span><strong>Malzeme:</strong> {product.material}</span>
-                          <span><strong>Boyutlar:</strong> {product.dimensions}</span>
+                          {product.material && <span><strong>Malzeme:</strong> {product.material}</span>}
+                          {product.dimensions && <span><strong>Boyutlar:</strong> {product.dimensions}</span>}
                         </div>
                       </div>
 

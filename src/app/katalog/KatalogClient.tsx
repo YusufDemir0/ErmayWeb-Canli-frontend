@@ -234,21 +234,25 @@ export default function KatalogClient({ initialProducts }: KatalogClientProps) {
                     {/* Specifications Box */}
                     <div className="bg-paper border border-line rounded-xs p-3 space-y-2 text-xs">
                       <div className="space-y-1.5 text-xs print:text-[10px]">
-                        <div className="flex items-start gap-2">
-                          <Ruler className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="text-xs uppercase font-bold text-neutral-500 block">Ölçüler</span>
-                            <span className="font-semibold text-neutral-800">{product.dimensions || 'G: 220cm | D: 95cm | Y: 75cm'}</span>
+                        {product.dimensions && (
+                          <div className="flex items-start gap-2">
+                            <Ruler className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
+                            <div>
+                              <span className="text-xs uppercase font-bold text-neutral-500 block">Ölçüler</span>
+                              <span className="font-semibold text-neutral-800">{product.dimensions}</span>
+                            </div>
                           </div>
-                        </div>
+                        )}
 
-                        <div className="flex items-start gap-2">
-                          <Layers className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="text-xs uppercase font-bold text-neutral-500 block">Malzeme</span>
-                            <span className="font-semibold text-neutral-800">{product.material}</span>
+                        {product.material && (
+                          <div className="flex items-start gap-2">
+                            <Layers className="h-3.5 w-3.5 text-wood flex-shrink-0 mt-0.5" />
+                            <div>
+                              <span className="text-xs uppercase font-bold text-neutral-500 block">Malzeme</span>
+                              <span className="font-semibold text-neutral-800">{product.material}</span>
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {product.setContents && (
                           <div className="flex items-start gap-2 pt-1 border-t border-line">

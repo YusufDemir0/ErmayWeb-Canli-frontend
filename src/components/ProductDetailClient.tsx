@@ -825,10 +825,13 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   const setPiecesSummaryText = product.setPieces && product.setPieces.length > 0 && selectedSetPieceTitles.length > 0
                     ? `\n• Seçili Takım Parçaları: ${selectedSetPieceTitles.join(', ')} (${selectedSetPieceTitles.length}/${product.setPieces.length} Parça)`
                     : '';
+                  // Ölçü/malzeme yalnız ürün kaydında varsa mesaja eklenir (uydurma varsayılan yok)
+                  const waDimensions = product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : '');
+                  const waSpecText = `${waDimensions ? `\n• Ölçüler: ${waDimensions}` : ''}${product.material ? `\n• Malzeme: ${product.material}` : ''}`;
                   return (
                     <a
                       hidden={!waNumber} href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
-                        `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}${setPiecesSummaryText}\n• Ölçüler: ${product.dimensions || (product.widthCm ? `${product.widthCm}x${product.depthCm}x${product.heightCm} cm` : 'Standart Seri')}\n• Malzeme: ${product.material || '1. Sınıf E1 Melamin & Metal İskelet'}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
+                        `Merhaba Ermay Mobilya, web sitenizden "${product.name}" modeli hakkında bilgi almak ve sipariş vermek istiyorum.\n• Seçili Renk: ${selectedSwatch.name}${setPiecesSummaryText}${waSpecText}\n• Fiyat: ${formatPrice(product.price)}\n• Ürün Linki: https://ermaymobilya.com/urun/${product.id}`
                       )}`}
                       target="_blank"
                       rel="noreferrer"
@@ -1014,12 +1017,14 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                   <h3 className="text-lg font-display font-bold text-ink tracking-tight">
                     {product.name}
                   </h3>
-                  <p>
-                    {product.description}
-                  </p>
+                  {product.description && (
+                    <p>
+                      {product.description}
+                    </p>
+                  )}
                   {product.material && (
                     <p>
-                      Bu ürün Modoko&apos;daki atölyemizde standart seri olarak üretilir. Malzeme: {product.material}.
+                      Malzeme: {product.material}.
                     </p>
                   )}
                 </div>
@@ -1065,20 +1070,20 @@ export default function ProductDetailClient({ id, initialProduct }: ProductDetai
                           product.setPieces.map((piece, idx) => (
                             <tr key={idx} className="hover:bg-neutral-50">
                               <td className="py-3 px-4 font-bold text-neutral-900">{piece.title}</td>
-                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[0] || '220 cm'}</td>
-                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[1] || '95 cm'}</td>
-                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[2] || '75 cm'}</td>
-                              <td className="py-3 px-4 text-neutral-600">{product.material || 'E1 Melamin & Metal İskelet'}</td>
+                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[0] || '—'}</td>
+                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[1] || '—'}</td>
+                              <td className="py-3 px-4 font-mono">{piece.dimensions?.split('x')[2] || '—'}</td>
+                              <td className="py-3 px-4 text-neutral-600">{product.material || '—'}</td>
                             </tr>
                           ))
                         ) : (
                           <tr className="hover:bg-neutral-50">
                             <td className="py-3 px-4 font-bold text-neutral-900">{product.name}</td>
-                            <td className="py-3 px-4 font-mono">{product.widthCm || product.dimensionSpec?.width || '220'} cm</td>
-                            <td className="py-3 px-4 font-mono">{product.depthCm || product.dimensionSpec?.depth || '95'} cm</td>
-                            <td className="py-3 px-4 font-mono">{product.heightCm || product.dimensionSpec?.height || '75'} cm</td>
+                            <td className="py-3 px-4 font-mono">{(product.widthCm || product.dimensionSpec?.width) ? `${product.widthCm || product.dimensionSpec?.width} cm` : '—'}</td>
+                            <td className="py-3 px-4 font-mono">{(product.depthCm || product.dimensionSpec?.depth) ? `${product.depthCm || product.dimensionSpec?.depth} cm` : '—'}</td>
+                            <td className="py-3 px-4 font-mono">{(product.heightCm || product.dimensionSpec?.height) ? `${product.heightCm || product.dimensionSpec?.height} cm` : '—'}</td>
                             <td className="py-3 px-4 text-neutral-600">
-                              <div>{product.material || '1. Sınıf E1 Melamin & Elektrostatik Metal İskelet'}</div>
+                              <div>{product.material || '—'}</div>
                               {product.drawerCount !== undefined && product.drawerCount > 0 && (
                                 <div className="text-xs text-neutral-500 font-mono mt-0.5">
                                   {product.drawerCount} Çekmeceli (Teleskopik Ray)

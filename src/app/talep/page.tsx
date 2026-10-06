@@ -436,6 +436,7 @@ export default function OrderRequestPage() {
                     </label>
                     <EmailInput
                       id="talep-email"
+                      maxLength={100}
                       name="email"
                       value={customerEmail}
                       onChange={(v) => {

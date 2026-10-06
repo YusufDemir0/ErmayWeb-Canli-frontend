@@ -159,10 +159,12 @@ export const ProductQuickView: React.FC = () => {
 
           {/* Key Specs */}
           <div className="bg-paper p-4 rounded-xs border border-line flex flex-col gap-2 mb-4 text-xs">
-            <div className="flex justify-between items-center py-1 border-b border-line">
-              <span className="font-semibold text-neutral-700">Malzeme:</span>
-              <span className="text-neutral-900 font-medium text-right">{product.material || '1. Sınıf Fırınlanmış Masif Ahşap'}</span>
-            </div>
+            {product.material && (
+              <div className="flex justify-between items-center py-1 border-b border-line">
+                <span className="font-semibold text-neutral-700">Malzeme:</span>
+                <span className="text-neutral-900 font-medium text-right">{product.material}</span>
+              </div>
+            )}
             {(product.widthCm || product.heightCm || product.depthCm) ? (
               <div className="flex justify-between items-center py-1 border-b border-line">
                 <span className="font-semibold text-neutral-700">Ölçüler (G × D × Y):</span>

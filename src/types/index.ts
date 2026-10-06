@@ -28,6 +28,10 @@ export interface ProductDimensionSpec {
   raw?: string;
 }
 
+/** ERP deneme ürünleri (ERP kodu DNM-<değer>); backend utils/erp.ts ile aynı liste */
+export const ERP_PLACEHOLDERS = ['MOBILYA', 'TAKIM', 'KOLTUK', 'MASA'] as const;
+export type ErpPlaceholder = (typeof ERP_PLACEHOLDERS)[number];
+
 export interface Product {
   id: string;
   slug?: string;
@@ -74,6 +78,9 @@ export interface Product {
   vatRate?: number;
   erpItemId?: string;
   erpItemCode?: string;
+  /** ERP'de karşılığı olmayan ürünün ERP'ye aktarıldığı deneme ürün (admin kabulüyle) */
+  erpPlaceholder?: ErpPlaceholder | null;
+  erpPlaceholderAckAt?: string | null;
   isPublished?: boolean;
   archivedAt?: string | null;
 }

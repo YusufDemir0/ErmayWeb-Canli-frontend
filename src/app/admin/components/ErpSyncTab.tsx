@@ -126,8 +126,8 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
         categoryId: item.webProduct?.categoryId || (categories[0]?.id || ''),
         name: item.webProduct?.name || item.erpName,
         description: item.webProduct?.description || '',
-        dimensions: item.webProduct?.dimensions || 'G: Standart | D: Standart | Y: Standart',
-        material: item.webProduct?.material || 'Lüks Ermay Mobilya Atölye Üretimi',
+        dimensions: item.webProduct?.dimensions || '',
+        material: item.webProduct?.material || '',
       });
 
       if (res.data?.success) {
@@ -152,11 +152,9 @@ export const ErpSyncTab: React.FC<ErpSyncTabProps> = ({
     setSelectedItem(item);
     setEditName(item.webProduct?.name || item.erpName);
     setEditCategoryId(item.webProduct?.categoryId || categories[0]?.id || '');
-    setEditDescription(
-      item.webProduct?.description || 'Lüks Modoko atölye zanaati ile özenle üretilmiş Ermay Mobilya tasarımı.'
-    );
-    setEditDimensions(item.webProduct?.dimensions || 'G: Standart | D: Standart | Y: Standart');
-    setEditMaterial(item.webProduct?.material || 'Lüks Ermay Mobilya Atölye Üretimi');
+    setEditDescription(item.webProduct?.description || '');
+    setEditDimensions(item.webProduct?.dimensions || '');
+    setEditMaterial(item.webProduct?.material || '');
     
     const existingImages = item.webProduct?.images?.length 
       ? item.webProduct.images 
